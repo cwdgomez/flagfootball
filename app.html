@@ -6,6 +6,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Flag Football Tracker</title>
+<meta name="theme-color" content="#CC0000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FF Tracker">
+<meta name="description" content="Youth flag football coaching app — live stats, rotations, MVP rankings, and season history.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -321,6 +328,130 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .toast-undo{border:none;border-radius:7px;padding:5px 11px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
 @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
 .pop{animation:pop .2s ease;}
+
+/* ══════════ ROSTER SCREEN ══════════ */
+#screen-roster{align-items:center;justify-content:flex-start;padding:20px 14px 80px;overflow-y:auto;}
+.roster-header{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.roster-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;color:var(--s);}
+.roster-header-btns{display:flex;gap:8px;}
+.roster-back{background:var(--dark3);border:1px solid var(--dark5);border-radius:9px;padding:7px 13px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--dim);cursor:pointer;letter-spacing:1px;}
+.roster-save-btn{border:none;border-radius:9px;padding:7px 16px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;text-transform:uppercase;}
+.roster-content{width:100%;max-width:560px;}
+.roster-sec{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin:14px 0 8px 2px;}
+.roster-player-row{background:var(--sur);border:1px solid var(--dark5);border-radius:12px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.rpr-num{flex:0 0 52px;}
+.rpr-num input{width:100%;background:var(--dark3);border:1px solid var(--dark5);border-radius:8px;padding:7px 8px;color:var(--s);font-family:'Bebas Neue',sans-serif;font-size:20px;text-align:center;outline:none;transition:border-color .2s;}
+.rpr-num input:focus{border-color:var(--s);}
+.rpr-name{flex:1;display:flex;flex-direction:column;gap:4px;}
+.rpr-name input{background:var(--dark3);border:1px solid var(--dark5);border-radius:8px;padding:8px 10px;color:var(--txt);font-family:'Barlow',sans-serif;font-size:15px;outline:none;transition:border-color .2s;width:100%;}
+.rpr-name input:focus{border-color:var(--s);}
+.rpr-name input.last-name{font-size:13px;color:var(--dimmer);}
+.rpr-del{background:none;border:none;color:var(--dimmer);font-size:18px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0;transition:color .15s;}
+.rpr-del:hover{color:var(--rose);}
+.rpr-drag{color:var(--dimmer);font-size:18px;cursor:grab;flex-shrink:0;padding:4px;line-height:1;user-select:none;}
+.roster-add-btn{width:100%;background:none;border:2px dashed var(--dark5);border-radius:12px;padding:13px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:var(--dimmer);cursor:pointer;text-transform:uppercase;transition:border-color .2s,color .2s;}
+.roster-add-btn:hover{border-color:var(--s);color:var(--s);}
+.roster-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.ract-btn{flex:1;min-width:100px;border-radius:10px;padding:10px 8px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid;}
+.ract-share{background:rgba(20,184,166,.12);border-color:rgba(20,184,166,.35);color:var(--teal);}
+.ract-reset{background:rgba(249,115,22,.08);border-color:rgba(249,115,22,.25);color:var(--orange);}
+.ract-import-roster{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.35);color:var(--blue);}
+.roster-entry-tip{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--dimmer);letter-spacing:1px;text-align:center;margin-top:4px;}
+
+/* roster open button on setup screen */
+.roster-open-btn{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--dark5);border-radius:10px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:var(--dimmer);cursor:pointer;text-transform:uppercase;margin-bottom:14px;transition:border-color .2s,color .2s;}
+.roster-open-btn:hover{border-color:var(--s);color:var(--s);}
+.roster-player-count{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--s);vertical-align:middle;margin-left:4px;}
+
+/* rotation alert */
+.rot-alert{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-80px);z-index:600;background:var(--odim);border:1px solid rgba(249,115,22,.5);border-radius:12px;padding:11px 20px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--orange);letter-spacing:1px;box-shadow:0 8px 30px rgba(0,0,0,.7);transition:transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap;}
+.rot-alert.show{transform:translateX(-50%) translateY(0);}
+
+/* share card modal */
+.share-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:700;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;}
+.share-overlay.show{opacity:1;pointer-events:all;}
+.share-card{background:linear-gradient(160deg,var(--p) 0%,var(--p2) 40%,#0a0a0a 100%);border-radius:20px;width:100%;max-width:360px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.9);}
+.sc-top{padding:20px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08);}
+.sc-game-badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:6px;}
+.sc-teams{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;line-height:1;color:#fff;}
+.sc-teams .our-score{color:var(--s);}
+.sc-teams .their-score{color:rgba(255,255,255,.5);}
+.sc-teams .vs-sep{color:rgba(255,255,255,.2);font-size:24px;margin:0 8px;}
+.sc-result{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;margin-top:4px;}
+.sc-result.win{color:var(--green);}
+.sc-result.loss{color:var(--rose);}
+.sc-result.tie{color:var(--dim);}
+.sc-podium{display:flex;gap:6px;padding:14px;justify-content:center;}
+.sc-pod-card{flex:1;background:rgba(0,0,0,.35);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid rgba(255,255,255,.06);}
+.sc-pod-medal{font-size:22px;line-height:1;}
+.sc-pod-name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:#fff;margin-top:3px;}
+.sc-pod-pts{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--s);font-weight:700;}
+.sc-stats-row{display:flex;border-top:1px solid rgba(255,255,255,.08);padding:12px;}
+.sc-stat{flex:1;text-align:center;}
+.sc-stat-num{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--s);line-height:1;}
+.sc-stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.35);text-transform:uppercase;margin-top:2px;}
+.sc-footer{background:rgba(0,0,0,.4);padding:10px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.2);text-transform:uppercase;}
+.share-actions{display:flex;gap:8px;padding:14px;padding-top:0;}
+.share-close{flex:1;background:var(--dark3);border:1px solid var(--dark5);border-radius:10px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--dim);cursor:pointer;text-transform:uppercase;}
+.share-copy{flex:2;border:none;border-radius:10px;padding:11px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;}
+
+/* ── PLAYER TREND SCREEN ── */
+#screen-trend{align-items:center;justify-content:flex-start;padding:20px 14px 80px;overflow-y:auto;}
+.trend-header{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.trend-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--s);}
+.trend-back{background:var(--dark3);border:1px solid var(--dark5);border-radius:9px;padding:7px 13px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--dim);cursor:pointer;}
+.trend-content{width:100%;max-width:560px;}
+.trend-player-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;}
+.trend-player-btn{background:var(--sur);border:1px solid var(--dark5);border-radius:12px;padding:12px;cursor:pointer;transition:border-color .2s;text-align:left;}
+.trend-player-btn:hover,.trend-player-btn.sel{border-color:var(--s);}
+.trend-player-btn.sel{background:rgba(255,215,0,.06);}
+.tpb-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--txt);}
+.tpb-num{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--dimmer);}
+.trend-chart-wrap{background:var(--sur);border:1px solid var(--dark5);border-radius:14px;padding:16px;margin-bottom:12px;}
+.trend-chart-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin-bottom:14px;}
+.trend-chart{position:relative;height:120px;display:flex;align-items:flex-end;gap:4px;}
+.tc-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;}
+.tc-bar-outer{flex:1;width:100%;display:flex;align-items:flex-end;position:relative;}
+.tc-bar{width:100%;border-radius:4px 4px 0 0;min-height:2px;transition:height .4s ease;}
+.tc-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:var(--dimmer);white-space:nowrap;}
+.tc-val{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--txt);position:absolute;top:-18px;left:50%;transform:translateX(-50%);}
+.trend-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;}
+.trend-stat-card{background:var(--sur);border:1px solid var(--dark5);border-radius:10px;padding:10px 6px;text-align:center;}
+.tsc-val{font-family:'Bebas Neue',sans-serif;font-size:24px;line-height:1;color:var(--s);}
+.tsc-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--dimmer);text-transform:uppercase;margin-top:2px;}
+.trend-game-list{display:flex;flex-direction:column;gap:6px;}
+.tgl-card{background:var(--sur);border:1px solid var(--dark5);border-radius:11px;padding:11px 13px;display:flex;align-items:center;justify-content:space-between;}
+.tgl-date{font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);}
+.tgl-opp{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--txt);}
+.tgl-pills{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;}
+.tgl-pill{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;}
+.tgl-pill.td{background:var(--gdim);color:var(--green);}
+.tgl-pill.fg{background:var(--bdim);color:var(--blue);}
+.tgl-pill.it{background:var(--pdim2);color:var(--purple);}
+.tgl-pill.sc{background:var(--sdim);color:var(--s);}
+.tgl-nodata{text-align:center;padding:24px;font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--dimmer);}
+
+/* ── QR CODE MODAL ── */
+.qr-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:700;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;}
+.qr-overlay.show{opacity:1;pointer-events:all;}
+.qr-box{background:var(--sur);border-radius:20px;padding:24px 20px;width:100%;max-width:320px;text-align:center;}
+.qr-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--s);margin-bottom:4px;}
+.qr-sub{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--dimmer);text-transform:uppercase;margin-bottom:18px;}
+#qr-canvas{border-radius:12px;display:block;margin:0 auto;}
+.qr-url{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--dim);margin-top:10px;word-break:break-all;}
+.qr-close{width:100%;margin-top:14px;border:1px solid var(--dark5);border-radius:10px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--dim);background:var(--dark3);cursor:pointer;text-transform:uppercase;}
+
+/* ── INSTALL BANNER ── */
+.install-banner{position:fixed;bottom:0;left:0;right:0;z-index:800;background:linear-gradient(90deg,var(--p),var(--p2));padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;transform:translateY(100%);transition:transform .4s cubic-bezier(.34,1.56,.64,1);box-shadow:0 -4px 24px rgba(0,0,0,.6);}
+.install-banner.show{transform:translateY(0);}
+.install-banner-txt{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--s);flex:1;}
+.install-banner-sub{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:rgba(255,255,255,.5);letter-spacing:1px;display:block;}
+.install-btn-yes{background:var(--s);color:#111;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;padding:9px 18px;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;}
+.install-btn-no{background:none;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer;padding:4px;}
+
+/* ── VIBRATION FEEDBACK FLASH ── */
+@keyframes tapFlash{0%{opacity:.35}100%{opacity:0}}
+.tap-flash{position:fixed;inset:0;background:rgba(255,255,255,.08);pointer-events:none;z-index:999;animation:tapFlash .15s ease-out forwards;}
 </style>
 </head>
 <body>
@@ -408,7 +539,10 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
       </select>
     </div>
 
-    <div class="setup-section-lbl">⚡ Starting Quarterback</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;margin-top:16px;">
+      <div class="setup-section-lbl" style="margin:0">⚡ Starting Quarterback</div>
+      <button type="button" class="roster-open-btn" style="width:auto;margin:0;padding:6px 14px;font-size:12px" onclick="openRoster()">✏️ Edit Roster</button>
+    </div>
     <div class="qb-select-list" id="qb-list"></div>
 
     <div class="setup-section-lbl">🚫 Mark Absent Players</div>
@@ -485,12 +619,98 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
     <div id="sl-games"></div>
     <div class="season-sec">Data</div>
     <div class="season-actions">
+      <button type="button" class="sact-btn" style="background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.35);color:var(--purple)" onclick="openQR()">📱 QR Code</button>
+      <button type="button" class="sact-btn" style="background:rgba(20,184,166,.12);border-color:rgba(20,184,166,.35);color:var(--teal)" onclick="openTrend()">📈 Trends</button>
       <button type="button" class="sact-btn sact-export" onclick="exportSeason()">⬇ Export</button>
       <button type="button" class="sact-btn sact-import" onclick="document.getElementById('import-file').click()">⬆ Import</button>
       <button type="button" class="sact-btn sact-clear" onclick="clearSeason()">🗑 Clear All</button>
     </div>
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="importSeason(event)">
   </div>
+</div>
+
+<!-- ROSTER SCREEN -->
+<div id="screen-roster" class="screen">
+  <div class="roster-header">
+    <div class="roster-title">👥 Roster Manager</div>
+    <div class="roster-header-btns">
+      <button type="button" class="roster-back" onclick="closeRoster()">← Back</button>
+      <button type="button" class="roster-save-btn" id="roster-save-btn" onclick="saveRoster()">💾 Save Roster</button>
+    </div>
+  </div>
+  <div class="roster-content">
+    <div class="roster-sec">Players <span id="roster-count" class="roster-player-count">0</span></div>
+    <div id="roster-player-list"></div>
+    <button type="button" class="roster-add-btn" onclick="addRosterPlayer()">+ Add Player</button>
+    <div class="roster-entry-tip">Tap any name or number to edit • Changes save automatically</div>
+    <div class="roster-sec" style="margin-top:18px">Actions</div>
+    <div class="roster-actions">
+      <button type="button" class="ract-btn ract-share" onclick="shareRosterURL()">🔗 Share Roster URL</button>
+      <button type="button" class="ract-btn ract-reset" onclick="resetToDefault()">↩ Reset to Default</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE CARD MODAL -->
+<div class="share-overlay" id="share-overlay">
+  <div>
+    <div class="share-card" id="share-card">
+      <div class="sc-top">
+        <div class="sc-game-badge" id="sc-game-badge">vs. Opponent · Game Day</div>
+        <div class="sc-teams">
+          <span class="our-score" id="sc-our-score">0</span>
+          <span class="vs-sep">–</span>
+          <span class="their-score" id="sc-their-score">0</span>
+        </div>
+        <div class="sc-result" id="sc-result-txt">FINAL</div>
+      </div>
+      <div class="sc-podium" id="sc-podium"></div>
+      <div class="sc-stats-row" id="sc-stats-row"></div>
+      <div class="sc-footer">Flag Football Tracker · cgmax</div>
+    </div>
+    <div class="share-actions">
+      <button type="button" class="share-close" onclick="closeShareCard()">Close</button>
+      <button type="button" class="share-copy" id="share-copy-btn" onclick="copyShareText()" style="background:linear-gradient(135deg,var(--p),var(--p2));color:var(--s)">📋 Copy Recap</button>
+    </div>
+  </div>
+</div>
+
+<!-- ROTATION ALERT -->
+<div class="rot-alert" id="rot-alert"></div>
+
+
+<!-- PLAYER TREND SCREEN -->
+<div id="screen-trend" class="screen">
+  <div class="trend-header">
+    <div class="trend-title">📈 Player Trends</div>
+    <button type="button" class="trend-back" onclick="closeTrend()">← Back</button>
+  </div>
+  <div class="trend-content">
+    <div class="season-sec">Select Player</div>
+    <div class="trend-player-grid" id="trend-player-grid"></div>
+    <div id="trend-detail"></div>
+  </div>
+</div>
+
+<!-- QR CODE MODAL -->
+<div class="qr-overlay" id="qr-overlay">
+  <div class="qr-box">
+    <div class="qr-title">📱 Share App</div>
+    <div class="qr-sub">Scan to open on any device</div>
+    <canvas id="qr-canvas" width="220" height="220"></canvas>
+    <div class="qr-url" id="qr-url-text"></div>
+    <button type="button" class="qr-close" onclick="closeQR()">Close</button>
+  </div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div class="install-banner" id="install-banner">
+  <div>
+    <div class="install-banner-txt">⚡ Add to Home Screen</div>
+    <span class="install-banner-sub">Install as app for offline use</span>
+  </div>
+  <button type="button" class="install-btn-yes" id="install-btn-yes">Install</button>
+  <button type="button" class="install-btn-no" onclick="dismissInstall()">✕</button>
 </div>
 
 <!-- HALFTIME MODAL -->
@@ -545,26 +765,50 @@ var PALETTES={
 };
 var TC={primary:'#CC0000',secondary:'#FFD700'};
 
-/* ── PLAYERS ── */
-var PLAYER_DATA={
-  'Jaxon Barto':   {num:13},
-  'Braden Adams':  {num:9},
-  'Cade Allison':  {num:84},
-  'Caelb Sharpe':  {num:1},
-  'Grayson Gomez': {num:85},
-  'Greyson Polk':  {num:18},
-  'Jax Jones':     {num:12},
-  'Milo Velasquez':{num:2},
-  'Nico Leiterman':{num:21},
-  'Phoenix Oliva': {num:88},
-  'Reed Johnson':  {num:99}
-};
-var QB_DEFAULT='Jaxon Barto';
-var ALL_PLAYERS=(function(){
-  var nonQB=Object.keys(PLAYER_DATA).filter(function(n){return n!==QB_DEFAULT;});
-  nonQB.sort(function(a,b){return a.split(' ')[1].localeCompare(b.split(' ')[1]);});
-  return [QB_DEFAULT].concat(nonQB);
-})();
+/* ── PLAYERS — dynamic, editable, localStorage-backed ── */
+var DEFAULT_ROSTER=[
+  {first:'Jaxon', last:'Barto',     num:13},
+  {first:'Braden',last:'Adams',     num:9},
+  {first:'Cade',  last:'Allison',   num:84},
+  {first:'Caelb', last:'Sharpe',    num:1},
+  {first:'Grayson',last:'Gomez',    num:85},
+  {first:'Greyson',last:'Polk',     num:18},
+  {first:'Jax',   last:'Jones',     num:12},
+  {first:'Milo',  last:'Velasquez', num:2},
+  {first:'Nico',  last:'Leiterman', num:21},
+  {first:'Phoenix',last:'Oliva',    num:88},
+  {first:'Reed',  last:'Johnson',   num:99}
+];
+var LS_ROSTER='ff_roster_v1';
+
+function loadRosterData(){
+  try{
+    var params=new URLSearchParams(window.location.search);
+    var encoded=params.get('roster');
+    if(encoded){var decoded=JSON.parse(atob(encoded));if(Array.isArray(decoded)&&decoded.length>0)return decoded;}
+  }catch(e){}
+  try{var saved=JSON.parse(localStorage.getItem(LS_ROSTER));if(Array.isArray(saved)&&saved.length>0)return saved;}catch(e){}
+  return DEFAULT_ROSTER.map(function(p){return {first:p.first,last:p.last,num:p.num};});
+}
+function saveRosterData(roster){try{localStorage.setItem(LS_ROSTER,JSON.stringify(roster));}catch(e){}}
+
+var LIVE_ROSTER=[];
+var PLAYER_DATA={};
+var QB_DEFAULT='';
+var ALL_PLAYERS=[];
+
+function rebuildFromRoster(){
+  PLAYER_DATA={};
+  LIVE_ROSTER.forEach(function(p){
+    var fullName=((p.first||'')+' '+(p.last||'')).trim();
+    if(fullName) PLAYER_DATA[fullName]={num:p.num||0};
+  });
+  var names=Object.keys(PLAYER_DATA);
+  if(!names.length) names=['Player 1'];
+  if(!QB_DEFAULT||!PLAYER_DATA[QB_DEFAULT]) QB_DEFAULT=names[0];
+  if(!G.qb||!PLAYER_DATA[G.qb]) G.qb=QB_DEFAULT;
+  ALL_PLAYERS=[G.qb].concat(names.filter(function(n){return n!==G.qb;}));
+}
 
 function jerseyNum(name){return PLAYER_DATA[name]?PLAYER_DATA[name].num:'';}
 function dispName(full){
@@ -578,7 +822,7 @@ function esc(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
 /* ── GAME STATE ── */
 var G={
   team:'',coach:'',opp:'Opponent',date:'',quarters:2,
-  qb:QB_DEFAULT,cq:1,
+  qb:'',cq:1,
   scores:{us:[],them:[]},
   stats:{},rots:{},notes:{},
   absent:[],
@@ -594,6 +838,7 @@ function blankRot(){return{onField:null,offSnaps:0,defSnaps:0,history:[]};}
 function isAbsent(name){return G.absent.indexOf(name)>=0;}
 
 function initState(){
+  rebuildFromRoster();
   G.stats={};G.rots={};
   G.scores.us=[];G.scores.them=[];
   for(var q=0;q<G.quarters;q++){G.scores.us.push(0);G.scores.them.push(0);}
@@ -719,6 +964,8 @@ function toggleAbsent(name){
 
 /* ── INIT ── */
 window.onload=function(){
+  LIVE_ROSTER=loadRosterData();
+  rebuildFromRoster();
   buildSwatches('primary');
   buildSwatches('secondary');
   buildQBList();
@@ -727,6 +974,7 @@ window.onload=function(){
   var d=document.getElementById('su-date');
   if(d) d.value=new Date().toISOString().split('T')[0];
   loadNotes();
+  updateRosterCountBadge();
 };
 
 /* ── START GAME ── */
@@ -962,6 +1210,7 @@ function rotToggle(name,side){
   }
   renderRots();
   if(G.tab==='summary')renderSummary();
+  setTimeout(checkRotationAlerts,300);
 }
 function toggleR(name){G.expR=G.expR===name?null:name;renderRots();}
 
@@ -1117,6 +1366,7 @@ function renderSummary(){
       +'<span style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;color:var(--blue)">■ DEFENSE</span>'
     +'</div>'
     +'<div class="pt-section">'+ptRows+'</div>'
+    +'<button type="button" style="width:100%;background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.35);border-radius:14px;padding:12px;font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;color:var(--teal);cursor:pointer;margin-bottom:6px" onclick="openShareCard()">📤 Share Game Recap</button>'
     +'<button type="button" class="end-game-btn" style="'+egStyle+'" onclick="endAndSave()">💾 End Game &amp; Save to Season</button>'
     +'<button type="button" class="reset-btn" onclick="doReset()">⚠ New Game (don\'t save)</button>';
 }
@@ -1328,6 +1578,432 @@ function importSeason(event){
   reader.readAsText(file);
   event.target.value='';
 }
+
+/* ══ ROSTER MANAGER ══ */
+function openRoster(){
+  var fromMain=document.getElementById('screen-main').classList.contains('active');
+  ['screen-main','screen-setup','screen-season'].forEach(function(id){document.getElementById(id).classList.remove('active');});
+  document.getElementById('screen-roster').classList.add('active');
+  document.getElementById('screen-roster').dataset.from=fromMain?'main':'setup';
+  renderRosterScreen();
+}
+function closeRoster(){
+  var from=document.getElementById('screen-roster').dataset.from;
+  document.getElementById('screen-roster').classList.remove('active');
+  document.getElementById(from==='main'?'screen-main':'screen-setup').classList.add('active');
+}
+function updateRosterCountBadge(){var el=document.getElementById('roster-count');if(el)el.textContent=LIVE_ROSTER.length;}
+function renderRosterScreen(){
+  var s=TC.secondary,p=TC.primary;
+  var btn=document.getElementById('roster-save-btn');
+  if(btn){btn.style.background=p;btn.style.color=s;}
+  updateRosterCountBadge();
+  var list=document.getElementById('roster-player-list');if(!list)return;
+  list.innerHTML='';
+  LIVE_ROSTER.forEach(function(player,idx){
+    var row=document.createElement('div');
+    row.className='roster-player-row';
+    var numInput='<div class="rpr-num"><input type="number" min="0" max="99" value="'+(player.num||0)+'" placeholder="#" oninput=\'updateRosterField('+idx+',&quot;num&quot;,this.value)\"></div>';
+    var firstInput='<input type="text" value="'+escHtml(player.first||'')+'" placeholder="First name" oninput=\'updateRosterField('+idx+',&quot;first&quot;,this.value)\'>';
+    var lastInput='<input type="text" value="'+escHtml(player.last||'')+'" placeholder="Last name" class="last-name" oninput=\'updateRosterField('+idx+',&quot;last&quot;,this.value)\'>';
+    row.innerHTML='<div class="rpr-drag">⠿</div>'+numInput+'<div class="rpr-name">'+firstInput+lastInput+'</div>'+'<button type="button" class="rpr-del" onclick=\'removeRosterPlayer('+idx+')\'> ✕</button>';
+    list.appendChild(row);
+  });
+}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function updateRosterField(idx,field,val){
+  if(!LIVE_ROSTER[idx])return;
+  LIVE_ROSTER[idx][field]=field==='num'?(parseInt(val)||0):val;
+}
+function addRosterPlayer(){
+  LIVE_ROSTER.push({first:'Player',last:''+(LIVE_ROSTER.length+1),num:0});
+  renderRosterScreen();
+}
+function removeRosterPlayer(idx){
+  if(LIVE_ROSTER.length<=2){showToast('Need at least 2 players');return;}
+  if(!confirm('Remove '+((LIVE_ROSTER[idx].first||'')+' '+(LIVE_ROSTER[idx].last||'')).trim()+'?'))return;
+  LIVE_ROSTER.splice(idx,1);
+  renderRosterScreen();
+}
+function saveRoster(){
+  var hasBlank=LIVE_ROSTER.some(function(p){return !(p.first||'').trim();});
+  if(hasBlank){showToast('Fill in all first names');return;}
+  saveRosterData(LIVE_ROSTER);
+  rebuildFromRoster();
+  buildQBList();buildAbsentList();
+  updateRosterCountBadge();
+  showToast('Roster saved — '+LIVE_ROSTER.length+' players');
+  setTimeout(function(){closeRoster();},700);
+}
+function resetToDefault(){
+  if(!confirm('Reset to default 11-player roster?'))return;
+  LIVE_ROSTER=DEFAULT_ROSTER.map(function(p){return {first:p.first,last:p.last,num:p.num};});
+  saveRosterData(LIVE_ROSTER);
+  renderRosterScreen();
+  showToast('Reset to default roster');
+}
+function shareRosterURL(){
+  try{
+    var encoded=btoa(JSON.stringify(LIVE_ROSTER));
+    var base=window.location.href.split('?')[0];
+    var url=base+'?roster='+encoded;
+    if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){showToast('Roster URL copied!');});}
+    else{prompt('Share this URL:',url);}
+  }catch(e){showToast('Could not generate URL');}
+}
+
+/* ══ ROTATION ALERTS ══ */
+var rotAlertTimer=null;
+function checkRotationAlerts(){
+  var present=ALL_PLAYERS.filter(function(n){return !isAbsent(n)&&n!==G.qb;});
+  var totalTeamSnaps=0;
+  present.forEach(function(n){var r=G.rots[n][G.cq];totalTeamSnaps+=r.history.length+(r.onField?1:0);});
+  if(totalTeamSnaps<3)return;
+  var sitting=present.filter(function(name){var r=G.rots[name][G.cq];return (r.history.length+(r.onField?1:0))===0;});
+  if(sitting.length){
+    var names=sitting.slice(0,2).map(firstName).join(', ')+(sitting.length>2?' +'+(sitting.length-2):'');
+    showRotAlert('⚠️ Sitting out: '+names);
+  }
+}
+function showRotAlert(msg){
+  var el=document.getElementById('rot-alert');if(!el)return;
+  el.textContent=msg;el.classList.add('show');
+  if(rotAlertTimer)clearTimeout(rotAlertTimer);
+  rotAlertTimer=setTimeout(function(){el.classList.remove('show');},4500);
+}
+
+/* ══ SHARE CARD ══ */
+function openShareCard(){
+  var us=G.scores.us.reduce(function(a,b){return a+b;},0);
+  var them=G.scores.them.reduce(function(a,b){return a+b;},0);
+  var result=us>them?'win':us<them?'loss':'tie';
+  var resultTxt=us>them?'WIN':us<them?'LOSS':'TIE';
+  document.getElementById('sc-game-badge').textContent='vs. '+G.opp+(G.date?' · '+new Date(G.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'');
+  document.getElementById('sc-our-score').textContent=us;
+  document.getElementById('sc-their-score').textContent=them;
+  var rEl=document.getElementById('sc-result-txt');rEl.textContent=resultTxt;rEl.className='sc-result '+result;
+  var mvps=mvpCalc();
+  var medals3=[{icon:'🥇'},{icon:'🥈'},{icon:'🎖️'}];
+  document.getElementById('sc-podium').innerHTML=medals3.map(function(m,i){
+    var mv=mvps[i];if(!mv)return '';
+    return '<div class="sc-pod-card"><div class="sc-pod-medal">'+m.icon+'</div><div class="sc-pod-name">'+firstName(mv.name)+'</div><div class="sc-pod-pts">'+mv.score+' pts</div></div>';
+  }).join('');
+  var totalTDs=0,totalFlags=0,totalBlocks=0;
+  ALL_PLAYERS.filter(function(n){return !isAbsent(n);}).forEach(function(name){
+    for(var q=1;q<=G.quarters;q++){var st=G.stats[name][q];totalTDs+=st.tds+st.qbTDs;totalFlags+=st.flags;totalBlocks+=st.blocks||0;}
+  });
+  document.getElementById('sc-stats-row').innerHTML=
+    '<div class="sc-stat"><div class="sc-stat-num">'+totalTDs+'</div><div class="sc-stat-lbl">TDs</div></div>'
+    +'<div class="sc-stat"><div class="sc-stat-num">'+totalFlags+'</div><div class="sc-stat-lbl">Flags</div></div>'
+    +'<div class="sc-stat"><div class="sc-stat-num">'+totalBlocks+'</div><div class="sc-stat-lbl">Blocks</div></div>'
+    +'<div class="sc-stat"><div class="sc-stat-num">'+mvps.length+'</div><div class="sc-stat-lbl">Active</div></div>';
+  var card=document.getElementById('share-card');
+  if(card){card.style.setProperty('--p',TC.primary);card.style.setProperty('--p2',darken(TC.primary,50));}
+  var copyBtn=document.getElementById('share-copy-btn');
+  if(copyBtn){copyBtn.style.background='linear-gradient(135deg,'+TC.primary+','+darken(TC.primary,50)+')';copyBtn.style.color=TC.secondary;}
+  document.getElementById('share-overlay').classList.add('show');
+}
+function closeShareCard(){document.getElementById('share-overlay').classList.remove('show');}
+function copyShareText(){
+  var us=G.scores.us.reduce(function(a,b){return a+b;},0);
+  var them=G.scores.them.reduce(function(a,b){return a+b;},0);
+  var mvps=mvpCalc();
+  var text='🏈 '+G.team+' '+(us>them?'WIN':'LOSS')+'\n'
+    +G.team+' '+us+' – '+them+' '+G.opp
+    +(G.date?'\n📅 '+new Date(G.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'')+
+    (mvps[0]?'\n🥇 MVP: '+dispName(mvps[0].name)+' ('+mvps[0].score+' pts)':'')+
+    '\n\nTracked with Flag Football Tracker';
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){showToast('Recap copied!');});}
+  else{prompt('Copy:',text);}
+}
+
 </script>
 </body>
 </html>
+<script>
+/* ════════════════════════════════════════════════════
+   SERVICE WORKER REGISTRATION
+════════════════════════════════════════════════════ */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
+}
+
+/* ════════════════════════════════════════════════════
+   INSTALL PROMPT (Android Chrome / Edge)
+════════════════════════════════════════════════════ */
+var deferredInstall=null;
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();
+  deferredInstall=e;
+  // Only show if not already installed and not dismissed
+  if(!localStorage.getItem('ff_install_dismissed')){
+    setTimeout(function(){
+      document.getElementById('install-banner').classList.add('show');
+    },3000);
+  }
+});
+document.getElementById('install-btn-yes').addEventListener('click',function(){
+  if(deferredInstall){
+    deferredInstall.prompt();
+    deferredInstall.userChoice.then(function(){
+      deferredInstall=null;
+      document.getElementById('install-banner').classList.remove('show');
+    });
+  }
+});
+function dismissInstall(){
+  document.getElementById('install-banner').classList.remove('show');
+  localStorage.setItem('ff_install_dismissed','1');
+}
+
+/* ════════════════════════════════════════════════════
+   VIBRATION FEEDBACK
+════════════════════════════════════════════════════ */
+function vibe(pattern){
+  if(navigator.vibrate) navigator.vibrate(pattern||[12]);
+}
+function tapFlash(){
+  var el=document.createElement('div');
+  el.className='tap-flash';
+  document.body.appendChild(el);
+  setTimeout(function(){el.remove();},200);
+}
+
+/* ════════════════════════════════════════════════════
+   QR CODE GENERATOR (pure canvas — no library needed)
+   Simple QR: encodes URL as text using a micro QR approach
+   For a real URL we use a reliable CDN-free implementation
+════════════════════════════════════════════════════ */
+function openQR(){
+  var overlay=document.getElementById('qr-overlay');
+  var canvas=document.getElementById('qr-canvas');
+  var urlText=document.getElementById('qr-url-text');
+  var url=window.location.href.split('?')[0];
+  urlText.textContent=url;
+  // Draw QR using qrcodejs loaded from CDN
+  drawQRCanvas(canvas, url);
+  overlay.classList.add('show');
+}
+function closeQR(){document.getElementById('qr-overlay').classList.remove('show');}
+
+// Minimal QR encoder using the qrcodejs approach via dynamic script load
+function drawQRCanvas(canvas, text){
+  var ctx=canvas.getContext('2d');
+  var size=canvas.width;
+  ctx.fillStyle='#1a1a1a';
+  ctx.fillRect(0,0,size,size);
+  ctx.fillStyle='var(--dimmer)';
+  ctx.font='12px sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('Loading QR...', size/2, size/2);
+
+  // Load qrcodejs dynamically
+  if(window._qrLoaded){
+    _renderQR(canvas, text);
+    return;
+  }
+  var s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  s.onload=function(){
+    window._qrLoaded=true;
+    _renderQR(canvas, text);
+  };
+  s.onerror=function(){
+    // Fallback: show URL text in canvas
+    ctx.fillStyle='#1a1a1a';ctx.fillRect(0,0,size,size);
+    ctx.fillStyle='var(--s)';ctx.font='bold 13px sans-serif';ctx.textAlign='center';
+    var words=text.split('/');
+    words.forEach(function(w,i){ctx.fillText(w,size/2,size/2-20+(i*20));});
+  };
+  document.head.appendChild(s);
+}
+function _renderQR(canvas, text){
+  var tmp=document.createElement('div');
+  tmp.style.display='none';
+  document.body.appendChild(tmp);
+  try{
+    new QRCode(tmp,{text:text,width:200,height:200,colorDark:'#FFD700',colorLight:'#111111',correctLevel:QRCode.CorrectLevel.M});
+    setTimeout(function(){
+      var img=tmp.querySelector('img')||tmp.querySelector('canvas');
+      if(img){
+        var ctx=canvas.getContext('2d');
+        ctx.fillStyle='#111';ctx.fillRect(0,0,canvas.width,canvas.height);
+        if(img.tagName==='IMG'){
+          var i=new Image();i.onload=function(){ctx.drawImage(i,10,10,200,200);};i.src=img.src;
+        } else {
+          ctx.drawImage(img,10,10,200,200);
+        }
+      }
+      tmp.remove();
+    },200);
+  }catch(e){tmp.remove();}
+}
+
+/* ════════════════════════════════════════════════════
+   PLAYER TREND SCREEN
+════════════════════════════════════════════════════ */
+var trendSelectedPlayer=null;
+var trendFromScreen='season';
+
+function openTrend(){
+  var fromSeason=document.getElementById('screen-season').classList.contains('active');
+  trendFromScreen=fromSeason?'season':'main';
+  ['screen-season','screen-main','screen-setup','screen-roster'].forEach(function(id){
+    document.getElementById(id).classList.remove('active');
+  });
+  document.getElementById('screen-trend').classList.add('active');
+  trendSelectedPlayer=null;
+  renderTrendScreen();
+}
+function closeTrend(){
+  document.getElementById('screen-trend').classList.remove('active');
+  document.getElementById(trendFromScreen==='season'?'screen-season':'screen-main').classList.add('active');
+  if(trendFromScreen==='season') renderSeasonScreen();
+}
+
+function renderTrendScreen(){
+  var games=loadSeason();
+  var grid=document.getElementById('trend-player-grid');
+  if(!grid) return;
+  var s=TC.secondary;
+
+  // Build list of players who appear in any game
+  var allNames={};
+  ALL_PLAYERS.forEach(function(n){allNames[n]=true;});
+  games.forEach(function(g){Object.keys(g.playerStats||{}).forEach(function(n){allNames[n]=true;});});
+  var names=Object.keys(allNames);
+
+  grid.innerHTML=names.map(function(name){
+    var isSel=trendSelectedPlayer===name;
+    return '<div class="trend-player-btn'+(isSel?' sel':'')+'" onclick="selectTrendPlayer(\''+esc(name)+'\')">'
+      +'<div class="tpb-name">'+dispName(name)+'</div>'
+      +'<div class="tpb-num">#'+jerseyNum(name)+(name===G.qb?' · QB':'')+'</div>'
+      +'</div>';
+  }).join('');
+
+  if(trendSelectedPlayer) renderTrendDetail(trendSelectedPlayer);
+  else document.getElementById('trend-detail').innerHTML='<div class="tgl-nodata">👆 Select a player to see their season trends</div>';
+}
+
+function selectTrendPlayer(name){
+  trendSelectedPlayer=name;
+  renderTrendScreen();
+}
+
+function renderTrendDetail(name){
+  var games=loadSeason().filter(function(g){return g.playerStats&&g.playerStats[name];}).reverse(); // oldest first
+  var detail=document.getElementById('trend-detail');
+  if(!detail) return;
+  var s=TC.secondary, p=TC.primary;
+
+  if(!games.length){
+    detail.innerHTML='<div class="tgl-nodata">No season games saved yet for '+dispName(name)+'.</div>';
+    return;
+  }
+
+  // Season totals
+  var totTD=0,totFlags=0,totInts=0,totScore=0,totSnaps=0;
+  games.forEach(function(g){
+    var st=g.playerStats[name];
+    totTD+=(st.tds||0)+(st.qbTDs||0);
+    totFlags+=st.flags||0;
+    totInts+=st.ints||0;
+    totScore+=st.score||0;
+    totSnaps+=(st.snapO||0)+(st.snapD||0);
+  });
+
+  // Build bar chart data for TDs per game
+  var maxTD=Math.max.apply(null,[1].concat(games.map(function(g){
+    var st=g.playerStats[name];return (st.tds||0)+(st.qbTDs||0);
+  })));
+
+  var bars=games.map(function(g,i){
+    var st=g.playerStats[name];
+    var td=(st.tds||0)+(st.qbTDs||0);
+    var pct=Math.round(td/maxTD*100);
+    var dateShort=g.date?new Date(g.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'G'+(i+1);
+    return '<div class="tc-bar-wrap">'
+      +'<div class="tc-bar-outer">'
+        +'<div class="tc-bar" style="width:100%;height:'+Math.max(4,pct)+'%;background:linear-gradient(180deg,'+s+','+p+')"></div>'
+        +(td?'<div class="tc-val">'+td+'</div>':'')
+      +'</div>'
+      +'<div class="tc-label">'+dateShort+'</div>'
+      +'</div>';
+  }).join('');
+
+  // Flag pulls chart
+  var maxF=Math.max.apply(null,[1].concat(games.map(function(g){return g.playerStats[name].flags||0;})));
+  var fbars=games.map(function(g,i){
+    var f=g.playerStats[name].flags||0;
+    var pct=Math.round(f/maxF*100);
+    var dateShort=g.date?new Date(g.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'G'+(i+1);
+    return '<div class="tc-bar-wrap">'
+      +'<div class="tc-bar-outer">'
+        +'<div class="tc-bar" style="width:100%;height:'+Math.max(4,pct)+'%;background:linear-gradient(180deg,#3B82F6,#1d4ed8)"></div>'
+        +(f?'<div class="tc-val">'+f+'</div>':'')
+      +'</div>'
+      +'<div class="tc-label">'+dateShort+'</div>'
+      +'</div>';
+  }).join('');
+
+  // Per-game cards
+  var gameCards=games.slice().reverse().map(function(g){
+    var st=g.playerStats[name];
+    var td=(st.tds||0)+(st.qbTDs||0);
+    var fl=st.flags||0;
+    var it=st.ints||0;
+    var sc=st.score||0;
+    var dateStr=g.date?new Date(g.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';
+    var pills=(td?'<span class="tgl-pill td">'+td+'TD</span>':'')
+      +(fl?'<span class="tgl-pill fg">'+fl+'F</span>':'')
+      +(it?'<span class="tgl-pill it">'+it+'INT</span>':'')
+      +'<span class="tgl-pill sc">'+sc+'pts</span>';
+    return '<div class="tgl-card">'
+      +'<div><div class="tgl-opp">vs. '+g.opp+'</div><div class="tgl-date">'+dateStr+(g.us!==undefined?' · '+(g.us>g.them?'W':'L')+' '+g.us+'-'+g.them:'')+'</div></div>'
+      +'<div class="tgl-pills">'+pills+'</div>'
+      +'</div>';
+  }).join('');
+
+  detail.innerHTML=
+    '<div class="trend-stats-grid">'
+      +'<div class="trend-stat-card"><div class="tsc-val">'+totTD+'</div><div class="tsc-lbl">TDs</div></div>'
+      +'<div class="trend-stat-card"><div class="tsc-val">'+totFlags+'</div><div class="tsc-lbl">Flags</div></div>'
+      +'<div class="trend-stat-card"><div class="tsc-val">'+totInts+'</div><div class="tsc-lbl">INTs</div></div>'
+      +'<div class="trend-stat-card"><div class="tsc-val">'+totSnaps+'</div><div class="tsc-lbl">Snaps</div></div>'
+    +'</div>'
+    +'<div class="trend-chart-wrap">'
+      +'<div class="trend-chart-title">Touchdowns by Game</div>'
+      +'<div class="trend-chart">'+bars+'</div>'
+    +'</div>'
+    +'<div class="trend-chart-wrap">'
+      +'<div class="trend-chart-title">Flag Pulls by Game</div>'
+      +'<div class="trend-chart">'+fbars+'</div>'
+    +'</div>'
+    +'<div class="season-sec">Game Log — '+dispName(name)+'</div>'
+    +'<div class="trend-game-list">'+gameCards+'</div>';
+}
+
+/* ════════════════════════════════════════════════════
+   WIRE VIBRATION INTO KEY ACTIONS
+════════════════════════════════════════════════════ */
+// Patch logStat to vibrate
+var _origLogStat=logStat;
+logStat=function(name,key,ev){
+  vibe([8]);
+  _origLogStat(name,key,ev);
+};
+// Patch addScore to vibrate stronger on TD
+var _origAddScore=addScore;
+addScore=function(team,pts){
+  vibe(pts===6?[30,10,30]:[15]);
+  _origAddScore(team,pts);
+};
+// Patch rotToggle to vibrate
+var _origRotToggle=rotToggle;
+rotToggle=function(name,side){
+  vibe([10]);
+  _origRotToggle(name,side);
+};
+</script>
