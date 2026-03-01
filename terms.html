@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#AA0000">
+<meta name="description" content="Terms of Service for CGMax FFTP — Flag Football Tracker Pro by ITCC LLC">
+<title>Terms of Service · CGMax FFTP</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#FFD700;--gold2:#CC9900;--gold3:#FFF5B0;--red:#AA0000;--red2:#770000;--dark:#060606;--dark2:#0D0D0D;--dark3:#161616;--dark5:#2a2a2a;--txt:#F5F0E8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{background:var(--dark);color:var(--txt);font-family:'Barlow',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.bg-grad{position:absolute;inset:0;background:radial-gradient(ellipse 130% 55% at 50% -5%,rgba(170,0,0,.32) 0%,transparent 55%),radial-gradient(ellipse 55% 35% at 90% 95%,rgba(255,215,0,.05) 0%,transparent 50%),var(--dark);}
+.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,215,0,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,215,0,.03) 1px,transparent 1px);background-size:52px 52px;}
+nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:12px 24px;padding-top:max(12px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(6,6,6,.96);border-bottom:1px solid rgba(255,215,0,.08);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:4px;color:var(--gold);text-decoration:none;}
+.nav-logo span{color:rgba(255,255,255,.25);}
+.nav-back{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;color:rgba(255,215,0,.5);text-decoration:none;text-transform:uppercase;padding:7px 16px;border-radius:7px;border:1px solid rgba(255,215,0,.15);transition:all .2s;}
+.nav-back:hover{color:var(--gold);border-color:rgba(255,215,0,.35);background:rgba(255,215,0,.05);}
+@media(max-width:480px){nav{padding:10px 16px;}.nav-back{font-size:11px;padding:6px 12px;}}
+.page{position:relative;z-index:10;max-width:820px;margin:0 auto;padding:120px 28px 80px;padding-top:max(120px,calc(env(safe-area-inset-top) + 100px));padding-bottom:max(80px,calc(env(safe-area-inset-bottom) + 60px));}
+@media(max-width:480px){.page{padding:100px 18px 60px;}}
+.doc-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:6px;color:rgba(255,215,0,.45);text-transform:uppercase;margin-bottom:16px;}
+.doc-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(46px,10vw,88px);letter-spacing:3px;line-height:.92;margin-bottom:8px;}
+.doc-title .acc{background:linear-gradient(130deg,var(--gold),var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.doc-rule{width:80px;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);border-radius:2px;margin:20px 0 32px;}
+.doc-meta{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:48px;padding:16px 20px;background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.1);border-radius:12px;}
+.doc-meta-item{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.45);}
+.doc-meta-item strong{color:rgba(255,215,0,.75);}
+.doc-section{margin-bottom:48px;}
+.doc-section-num{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;color:rgba(255,215,0,.38);text-transform:uppercase;margin-bottom:6px;}
+.doc-section h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,4vw,30px);letter-spacing:2px;color:var(--gold);margin-bottom:16px;line-height:1.1;}
+.doc-section p{font-family:'Barlow',sans-serif;font-size:15px;line-height:1.78;color:rgba(255,255,255,.62);margin-bottom:14px;}
+.doc-section p:last-child{margin-bottom:0;}
+.doc-section ul{list-style:none;margin:12px 0 14px;display:flex;flex-direction:column;gap:8px;}
+.doc-section ul li{font-family:'Barlow',sans-serif;font-size:15px;line-height:1.65;color:rgba(255,255,255,.58);padding-left:20px;position:relative;}
+.doc-section ul li::before{content:'▸';position:absolute;left:0;color:var(--gold);opacity:.6;font-size:10px;top:5px;}
+.doc-section strong{color:rgba(255,255,255,.88);}
+.doc-highlight{background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.14);border-left:3px solid var(--gold2);border-radius:0 10px 10px 0;padding:16px 20px;margin:16px 0;}
+.doc-highlight p{color:rgba(255,255,255,.7);margin-bottom:0;font-size:14px;}
+.doc-contact{background:linear-gradient(135deg,rgba(170,0,0,.18),rgba(100,0,0,.1));border:1px solid rgba(255,215,0,.18);border-radius:14px;padding:24px 28px;margin-top:12px;}
+.doc-contact-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--gold);margin-bottom:10px;}
+.doc-contact p{color:rgba(255,255,255,.6);font-size:14px;margin-bottom:6px;}
+.doc-contact a{color:var(--gold);text-decoration:none;font-weight:600;}
+.doc-contact a:hover{text-decoration:underline;}
+.doc-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.12),transparent);margin:0 0 48px;}
+footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);padding:22px 24px;padding-bottom:max(22px,calc(env(safe-area-inset-bottom)+14px));}
+.foot-inner{max-width:820px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.foot-logo{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:4px;color:rgba(255,215,0,.3);}
+.foot-links{display:flex;gap:16px;flex-wrap:wrap;}
+.foot-link{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.22);text-decoration:none;text-transform:uppercase;transition:color .2s;}
+.foot-link:hover{color:rgba(255,215,0,.6);}
+.foot-copy{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,.1);text-transform:uppercase;width:100%;margin-top:8px;}
+@media(max-width:480px){footer{padding:18px 16px;}.foot-inner{flex-direction:column;align-items:flex-start;gap:8px;}}
+</style>
+</head>
+<body>
+<div class="bg"><div class="bg-grad"></div><div class="bg-grid"></div></div>
+<nav>
+  <a href="./index.html" class="nav-logo">CGMAX <span>·</span> FFTP</a>
+  <a href="./index.html" class="nav-back">← Back to Home</a>
+</nav>
+<div class="page">
+
+  <div class="doc-eyebrow">CGMax FFTP · Legal Documents</div>
+  <div class="doc-title">Terms of<br><span class="acc">Service</span></div>
+  <div class="doc-rule"></div>
+
+  <div class="doc-meta">
+    <div class="doc-meta-item"><strong>Effective Date:</strong> January 1, 2025</div>
+    <div class="doc-meta-item"><strong>Last Updated:</strong> February 2025</div>
+    <div class="doc-meta-item"><strong>Operator:</strong> ITCC LLC</div>
+    <div class="doc-meta-item"><strong>Contact:</strong> cgomez@itcc.llc</div>
+  </div>
+
+  <!-- 1 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 01</div>
+    <h2>Agreement to These Terms</h2>
+    <p>These Terms of Service ("Terms") constitute a legally binding agreement between you ("User," "Coach," or "you") and <strong>ITCC LLC</strong> ("Company," "we," "our," or "us") governing your access to and use of <strong>CGMax FFTP — Flag Football Tracker Pro</strong> (the "App" or "Service").</p>
+    <p>By accessing the App — whether by entering an access code, using any feature, or installing the App on your device — you represent that you have read, understood, and agree to be bound by these Terms in full. If you do not agree to these Terms, you must immediately cease all use of the App.</p>
+    <div class="doc-highlight">
+      <p><strong>Important:</strong> The App is intended solely for use by adult coaches and authorized team staff. If you are using the App in connection with a youth sports program involving minors, you represent that you have obtained all required parental consents and comply with all applicable laws governing youth sports activities.</p>
+    </div>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 2 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 02</div>
+    <h2>Description of the Service</h2>
+    <p>CGMax FFTP — Flag Football Tracker Pro is a web-based Progressive Web Application (PWA) designed to assist youth flag football coaches with:</p>
+    <ul>
+      <li>Live game scoring and per-quarter tracking</li>
+      <li>Player statistics logging (touchdowns, flag pulls, interceptions, conversions, and more)</li>
+      <li>Smart rotation management and play-count tracking</li>
+      <li>Automated MVP scoring and end-of-game summaries</li>
+      <li>Season history, cumulative leaderboards, and game recaps</li>
+      <li>Voice-activated stat logging and lineup setting</li>
+      <li>Offline functionality via Service Worker caching</li>
+      <li>Roster management with privacy-preserving name formatting</li>
+    </ul>
+    <p>The App operates primarily via client-side local storage on your device. ITCC LLC does not store your coaching data, rosters, or game statistics on its servers.</p>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 3 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 03</div>
+    <h2>Access Codes and Authorized Use</h2>
+    <p>Access to CGMax FFTP requires a valid access code issued directly by ITCC LLC. By accepting and using an access code, you agree to the following:</p>
+    <ul>
+      <li><strong>Personal use only:</strong> Your access code is issued to you individually and may not be shared, resold, sublicensed, transferred, or distributed to any other individual or entity without prior written consent from ITCC LLC.</li>
+      <li><strong>Authorized coaches only:</strong> Access codes may only be used by the individual coach or authorized team staff member to whom they were issued.</li>
+      <li><strong>No reverse engineering:</strong> You may not attempt to reverse-engineer, extract, or reproduce the access code validation mechanism embedded in the App.</li>
+      <li><strong>Revocation:</strong> ITCC LLC reserves the right to revoke any access code at any time, with or without notice, for any violation of these Terms or for any other reason at its sole discretion.</li>
+    </ul>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 4 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 04</div>
+    <h2>Intellectual Property Rights</h2>
+    <p>The App, including but not limited to its source code, design, graphics, user interface, SVG logos, shield and brand elements, all text content, feature logic, and the "CGMax FFTP" and "Flag Football Tracker Pro" names and marks, are the exclusive intellectual property of <strong>ITCC LLC</strong> and are protected by applicable intellectual property laws.</p>
+    <ul>
+      <li>You may not copy, reproduce, distribute, modify, create derivative works of, publicly display, or exploit any portion of the App without prior written authorization from ITCC LLC.</li>
+      <li>You may not attempt to decompile, disassemble, or extract the source code of the App.</li>
+      <li>You may not remove, obscure, or alter any proprietary notices, branding, or copyright notices within the App.</li>
+      <li>The name "CGMax FFTP," "CGMax Flag Football Tracker Pro," and all associated logos and shield designs are trademarks of ITCC LLC. Unauthorized use of these marks is strictly prohibited.</li>
+    </ul>
+    <p>Nothing in these Terms grants you any ownership right or license in ITCC LLC's intellectual property beyond the limited right to use the App as expressly set forth herein.</p>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 5 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 05</div>
+    <h2>Acceptable Use Policy</h2>
+    <p>You agree to use the App only for lawful purposes and in accordance with these Terms. You specifically agree <strong>not</strong> to:</p>
+    <ul>
+      <li>Use the App in any manner that violates any applicable local, state, national, or international law or regulation</li>
+      <li>Input, store, or process any personally identifiable information of minors beyond first name and last initial (e.g., "Jaxon B.") as designed by the App's privacy-preserving interface</li>
+      <li>Attempt to gain unauthorized access to any part of the App or circumvent its access control mechanisms</li>
+      <li>Use the App for any commercial purpose other than your own authorized coaching activities without prior written consent</li>
+      <li>Interfere with or disrupt the integrity or performance of the App, its hosting infrastructure, or any related services</li>
+      <li>Use automated means, scripts, or bots to access or interact with the App</li>
+      <li>Exploit the App or its underlying technology for any purpose not expressly authorized by these Terms</li>
+    </ul>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 6 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 06</div>
+    <h2>Disclaimers and Limitation of Liability</h2>
+    <p>THE APP IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
+    <p>ITCC LLC does not warrant that:</p>
+    <ul>
+      <li>The App will be available at all times or function without interruption or error</li>
+      <li>Any statistics, recommendations, rotation suggestions, or MVP calculations will be accurate, complete, or suitable for any particular coaching decision</li>
+      <li>The App will be compatible with all devices, browsers, or operating system versions</li>
+      <li>Data stored in local browser storage will be permanently retained (browsers may clear localStorage under low-storage conditions)</li>
+    </ul>
+    <p>TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT WILL ITCC LLC, ITS OFFICERS, DIRECTORS, EMPLOYEES, OR AGENTS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING OUT OF OR RELATED TO YOUR USE OF OR INABILITY TO USE THE APP, REGARDLESS OF THE THEORY OF LIABILITY AND EVEN IF ITCC LLC HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+    <p>IN NO EVENT WILL ITCC LLC'S TOTAL CUMULATIVE LIABILITY TO YOU FOR ALL CLAIMS ARISING FROM OR RELATED TO THESE TERMS OR THE APP EXCEED THE AMOUNT YOU PAID TO ITCC LLC, IF ANY, IN THE TWELVE MONTHS PRECEDING THE CLAIM.</p>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 7 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 07</div>
+    <h2>Indemnification</h2>
+    <p>You agree to defend, indemnify, and hold harmless ITCC LLC and its respective officers, directors, employees, contractors, and agents from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable attorneys' fees) arising out of or relating to:</p>
+    <ul>
+      <li>Your violation of these Terms</li>
+      <li>Your use of the App in a manner not authorized by these Terms</li>
+      <li>Any data or information you input into the App that violates any applicable law, including privacy laws applicable to minors</li>
+      <li>Any claim by a third party arising from your coaching activities facilitated by the App</li>
+    </ul>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 8 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 08</div>
+    <h2>Device Security and Responsibility</h2>
+    <p>Because CGMax FFTP stores data locally on your device, you are responsible for maintaining the security and integrity of your device and its stored data. ITCC LLC strongly recommends:</p>
+    <ul>
+      <li>Using a secure device passcode or biometric authentication</li>
+      <li>Not jailbreaking or rooting your device, as doing so may compromise the security of locally stored App data and may cause the App to malfunction</li>
+      <li>Keeping your device operating system and browser up to date</li>
+      <li>Not sharing your device with unauthorized individuals who could access your coaching data</li>
+    </ul>
+    <p>ITCC LLC is not responsible for any loss, corruption, or unauthorized access to data resulting from your failure to maintain adequate device security.</p>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 9 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 09</div>
+    <h2>Modifications to the App and Terms</h2>
+    <p>ITCC LLC reserves the right, at its sole discretion, to modify, update, suspend, or discontinue the App or any part thereof at any time, with or without notice. This includes the right to:</p>
+    <ul>
+      <li>Add, remove, or change features</li>
+      <li>Modify access code requirements or distribution policies</li>
+      <li>Change pricing or introduce new service tiers</li>
+      <li>Discontinue the App entirely</li>
+    </ul>
+    <p>We may also update these Terms at any time. We will indicate the updated effective date at the top of this page. Your continued use of the App after any modification to these Terms constitutes your acceptance of the revised Terms. If you do not agree with any modification, your sole remedy is to discontinue use of the App.</p>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 10 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 10</div>
+    <h2>Governing Law and Dispute Resolution</h2>
+    <p>These Terms and any dispute arising out of or related to your use of the App shall be governed by and construed in accordance with the laws of the <strong>State of California</strong>, without regard to its conflict-of-law provisions.</p>
+    <p>Any dispute, claim, or controversy arising out of or relating to these Terms or the App that is not resolved informally shall be submitted to binding arbitration administered by a mutually agreed-upon arbitration provider in accordance with its commercial arbitration rules. The arbitration shall be conducted in California. Judgment on the award rendered by the arbitrator(s) may be entered in any court having jurisdiction thereof.</p>
+    <p>You agree that any claims against ITCC LLC must be brought in your individual capacity and not as a plaintiff or class member in any purported class, collective, or representative proceeding. You waive any right to a jury trial or to participate in a class action.</p>
+    <div class="doc-highlight">
+      <p>This is a preliminary Terms of Service. ITCC LLC intends to work with qualified legal counsel to finalize these Terms prior to any large-scale commercial distribution of the App.</p>
+    </div>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 11 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 11</div>
+    <h2>Severability and Entire Agreement</h2>
+    <p>If any provision of these Terms is found by a court of competent jurisdiction to be invalid, illegal, or unenforceable, the remaining provisions shall continue in full force and effect. The invalid or unenforceable provision shall be modified to the minimum extent necessary to make it enforceable, or if modification is not possible, it shall be severed from these Terms.</p>
+    <p>These Terms, together with the Privacy Policy, constitute the entire agreement between you and ITCC LLC with respect to the App and supersede all prior and contemporaneous understandings, agreements, representations, and warranties relating to the App.</p>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 12 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 12</div>
+    <h2>Contact Us</h2>
+    <div class="doc-contact">
+      <div class="doc-contact-title">ITCC LLC — Legal Inquiries</div>
+      <p>For questions about these Terms of Service, to report a violation, or to request an access code, contact us:</p>
+      <p style="margin-top:12px;"><strong>Email:</strong> <a href="mailto:cgomez@itcc.llc">cgomez@itcc.llc</a></p>
+      <p><strong>Company:</strong> ITCC LLC</p>
+      <p><strong>Product:</strong> CGMax FFTP — Flag Football Tracker Pro</p>
+      <p style="margin-top:12px;font-size:13px;color:rgba(255,255,255,.4);">We aim to respond to all legal inquiries within 5 business days. These Terms were prepared in good faith and will be reviewed by qualified legal counsel prior to large-scale commercial deployment.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="foot-inner">
+    <div class="foot-logo">CGMax FFTP · ITCC LLC</div>
+    <div class="foot-links">
+      <a href="./index.html" class="foot-link">Home</a>
+      <a href="./privacy.html" class="foot-link">Privacy Policy</a>
+      <a href="./terms.html" class="foot-link">Terms of Service</a>
+      <a href="./app.html" class="foot-link">⚡ Open App</a>
+    </div>
+    <div class="foot-copy">© 2025 ITCC LLC · All Rights Reserved · CGMax FFTP is a trademark of ITCC LLC</div>
+  </div>
+</footer>
+</body>
+</html>

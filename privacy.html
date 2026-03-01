@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#AA0000">
+<meta name="description" content="Privacy Policy for CGMax FFTP — Flag Football Tracker Pro by ITCC LLC">
+<title>Privacy Policy · CGMax FFTP</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#FFD700;--gold2:#CC9900;--gold3:#FFF5B0;
+  --red:#AA0000;--red2:#770000;--red3:#CC2200;
+  --dark:#060606;--dark2:#0D0D0D;--dark3:#161616;--dark4:#1f1f1f;--dark5:#2a2a2a;
+  --txt:#F5F0E8;--dim:#999;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{
+  background:var(--dark);color:var(--txt);
+  font-family:'Barlow',sans-serif;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── BACKGROUND ── */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.bg-grad{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 130% 55% at 50% -5%,rgba(170,0,0,.32) 0%,transparent 55%),
+    radial-gradient(ellipse 55% 35% at 90% 95%,rgba(255,215,0,.05) 0%,transparent 50%),
+    var(--dark);
+}
+.bg-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,215,0,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,215,0,.03) 1px,transparent 1px);
+  background-size:52px 52px;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  padding:12px 24px;padding-top:max(12px,env(safe-area-inset-top));
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:rgba(6,6,6,.96);
+  border-bottom:1px solid rgba(255,215,0,.08);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:4px;
+  color:var(--gold);text-shadow:0 0 18px rgba(255,215,0,.3);
+  text-decoration:none;
+}
+.nav-logo span{color:rgba(255,255,255,.25);}
+.nav-back{
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:2px;color:rgba(255,215,0,.5);text-decoration:none;
+  text-transform:uppercase;padding:7px 16px;border-radius:7px;
+  border:1px solid rgba(255,215,0,.15);transition:all .2s;
+}
+.nav-back:hover{color:var(--gold);border-color:rgba(255,215,0,.35);background:rgba(255,215,0,.05);}
+@media(max-width:480px){
+  nav{padding:10px 16px;}
+  .nav-back{font-size:11px;padding:6px 12px;}
+}
+
+/* ── PAGE WRAPPER ── */
+.page{
+  position:relative;z-index:10;
+  max-width:820px;margin:0 auto;
+  padding:120px 28px 80px;
+  padding-top:max(120px,calc(env(safe-area-inset-top) + 100px));
+  padding-bottom:max(80px,calc(env(safe-area-inset-bottom) + 60px));
+}
+@media(max-width:480px){.page{padding:100px 18px 60px;}}
+
+/* ── HERO BLOCK ── */
+.doc-eyebrow{
+  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:6px;color:rgba(255,215,0,.45);text-transform:uppercase;
+  margin-bottom:16px;
+}
+.doc-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(46px,10vw,88px);letter-spacing:3px;line-height:.92;
+  margin-bottom:8px;
+}
+.doc-title .acc{
+  background:linear-gradient(130deg,var(--gold),var(--gold3),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.doc-rule{width:80px;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);border-radius:2px;margin:20px 0 32px;}
+.doc-meta{
+  display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:48px;
+  padding:16px 20px;
+  background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.1);border-radius:12px;
+}
+.doc-meta-item{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.45);}
+.doc-meta-item strong{color:rgba(255,215,0,.75);}
+
+/* ── SECTION BLOCKS ── */
+.doc-section{margin-bottom:48px;}
+.doc-section-num{
+  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;
+  color:rgba(255,215,0,.38);text-transform:uppercase;margin-bottom:6px;
+}
+.doc-section h2{
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,4vw,30px);letter-spacing:2px;
+  color:var(--gold);margin-bottom:16px;line-height:1.1;
+}
+.doc-section p{
+  font-family:'Barlow',sans-serif;font-size:15px;line-height:1.78;
+  color:rgba(255,255,255,.62);margin-bottom:14px;
+}
+.doc-section p:last-child{margin-bottom:0;}
+.doc-section ul{
+  list-style:none;margin:12px 0 14px 0;display:flex;flex-direction:column;gap:8px;
+}
+.doc-section ul li{
+  font-family:'Barlow',sans-serif;font-size:15px;line-height:1.65;
+  color:rgba(255,255,255,.58);padding-left:20px;position:relative;
+}
+.doc-section ul li::before{
+  content:'▸';position:absolute;left:0;
+  color:var(--gold);opacity:.6;font-size:10px;top:5px;
+}
+.doc-section strong{color:rgba(255,255,255,.88);}
+
+/* Highlight box */
+.doc-highlight{
+  background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.14);
+  border-left:3px solid var(--gold2);border-radius:0 10px 10px 0;
+  padding:16px 20px;margin:16px 0;
+}
+.doc-highlight p{color:rgba(255,255,255,.7);margin-bottom:0;font-size:14px;}
+
+/* Contact card */
+.doc-contact{
+  background:linear-gradient(135deg,rgba(170,0,0,.18),rgba(100,0,0,.1));
+  border:1px solid rgba(255,215,0,.18);border-radius:14px;
+  padding:24px 28px;margin-top:12px;
+}
+.doc-contact-title{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;
+  color:var(--gold);margin-bottom:10px;
+}
+.doc-contact p{color:rgba(255,255,255,.6);font-size:14px;}
+.doc-contact a{color:var(--gold);text-decoration:none;font-weight:600;}
+.doc-contact a:hover{text-decoration:underline;}
+
+/* Section divider */
+.doc-divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,215,0,.12),transparent);
+  margin:0 0 48px;
+}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:10;
+  border-top:1px solid rgba(255,215,0,.07);
+  padding:22px 24px;padding-bottom:max(22px,calc(env(safe-area-inset-bottom)+14px));
+}
+.foot-inner{
+  max-width:820px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+}
+.foot-logo{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:4px;color:rgba(255,215,0,.3);}
+.foot-links{display:flex;gap:16px;flex-wrap:wrap;}
+.foot-link{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;
+  color:rgba(255,255,255,.22);text-decoration:none;text-transform:uppercase;transition:color .2s;}
+.foot-link:hover{color:rgba(255,215,0,.6);}
+.foot-copy{
+  font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;
+  color:rgba(255,255,255,.1);text-transform:uppercase;width:100%;margin-top:8px;
+}
+@media(max-width:480px){
+  footer{padding:18px 16px;}
+  .foot-inner{flex-direction:column;align-items:flex-start;gap:8px;}
+}
+</style>
+</head>
+<body>
+<div class="bg"><div class="bg-grad"></div><div class="bg-grid"></div></div>
+<nav>
+  <a href="./index.html" class="nav-logo">CGMAX <span>·</span> FFTP</a>
+  <a href="./index.html" class="nav-back">← Back to Home</a>
+</nav>
+<div class="page">
+
+  <div class="doc-eyebrow">CGMax FFTP · Legal Documents</div>
+  <div class="doc-title">Privacy<br><span class="acc">Policy</span></div>
+  <div class="doc-rule"></div>
+
+  <div class="doc-meta">
+    <div class="doc-meta-item"><strong>Effective Date:</strong> January 1, 2025</div>
+    <div class="doc-meta-item"><strong>Last Updated:</strong> February 2025</div>
+    <div class="doc-meta-item"><strong>Controller:</strong> ITCC LLC</div>
+    <div class="doc-meta-item"><strong>Contact:</strong> cgomez@itcc.llc</div>
+  </div>
+
+  <!-- 1 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 01</div>
+    <h2>Who We Are and Scope of This Policy</h2>
+    <p>This Privacy Policy explains how <strong>CGMax FFTP — Flag Football Tracker Pro</strong> ("FFTP," "we," "our," or "us"), operated by <strong>ITCC LLC</strong>, handles information in connection with your use of the FFTP web application (the "App") accessible at our website.</p>
+    <p>By using the App, you acknowledge you have read and understood this Privacy Policy. If you do not agree, please do not use the App.</p>
+    <div class="doc-highlight">
+      <p><strong>Key fact:</strong> FFTP is a locally-operated web application. All game data, rosters, and statistics you enter are stored exclusively in your device's local browser storage (localStorage). We do not operate servers that receive, store, or process your coaching data.</p>
+    </div>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 2 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 02</div>
+    <h2>Information We Collect — and What We Do Not Collect</h2>
+    <p>FFTP is designed with a minimal data footprint. Here is exactly what happens with information when you use the App:</p>
+    <p><strong>What is stored locally on your device (not transmitted to us):</strong></p>
+    <ul>
+      <li>Team name and coach name you enter during setup</li>
+      <li>Player roster: first names and last initials only (e.g., "Jaxon B.") — never full last names</li>
+      <li>Jersey numbers</li>
+      <li>Game scores, per-player statistics, and rotation play counts</li>
+      <li>Season history, MVP records, and quarter-by-quarter data</li>
+      <li>Your access code validation token (a hashed indicator that a valid code was entered — the code itself is not stored in a recoverable form)</li>
+      <li>Your selected team colors and app preferences</li>
+    </ul>
+    <p><strong>What we do NOT collect:</strong></p>
+    <ul>
+      <li>Full names, addresses, email addresses, or phone numbers of players</li>
+      <li>Photos or biometric data of any kind</li>
+      <li>Payment information (access codes are distributed directly; no payment is processed in-app)</li>
+      <li>Precise geolocation data</li>
+      <li>Device identifiers, advertising IDs, or behavioral tracking data</li>
+      <li>Any data from players who are minors — the App is designed so no minor's personal information is ever entered or transmitted</li>
+    </ul>
+    <p><strong>Web server access logs:</strong> Like all websites, our web host may automatically log basic access information such as your IP address, browser type, operating system, and pages visited for security and operational purposes. This data is controlled by our web hosting provider under their own privacy policy and is not linked to your coaching data.</p>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 3 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 03</div>
+    <h2>Children's Privacy (COPPA Compliance)</h2>
+    <p>We take the privacy of minors extremely seriously. FFTP is a <strong>coaching tool for adults</strong> — it is designed to be used exclusively by coaches and adult team staff, not by players or children.</p>
+    <ul>
+      <li>The App requires an access code distributed directly to authorized coaches. It is not publicly accessible to minors.</li>
+      <li>The App is designed to capture only first name and last initial of players (e.g., "Marcus T.") — never full last names or any other identifying information.</li>
+      <li>No player photos, biometrics, or contact information are collected at any point.</li>
+      <li>We do not knowingly collect personal information from children under 13 in any form.</li>
+      <li>Coaches using this App confirm by use that they have obtained appropriate parental or guardian consent as required by applicable law for any coaching activities involving minors.</li>
+    </ul>
+    <p>If you believe a child has submitted personal information through the App in any way, please contact us immediately at <strong>cgomez@itcc.llc</strong> and we will take appropriate action.</p>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 4 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 04</div>
+    <h2>How We Use Information</h2>
+    <p>Because FFTP operates locally on your device, we do not "use" your coaching data — we never receive it. The limited purposes for which information is processed are:</p>
+    <ul>
+      <li><strong>App functionality:</strong> localStorage enables the App to save your roster, stats, and preferences between sessions. This processing occurs entirely on your device.</li>
+      <li><strong>Access control:</strong> Your access code is validated locally against an embedded list. No code entry data is transmitted to our servers.</li>
+      <li><strong>Security and operations:</strong> Web server access logs (IP address, browser type, referrer) are used to protect against abuse, diagnose technical issues, and maintain availability.</li>
+      <li><strong>Communications:</strong> If you contact us at cgomez@itcc.llc, we will use your email address solely to respond to your inquiry.</li>
+    </ul>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 5 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 05</div>
+    <h2>Data Sharing and Disclosure</h2>
+    <p>We do <strong>not</strong> sell, rent, or trade any personal information. We do not share your coaching data with advertisers, data brokers, or analytics platforms.</p>
+    <p>We may disclose information in the following limited circumstances:</p>
+    <ul>
+      <li><strong>Web hosting services:</strong> Our website is hosted by a third-party provider who may process web server access logs as described in Section 2. They are bound by contractual obligations consistent with applicable law.</li>
+      <li><strong>Legal requirements:</strong> We may disclose information if required to do so by law, court order, or government regulation, or to protect the rights, safety, or property of ITCC LLC or others.</li>
+      <li><strong>Business transitions:</strong> In the event of a merger, acquisition, or sale of ITCC LLC or its assets, any data we hold may be transferred as part of that transaction. We will notify affected users if this occurs.</li>
+    </ul>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 6 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 06</div>
+    <h2>Data Storage, Retention, and Deletion</h2>
+    <p>All coaching data is stored in your browser's <strong>localStorage</strong> on your own device. ITCC LLC does not have access to this data and cannot retrieve it.</p>
+    <p><strong>How to delete your data:</strong></p>
+    <ul>
+      <li>In any browser: go to Settings → Privacy → Clear Browsing Data → Clear Site Data / Local Storage</li>
+      <li>On iOS Safari: Settings → Safari → Clear History and Website Data</li>
+      <li>On Chrome/Android: Settings → Site Settings → Storage → Find the App → Clear Data</li>
+      <li>Uninstalling the App from your home screen will remove the installed cache but may not delete localStorage — follow the steps above to ensure full deletion</li>
+    </ul>
+    <p>Web server access logs are retained according to our hosting provider's standard retention schedules (typically 30–90 days) and are then automatically deleted.</p>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 7 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 07</div>
+    <h2>Security</h2>
+    <p>We implement reasonable technical and organizational measures to protect the App and its infrastructure, including HTTPS encryption for all data in transit between your browser and our web server. However, because all coaching data is stored locally on your device, the security of that data also depends on the security of your device and browser.</p>
+    <p>We recommend:</p>
+    <ul>
+      <li>Using a device passcode or biometric lock</li>
+      <li>Not sharing your access code with unauthorized individuals</li>
+      <li>Keeping your browser and operating system updated</li>
+    </ul>
+    <p>No system can guarantee absolute security. If you become aware of a security issue affecting the App, please notify us at <strong>cgomez@itcc.llc</strong>.</p>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 8 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 08</div>
+    <h2>California Residents — CCPA / CPRA Rights</h2>
+    <p>If you are a California resident, the California Consumer Privacy Act (CCPA) as amended by the California Privacy Rights Act (CPRA) may afford you certain rights regarding your personal information. In the context of FFTP:</p>
+    <ul>
+      <li><strong>Right to Know:</strong> We collect only minimal server log data as described in Section 2. No coaching data is collected by us.</li>
+      <li><strong>Right to Delete:</strong> You may request deletion of any server log data we hold associated with your IP address by contacting us.</li>
+      <li><strong>Right to Opt Out of Sale:</strong> We do not sell personal information. There is nothing to opt out of.</li>
+      <li><strong>Non-Discrimination:</strong> You will not receive different service or pricing for exercising any CCPA/CPRA rights.</li>
+    </ul>
+    <p>To exercise any California privacy rights, contact us at <strong>cgomez@itcc.llc</strong>.</p>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 9 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 09</div>
+    <h2>Changes to This Privacy Policy</h2>
+    <p>We may update this Privacy Policy from time to time as the App evolves. When we make material changes, we will update the "Last Updated" date at the top of this page. For significant changes, we will make reasonable efforts to notify active users (for example, by displaying a notice within the App on next access).</p>
+    <p>Continued use of the App after any changes to this Privacy Policy constitutes acceptance of the updated Policy.</p>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 10 -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 10</div>
+    <h2>Contact Us</h2>
+    <div class="doc-contact">
+      <div class="doc-contact-title">ITCC LLC — Privacy Inquiries</div>
+      <p>If you have any questions, concerns, or requests regarding this Privacy Policy or the handling of any information in connection with CGMax FFTP, please contact us:</p>
+      <p style="margin-top:12px;"><strong>Email:</strong> <a href="mailto:cgomez@itcc.llc">cgomez@itcc.llc</a></p>
+      <p><strong>Company:</strong> ITCC LLC</p>
+      <p><strong>Product:</strong> CGMax FFTP — Flag Football Tracker Pro</p>
+      <p style="margin-top:12px;font-size:13px;color:rgba(255,255,255,.4);">We aim to respond to all privacy inquiries within 5 business days.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="foot-inner">
+    <div class="foot-logo">CGMax FFTP · ITCC LLC</div>
+    <div class="foot-links">
+      <a href="./index.html" class="foot-link">Home</a>
+      <a href="./privacy.html" class="foot-link">Privacy Policy</a>
+      <a href="./terms.html" class="foot-link">Terms of Service</a>
+      <a href="./app.html" class="foot-link">⚡ Open App</a>
+    </div>
+    <div class="foot-copy">© 2025 ITCC LLC · All Rights Reserved · CGMax FFTP is a trademark of ITCC LLC</div>
+  </div>
+</footer>
+</body>
+</html>
