@@ -782,7 +782,7 @@ body.light-mode .toast-msg{color:#1a1714;}
   border-radius:4px;padding:1px 5px;vertical-align:middle;margin-left:5px;text-transform:uppercase;}
 .pro-lock-overlay{position:relative;display:inline-block;}
 .nav-tab .pro-badge{font-size:8px;padding:1px 4px;margin-left:3px;}
-.pro-upgrade-modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.93);backdrop-filter:blur(6px);
+.pro-upgrade-modal{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.93);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
   display:none;align-items:center;justify-content:center;padding:20px;}
 .pro-upgrade-modal.show{display:flex;}
 .pro-upgrade-box{background:var(--sur);border:1px solid rgba(251,191,36,.25);border-radius:22px;
@@ -1268,11 +1268,18 @@ body.light-mode .toast-msg{color:#1a1714;}
       <button type="button" class="sync-copy-btn" onclick="copySessionCode()">📋 Copy Code</button>
       <div class="sync-fb-note">Tap Go Live → text parents the link. Scores update automatically every 15 seconds. Works on any phone, no app required.</div>
       <button type="button" class="sync-join-btn" onclick="hostSession()" style="background:linear-gradient(135deg,var(--teal),#0f766e);color:#fff;">📡 Go Live Now</button>
-      <div id="parent-link-section" style="display:none;margin-top:12px;background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.18);border-radius:10px;padding:10px 12px;">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--s);text-transform:uppercase;margin-bottom:5px;">📱 Parent Link — Text This!</div>
-        <div id="parent-link-display" style="background:var(--dark2);border:1px solid var(--dark5);border-radius:6px;padding:6px 8px;font-family:monospace;font-size:9px;color:var(--dim);word-break:break-all;margin-bottom:7px;max-height:52px;overflow:hidden;">—</div>
-        <button type="button" class="sync-copy-btn" onclick="copyParentLink()" style="width:100%;font-size:12px;">📋 Copy &amp; Share Link</button>
-        <button type="button" class="sync-copy-btn" onclick="stopLiveSync();closeSyncModal();" style="width:100%;font-size:12px;margin-top:6px;background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#ef4444;">⏹ Stop Live Score</button>
+      <div id="parent-link-section" style="display:none;margin-top:14px;background:linear-gradient(135deg,rgba(20,184,166,.12),rgba(20,184,166,.06));border:2px solid rgba(20,184,166,.5);border-radius:14px;padding:14px 14px 10px;">
+        <!-- LIVE indicator -->
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
+          <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:pulse 1.2s ease-in-out infinite;"></span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;color:#14b8a6;">LIVE — Share This Link With Parents</span>
+        </div>
+        <!-- Big link display -->
+        <div id="parent-link-display" style="background:rgba(0,0,0,.4);border:1px solid rgba(20,184,166,.3);border-radius:8px;padding:9px 10px;font-family:monospace;font-size:11px;color:#5eead4;word-break:break-all;margin-bottom:10px;line-height:1.5;">—</div>
+        <!-- Copy button — big and obvious -->
+        <button type="button" onclick="copyParentLink()" style="width:100%;background:linear-gradient(135deg,#14b8a6,#0f766e);border:none;border-radius:10px;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:3px;color:#fff;cursor:pointer;margin-bottom:7px;box-shadow:0 4px 16px rgba(20,184,166,.35);">📋 COPY LINK — TEXT TO PARENTS</button>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,.35);text-align:center;letter-spacing:1px;margin-bottom:8px;">Parents open the link on their phone — no app needed · Updates every 15 sec</div>
+        <button type="button" onclick="stopLiveSync();closeSyncModal();" style="width:100%;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);border-radius:9px;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:#ef4444;cursor:pointer;">⏹ Stop Live Score</button>
       </div>
     </div>
     <div class="sync-panel" id="sync-panel-join">
@@ -2797,12 +2804,49 @@ function dismissInstall(){
 }
 
 /* ════════════════════════════════════════════════════
-   VIBRATION FEEDBACK
+   VIBRATION + AUDIO FEEDBACK
+   - Android: uses navigator.vibrate
+   - iOS: uses Web Audio API click/chime (vibrate not supported on iOS)
+   - Both: visual ripple tap animation
 ════════════════════════════════════════════════════ */
+var _audioCtx=null;
+function getAudioCtx(){
+  if(!_audioCtx){
+    try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
+  }
+  return _audioCtx;
+}
+// Unlock audio context on first user tap (required by browsers)
+document.addEventListener('touchstart',function _unlockAudio(){
+  getAudioCtx();
+  document.removeEventListener('touchstart',_unlockAudio);
+},{once:true,passive:true});
+
+function playTick(freq,dur,vol){
+  // Short synthesized click — works on iOS Safari
+  var ctx=getAudioCtx();
+  if(!ctx)return;
+  try{
+    var o=ctx.createOscillator();
+    var g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.frequency.value=freq||800;
+    o.type='sine';
+    g.gain.setValueAtTime(vol||0.18,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+(dur||0.07));
+    o.start(ctx.currentTime);
+    o.stop(ctx.currentTime+(dur||0.07));
+  }catch(e){}
+}
+
 function vibe(pattern,ev){
-  // Haptic vibration (Android/Chrome)
+  // Haptic vibration (Android Chrome — not supported on iOS)
   if(navigator.vibrate){try{navigator.vibrate(pattern||[12]);}catch(e){}}
-  // Visual ripple — works everywhere including iOS
+  // Audio click — works on iOS after first user interaction
+  var isLong=Array.isArray(pattern)&&pattern[0]>=30;
+  if(isLong){playTick(660,0.12,0.22);}  // score/TD — higher pitched chime
+  else{playTick(800,0.06,0.14);}         // regular stat tap — short click
+  // Visual ripple — works everywhere
   var x,y;
   if(ev&&ev.touches&&ev.touches.length){x=ev.touches[0].clientX;y=ev.touches[0].clientY;}
   else if(ev&&ev.clientX!==undefined){x=ev.clientX;y=ev.clientY;}
