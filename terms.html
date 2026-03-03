@@ -102,8 +102,13 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
       <li>Voice-activated stat logging and lineup setting</li>
       <li>Offline functionality via Service Worker caching</li>
       <li>Roster management with privacy-preserving name formatting</li>
+      <li>Multiple team management with per-team roster and season history</li>
+      <li>Attendance tracking — mark players present or absent before each game</li>
+      <li>Live Sync — optional real-time co-coaching via Firebase Realtime Database</li>
+      <li>Live Parent Scoreboard — optional shareable read-only live game link for parents, powered by Firebase</li>
     </ul>
     <p>The App operates primarily via client-side local storage on your device. ITCC LLC does not store your coaching data, rosters, or game statistics on its servers.</p>
+    <p><strong>Live Sync and Parent View (optional):</strong> These features use Firebase Realtime Database (Google) to transmit live game data to other devices. Use of these features is entirely optional, requires the coach to supply a personal Firebase project configuration, and is subject to Google's Terms of Service and Privacy Policy. By using these optional features, you acknowledge that live game data (scores, stats, player names in first name + last initial format) will be transmitted to your Firebase project and may be accessible by any person who possesses the parent view link you share.</p>
   </div>
   <div class="doc-divider"></div>
 

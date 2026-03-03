@@ -310,6 +310,56 @@ nav{
 .fl-badge-txt{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:1px;}
 @media(max-width:900px){.fl-badge{display:none;}}
 
+/* ── LIVE PARENT FEATURE BAND ── */
+.live-band{
+  position:relative;z-index:10;
+  background:linear-gradient(135deg,rgba(170,0,0,.12) 0%,rgba(0,0,0,0) 50%,rgba(255,215,0,.05) 100%);
+  border-top:1px solid rgba(170,0,0,.2);border-bottom:1px solid rgba(170,0,0,.2);
+  padding:70px 20px;overflow:hidden;
+}
+@media(max-width:480px){.live-band{padding:52px 16px;}}
+.live-band-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;}
+@media(max-width:700px){.live-band-inner{grid-template-columns:1fr;gap:32px;}}
+.live-band-glow{position:absolute;top:50%;left:25%;transform:translate(-50%,-50%);
+  width:500px;height:500px;background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(220,0,0,.12),transparent);
+  pointer-events:none;}
+.live-band-text .sec-eyebrow{margin-bottom:8px;}
+.live-band-text h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5.5vw,54px);letter-spacing:2px;line-height:1;margin-bottom:14px;}
+.live-band-text p{font-family:'Barlow',sans-serif;font-size:15px;line-height:1.7;color:rgba(255,255,255,.55);margin-bottom:20px;}
+.live-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:24px;}
+.live-step{display:flex;align-items:flex-start;gap:12px;}
+.live-step-num{width:26px;height:26px;border-radius:50%;background:var(--red);color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.live-step-txt{font-family:'Barlow',sans-serif;font-size:14px;color:rgba(255,255,255,.6);line-height:1.5;}
+.live-step-txt strong{color:rgba(255,255,255,.85);}
+/* Mockup scoreboard */
+.live-mockup{background:rgba(6,6,6,.9);border:1px solid rgba(255,215,0,.2);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.8);}
+.lm-header{background:rgba(0,0,0,.7);border-bottom:2px solid var(--gold);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;}
+.lm-live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(220,0,0,.15);border:1px solid rgba(220,0,0,.4);border-radius:12px;padding:3px 9px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:#FF5555;text-transform:uppercase;}
+.lm-dot{width:6px;height:6px;border-radius:50%;background:#FF5555;animation:livePulse 1.4s ease-in-out infinite;}
+@keyframes livePulse{0%,100%{opacity:1;}50%{opacity:.2;}}
+.lm-brand{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;color:rgba(255,215,0,.5);}
+.lm-body{padding:16px 14px;}
+.lm-score-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:10px;}
+.lm-score-team{text-align:center;flex:1;}
+.lm-team-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:#666;text-transform:uppercase;margin-bottom:2px;}
+.lm-score-num{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:.9;}
+.lm-score-us{color:var(--gold);}
+.lm-score-them{color:#555;}
+.lm-sep{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#333;flex-shrink:0;}
+.lm-q-bar{display:flex;gap:5px;justify-content:center;margin-bottom:10px;align-items:center;}
+.lm-pip{width:22px;height:5px;border-radius:3px;background:#1a1a1a;border:1px solid #333;}
+.lm-pip.done{background:rgba(255,215,0,.2);border-color:rgba(255,215,0,.3);}
+.lm-pip.cur{background:var(--gold);border-color:var(--gold);}
+.lm-q-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;color:var(--gold);margin-left:5px;}
+.lm-stat-rows{border-top:1px solid #1a1a1a;padding-top:8px;}
+.lm-stat-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #111;}
+.lm-stat-row:last-child{border-bottom:none;}
+.lm-rank{font-family:'Bebas Neue',sans-serif;font-size:14px;width:20px;text-align:center;color:#555;}
+.lm-sname{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:#aaa;}
+.lm-pill{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;}
+.lm-pill-td{background:rgba(34,197,94,.14);color:#22C55E;border:1px solid rgba(34,197,94,.3);}
+.lm-pill-f{background:rgba(59,130,246,.14);color:#3B82F6;border:1px solid rgba(59,130,246,.3);}
+
 /* ── NEW FEATURES BAND ── */
 .new-band{position:relative;z-index:10;
   background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(20,184,166,.06));
@@ -326,6 +376,9 @@ nav{
 .nf-new-tag{position:absolute;top:12px;right:12px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);
   border-radius:4px;padding:2px 7px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;
   letter-spacing:2px;color:var(--green);text-transform:uppercase;}
+.nf-hot-tag{position:absolute;top:12px;right:12px;background:rgba(170,0,0,.18);border:1px solid rgba(170,0,0,.4);
+  border-radius:4px;padding:2px 7px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;
+  letter-spacing:2px;color:#FF5555;text-transform:uppercase;}
 .nf-icon{font-size:26px;margin-bottom:10px;}
 .nf-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;color:var(--gold);margin-bottom:5px;}
 .nf-body{font-family:'Barlow',sans-serif;font-size:13px;line-height:1.6;color:rgba(255,255,255,.42);}
@@ -553,38 +606,92 @@ footer{
   </div>
 </section>
 
+<!-- LIVE PARENT SCOREBOARD FEATURE -->
+<section class="live-band" id="live-parent">
+  <div class="live-band-glow"></div>
+  <div class="live-band-inner">
+    <!-- Text side -->
+    <div class="live-band-text reveal">
+      <div class="sec-eyebrow">Brand New</div>
+      <h2>Live Parent <span class="acc">Scoreboard</span></h2>
+      <p>Coach generates a link before the game. Parents open it on their phones and watch the score and stats update in real time — no app install required, no account, no setup.</p>
+      <div class="live-steps">
+        <div class="live-step">
+          <div class="live-step-num">1</div>
+          <div class="live-step-txt"><strong>Coach opens Live Sync</strong> in the app and taps <em>📱 Copy Parent Link</em></div>
+        </div>
+        <div class="live-step">
+          <div class="live-step-num">2</div>
+          <div class="live-step-txt"><strong>Paste into the team group chat</strong> — parents tap the link on any browser</div>
+        </div>
+        <div class="live-step">
+          <div class="live-step-num">3</div>
+          <div class="live-step-txt"><strong>Stats appear live</strong> as the coach logs every TD, flag pull, and catch</div>
+        </div>
+      </div>
+      <a href="./app.html" class="btn-gold" style="display:inline-flex;font-size:17px;padding:13px 28px;">⚡ Open The App</a>
+    </div>
+    <!-- Mockup side -->
+    <div class="live-mockup reveal">
+      <div class="lm-header">
+        <div class="lm-live-badge"><div class="lm-dot"></div>LIVE</div>
+        <div class="lm-brand">CGMax FFTP</div>
+        <div style="font-size:18px;opacity:.3">⟳</div>
+      </div>
+      <div class="lm-body">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;text-align:center;margin-bottom:4px;">River Hawks vs. Eagles · Sat Mar 7</div>
+        <div class="lm-score-row">
+          <div class="lm-score-team"><div class="lm-team-lbl">River Hawks</div><div class="lm-score-num lm-score-us">14</div></div>
+          <div class="lm-sep">–</div>
+          <div class="lm-score-team"><div class="lm-team-lbl">Eagles</div><div class="lm-score-num lm-score-them">7</div></div>
+        </div>
+        <div class="lm-q-bar">
+          <div class="lm-pip done"></div><div class="lm-pip cur"></div>
+          <div class="lm-q-lbl">Q2</div>
+        </div>
+        <div class="lm-stat-rows">
+          <div class="lm-stat-row"><div class="lm-rank">🥇</div><div class="lm-sname">Jaxon B.</div><div class="lm-pill lm-pill-td">2 TD</div><div class="lm-pill lm-pill-f" style="margin-left:3px">1 Flag</div></div>
+          <div class="lm-stat-row"><div class="lm-rank">🥈</div><div class="lm-sname">Reed J.</div><div class="lm-pill lm-pill-td">1 TD</div><div class="lm-pill lm-pill-f" style="margin-left:3px">2 Flag</div></div>
+          <div class="lm-stat-row"><div class="lm-rank">🎖️</div><div class="lm-sname">Cade A.</div><div class="lm-pill lm-pill-f">3 Flag</div></div>
+          <div class="lm-stat-row"><div class="lm-rank" style="color:#333">4</div><div class="lm-sname">Phoenix O.</div><div class="lm-pill lm-pill-f">2 Flag</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- WHAT'S NEW -->
 <section class="new-band" id="new">
   <div class="new-band-inner">
     <div class="reveal">
-      <div class="sec-eyebrow">Latest Update</div>
+      <div class="sec-eyebrow">Latest Update · March 2026</div>
       <h2 class="sec-title" style="font-size:clamp(30px,6vw,58px)">What's <span class="acc">New</span></h2>
       <div class="sec-rule"></div>
     </div>
     <div class="new-features-grid">
       <div class="nf-card reveal">
+        <div class="nf-hot-tag">🔴 Live</div>
+        <div class="nf-icon">📱</div>
+        <div class="nf-title">Live Parent Scoreboard</div>
+        <div class="nf-body">Generate a shareable link before the game. Parents follow live score and top stats in any browser — no app install, no login.</div>
+      </div>
+      <div class="nf-card reveal">
         <div class="nf-new-tag">New</div>
-        <div class="nf-icon">🔒</div>
-        <div class="nf-title">Coach Access Gate</div>
-        <div class="nf-body">FFTP is now a pro tool. Enter your access code to unlock the full app. Contact cgomez@itcc.llc to get yours.</div>
+        <div class="nf-icon">✅</div>
+        <div class="nf-title">Attendance Tracking</div>
+        <div class="nf-body">Mark players present or absent before kickoff. Absent players are auto-excluded from rotations. Attendance saved with each game record.</div>
+      </div>
+      <div class="nf-card reveal">
+        <div class="nf-new-tag">New</div>
+        <div class="nf-icon">🏈</div>
+        <div class="nf-title">Multiple Team Management</div>
+        <div class="nf-body">Coach multiple teams from one app. Each team keeps its own roster, season history, colors, and stats — switch in one tap.</div>
       </div>
       <div class="nf-card reveal">
         <div class="nf-new-tag">New</div>
         <div class="nf-icon">🎙️</div>
         <div class="nf-title">Voice Stat Logging</div>
         <div class="nf-body">Log stats and set lineups hands-free. Say player names and stats naturally — the app figures out the rest with confidence filtering.</div>
-      </div>
-      <div class="nf-card reveal">
-        <div class="nf-new-tag">New</div>
-        <div class="nf-icon">✏️</div>
-        <div class="nf-title">Editable Roster</div>
-        <div class="nf-body">Customize the full player roster — names, jersey numbers, roster size. First name + last initial only for player privacy.</div>
-      </div>
-      <div class="nf-card reveal">
-        <div class="nf-new-tag">New</div>
-        <div class="nf-icon">📈</div>
-        <div class="nf-title">Player Trend Charts</div>
-        <div class="nf-body">Tap any player in the Season screen to see their performance across every game — TD and flag pull bar charts, career totals, full game-by-game log.</div>
       </div>
       <div class="nf-card reveal">
         <div class="nf-new-tag">New</div>

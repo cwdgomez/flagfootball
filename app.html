@@ -152,6 +152,42 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .btn-kickoff{width:100%;border:none;border-radius:14px;padding:16px;color:var(--s);font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;cursor:pointer;margin-top:10px;transition:transform .1s,opacity .15s;}
 .btn-kickoff:active{transform:scale(.97);opacity:.9;}
 
+/* ── TEAM SWITCHER ── */
+.team-switcher-bar{display:flex;align-items:center;justify-content:space-between;background:var(--dark2);border:1px solid var(--dark5);border-radius:12px;padding:10px 13px;margin-bottom:14px;}
+.tsw-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;color:var(--dimmer);text-transform:uppercase;margin-bottom:2px;}
+.tsw-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;color:var(--txt);}
+.tsw-btn{background:var(--dark3);border:1px solid var(--dark5);border-radius:8px;padding:6px 12px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--dim);cursor:pointer;transition:border-color .15s,color .15s;text-transform:uppercase;white-space:nowrap;}
+.tsw-btn:active{border-color:var(--s);color:var(--s);}
+
+/* ── TEAM MANAGEMENT MODAL ── */
+.teams-overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.85);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;}
+.teams-overlay.hidden{display:none;}
+.teams-box{background:var(--dark2);border:1px solid var(--dark5);border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:20px 16px calc(24px + env(safe-area-inset-bottom));max-height:80vh;overflow-y:auto;}
+.teams-box-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--txt);margin-bottom:4px;}
+.teams-box-sub{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;color:var(--dim);margin-bottom:16px;}
+.team-item{display:flex;align-items:center;background:var(--dark3);border:1px solid var(--dark5);border-radius:12px;padding:11px 13px;margin-bottom:8px;gap:10px;}
+.team-item.active-team{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.05);}
+.team-color-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;border:2px solid rgba(255,255,255,.15);}
+.team-item-name{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--txt);}
+.team-active-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--s);text-transform:uppercase;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);border-radius:5px;padding:2px 7px;}
+.team-switch-btn{background:var(--dark4);border:1px solid var(--dark5);border-radius:7px;padding:5px 10px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--dim);cursor:pointer;text-transform:uppercase;transition:border-color .15s,color .15s;}
+.team-switch-btn:active{border-color:var(--s);color:var(--s);}
+.team-del-btn{background:none;border:none;padding:4px 6px;font-size:16px;cursor:pointer;opacity:.4;transition:opacity .15s;}
+.team-del-btn:active{opacity:1;}
+.btn-new-team{width:100%;border:none;border-radius:12px;padding:13px;background:linear-gradient(135deg,var(--p),var(--p2));color:var(--s);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;margin-top:6px;transition:opacity .15s;}
+.btn-new-team:active{opacity:.85;}
+.teams-dismiss{width:100%;background:none;border:1px solid var(--dark5);border-radius:10px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:var(--dim);cursor:pointer;margin-top:8px;text-transform:uppercase;}
+
+/* ── NEW TEAM FORM ── */
+.new-team-form{background:var(--dark3);border:1px solid var(--dark5);border-radius:12px;padding:14px;margin-bottom:10px;}
+.new-team-form.hidden{display:none;}
+.new-team-form label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin-bottom:6px;}
+.new-team-form input{width:100%;background:var(--dark2);border:1px solid var(--dark5);border-radius:8px;padding:10px 12px;color:var(--txt);font-family:'Barlow',sans-serif;font-size:16px;outline:none;transition:border-color .2s;margin-bottom:10px;}
+.new-team-form input:focus{border-color:var(--s);}
+.new-team-create-btn{width:100%;border:none;border-radius:9px;padding:11px;background:var(--green);color:#111;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;transition:opacity .15s;}
+.new-team-create-btn:active{opacity:.85;}
+.new-team-cancel{width:100%;background:none;border:none;padding:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--dimmer);cursor:pointer;margin-top:4px;}
+
 /* HEADER */
 .app-header{border-bottom:2px solid var(--s);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,0,0,.7);}
 .hdr-left{display:flex;align-items:center;gap:9px;}
@@ -865,6 +901,15 @@ body.light-mode .toast-msg{color:#1a1714;}
   </div>
 
   <div class="setup-card" id="setup-card">
+    <!-- TEAM SWITCHER -->
+    <div class="team-switcher-bar" id="team-switcher-bar">
+      <div>
+        <div class="tsw-label">Active Team</div>
+        <div class="tsw-name" id="tsw-name">My Team</div>
+      </div>
+      <button type="button" class="tsw-btn" onclick="openTeamsModal()">⟳ Switch Team</button>
+    </div>
+
     <div class="setup-section-lbl">🏈 Team Info</div>
     <div class="fg"><label>Team Name</label>
       <input type="text" id="su-team" placeholder="e.g. River Hawks, Bulldogs..."/>
@@ -915,6 +960,26 @@ body.light-mode .toast-msg{color:#1a1714;}
     <div id="absent-list"></div>
 
     <button type="button" class="btn-kickoff" id="kickoff-btn" onclick="startGame()">⚡ KICK OFF</button>
+  </div>
+</div>
+
+<!-- TEAM MANAGEMENT MODAL -->
+<div class="teams-overlay hidden" id="teams-overlay">
+  <div class="teams-box">
+    <div class="teams-box-title">🏈 Your Teams</div>
+    <div class="teams-box-sub">Switch between teams — each has its own roster &amp; season history</div>
+
+    <!-- New Team Form (hidden by default) -->
+    <div class="new-team-form hidden" id="new-team-form">
+      <label>New Team Name</label>
+      <input type="text" id="new-team-name-input" placeholder="e.g. River Hawks, Bulldogs..." maxlength="30">
+      <button type="button" class="new-team-create-btn" onclick="createTeam()">✅ Create Team</button>
+      <button type="button" class="new-team-cancel" onclick="hideNewTeamForm()">Cancel</button>
+    </div>
+
+    <div id="teams-list"></div>
+    <button type="button" class="btn-new-team" onclick="showNewTeamForm()">＋ Add New Team</button>
+    <button type="button" class="teams-dismiss" onclick="closeTeamsModal()">Done</button>
   </div>
 </div>
 
@@ -1162,6 +1227,13 @@ body.light-mode .toast-msg{color:#1a1714;}
       <button type="button" class="sync-copy-btn" onclick="copySessionCode()">📋 Copy Code</button>
       <div class="sync-fb-note">Requires a free Firebase project.<br>Paste your config in the Firebase Setup section below.<br>Assistant coach sees stats live as you tap.</div>
       <button type="button" class="sync-join-btn" onclick="hostSession()" style="background:linear-gradient(135deg,var(--teal),#0f766e);color:#fff;">📡 Start Hosting</button>
+      <!-- PARENT LINK — shown after hosting starts -->
+      <div id="parent-link-section" style="display:none;margin-top:12px;background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.18);border-radius:10px;padding:10px 12px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--s);text-transform:uppercase;margin-bottom:5px;">📱 Parent View Link</div>
+        <div style="font-family:'Barlow',sans-serif;font-size:11px;color:var(--dim);margin-bottom:7px;">Send this to parents for a live read-only view</div>
+        <div id="parent-link-display" style="background:var(--dark2);border:1px solid var(--dark5);border-radius:6px;padding:6px 8px;font-family:monospace;font-size:9px;color:var(--dim);word-break:break-all;margin-bottom:7px;max-height:52px;overflow:hidden;">—</div>
+        <button type="button" class="sync-copy-btn" onclick="copyParentLink()" style="width:100%;font-size:12px;">📋 Copy Parent Link</button>
+      </div>
     </div>
     <div class="sync-panel" id="sync-panel-join">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;">Enter the 6-letter code from the host coach:</div>
@@ -1471,8 +1543,9 @@ function pickColor(role,hex,el){
   if(el)el.classList.add('sel');
   document.getElementById('custom-'+role).value=hex;
   applyTheme();
+  if(typeof saveTeamColors==='function')saveTeamColors();
 }
-function setCustom(role,hex){TC[role]=hex;document.querySelectorAll('#'+role+'-swatches .swatch').forEach(function(s){s.classList.remove('sel');});applyTheme();}
+function setCustom(role,hex){TC[role]=hex;document.querySelectorAll('#'+role+'-swatches .swatch').forEach(function(s){s.classList.remove('sel');});applyTheme();if(typeof saveTeamColors==='function')saveTeamColors();}
 
 /* ── QB LIST ── */
 function buildQBList(){
@@ -1522,8 +1595,162 @@ function toggleAbsent(name){
   buildAbsentList();
 }
 
+/* ════════════════════════════════════════
+   MULTIPLE TEAM MANAGEMENT
+   Each team has its own roster, season, notes.
+   All data stored in localStorage.
+════════════════════════════════════════ */
+var LS_TEAMS      = 'ff_teams_v1';
+var LS_ACTIVE_TM  = 'ff_active_team';
+var ACTIVE_TEAM_ID= 'default';
+
+function getTeamRosterKey(id){return 'ff_roster_'+(id||'default');}
+function getTeamSeasonKey(id){return 'ff_season_'+(id||'default');}
+function getTeamNotesKey(id){return 'ff_notes_'+(id||'default');}
+function getTeamColorsKey(id){return 'ff_colors_'+(id||'default');}
+
+/* Migrate existing flat data to team-keyed data (one-time) */
+function initTeams(){
+  if(!localStorage.getItem(LS_TEAMS)){
+    // First run — create a default team and migrate existing data
+    var teams=[{id:'default',name:'My Team'}];
+    localStorage.setItem(LS_TEAMS,JSON.stringify(teams));
+    // Migrate existing roster
+    var r=localStorage.getItem('ff_roster_v1');
+    if(r)localStorage.setItem(getTeamRosterKey('default'),r);
+    // Migrate existing season
+    var s=localStorage.getItem('ff_season_v1');
+    if(s)localStorage.setItem(getTeamSeasonKey('default'),s);
+    // Migrate existing notes
+    var n=localStorage.getItem('ff_notes');
+    if(n)localStorage.setItem(getTeamNotesKey('default'),n);
+  }
+  // Restore active team
+  var saved=localStorage.getItem(LS_ACTIVE_TM)||'default';
+  // Verify the saved team still exists
+  var teams=loadTeams();
+  var exists=teams.some(function(t){return t.id===saved;});
+  if(!exists&&teams.length>0)saved=teams[0].id;
+  setActiveTeam(saved);
+}
+
+function loadTeams(){
+  try{var t=JSON.parse(localStorage.getItem(LS_TEAMS));if(Array.isArray(t)&&t.length>0)return t;}catch(e){}
+  return [{id:'default',name:'My Team'}];
+}
+function saveTeams(teams){try{localStorage.setItem(LS_TEAMS,JSON.stringify(teams));}catch(e){}}
+function getActiveTeamName(){var teams=loadTeams();var t=teams.find(function(x){return x.id===ACTIVE_TEAM_ID;});return t?t.name:'My Team';}
+
+/* Switch to a different team — reloads roster, season, notes, colors */
+function setActiveTeam(id){
+  ACTIVE_TEAM_ID=id||'default';
+  LS_ROSTER=getTeamRosterKey(ACTIVE_TEAM_ID);
+  LS_KEY=getTeamSeasonKey(ACTIVE_TEAM_ID);
+  localStorage.setItem(LS_ACTIVE_TM,ACTIVE_TEAM_ID);
+  // Load colors for this team
+  try{
+    var colors=JSON.parse(localStorage.getItem(getTeamColorsKey(ACTIVE_TEAM_ID)));
+    if(colors&&colors.primary){TC.primary=colors.primary;}
+    if(colors&&colors.secondary){TC.secondary=colors.secondary;}
+  }catch(e){}
+  // Update team switcher label
+  var lbl=document.getElementById('tsw-name');
+  if(lbl)lbl.textContent=getActiveTeamName();
+}
+
+/* Save current colors to active team */
+function saveTeamColors(){
+  try{localStorage.setItem(getTeamColorsKey(ACTIVE_TEAM_ID),JSON.stringify({primary:TC.primary,secondary:TC.secondary}));}catch(e){}
+}
+
+/* ── TEAMS MODAL ── */
+function openTeamsModal(){
+  renderTeamsList();
+  document.getElementById('teams-overlay').classList.remove('hidden');
+  document.getElementById('new-team-form').classList.add('hidden');
+  document.getElementById('new-team-name-input').value='';
+}
+function closeTeamsModal(){document.getElementById('teams-overlay').classList.add('hidden');}
+
+function renderTeamsList(){
+  var teams=loadTeams();
+  var el=document.getElementById('teams-list');
+  if(!el)return;
+  el.innerHTML=teams.map(function(t){
+    var isActive=t.id===ACTIVE_TEAM_ID;
+    var colors={primary:'#CC0000',secondary:'#FFD700'};
+    try{var c=JSON.parse(localStorage.getItem(getTeamColorsKey(t.id)));if(c&&c.primary){colors.primary=c.primary;colors.secondary=c.secondary;}}catch(e){}
+    var dotStyle='background:'+colors.primary+';border-color:'+colors.secondary+';';
+    var canDelete=teams.length>1;
+    return '<div class="team-item'+(isActive?' active-team':'') +'">'
+      +'<div class="team-color-dot" style="'+dotStyle+'"></div>'
+      +'<div class="team-item-name">'+esc(t.name)+'</div>'
+      +(isActive
+        ?'<span class="team-active-badge">Active</span>'
+        :'<button type="button" class="team-switch-btn" onclick="switchToTeam(\''+esc(t.id)+'\')">Switch</button>')
+      +(canDelete&&!isActive?'<button type="button" class="team-del-btn" onclick="deleteTeam(\''+esc(t.id)+'\',\''+esc(t.name)+'\')" title="Delete team">🗑</button>':'')
+      +'</div>';
+  }).join('');
+}
+
+function switchToTeam(id){
+  setActiveTeam(id);
+  LIVE_ROSTER=loadRosterData();
+  rebuildFromRoster();
+  loadNotes();
+  applyTheme();
+  buildQBList();
+  buildAbsentList();
+  // Reload team name into setup input if it was saved
+  var savedName=getActiveTeamName();
+  var inp=document.getElementById('su-team');
+  if(inp&&savedName!=='My Team')inp.value=savedName;
+  closeTeamsModal();
+  showToast('🏈 Switched to '+getActiveTeamName());
+}
+
+function showNewTeamForm(){document.getElementById('new-team-form').classList.remove('hidden');setTimeout(function(){document.getElementById('new-team-name-input').focus();},80);}
+function hideNewTeamForm(){document.getElementById('new-team-form').classList.add('hidden');}
+
+function createTeam(){
+  var name=(document.getElementById('new-team-name-input').value||'').trim();
+  if(!name){alert('Please enter a team name.');return;}
+  var id='team_'+Date.now();
+  var teams=loadTeams();
+  teams.push({id:id,name:name});
+  saveTeams(teams);
+  // Switch to new team (starts with default roster)
+  setActiveTeam(id);
+  LIVE_ROSTER=loadRosterData();
+  if(!LIVE_ROSTER||LIVE_ROSTER.length===0){LIVE_ROSTER=DEFAULT_ROSTER.map(function(p){return{name:p.name,num:p.num};});saveRosterData(LIVE_ROSTER);}
+  rebuildFromRoster();
+  loadNotes();
+  applyTheme();
+  buildQBList();
+  buildAbsentList();
+  var inp=document.getElementById('su-team');
+  if(inp)inp.value=name;
+  closeTeamsModal();
+  showToast('✅ Created team: '+name);
+}
+
+function deleteTeam(id,name){
+  if(!confirm('Delete team "'+name+'" and all its data? This cannot be undone.'))return;
+  var teams=loadTeams().filter(function(t){return t.id!==id;});
+  saveTeams(teams);
+  // Remove team data
+  try{localStorage.removeItem(getTeamRosterKey(id));}catch(e){}
+  try{localStorage.removeItem(getTeamSeasonKey(id));}catch(e){}
+  try{localStorage.removeItem(getTeamNotesKey(id));}catch(e){}
+  try{localStorage.removeItem(getTeamColorsKey(id));}catch(e){}
+  renderTeamsList();
+  showToast('🗑 Team deleted');
+}
+
 /* ── INIT ── */
 window.onload=function(){
+  // Initialize team management (migrate data if needed)
+  initTeams();
   LIVE_ROSTER=loadRosterData();
   rebuildFromRoster();
   buildSwatches('primary');
@@ -1541,6 +1768,8 @@ window.onload=function(){
   if(!localStorage.getItem('ff_onboarded')) showOnboarding();
   // Load any saved Firebase config
   try{var cfg=localStorage.getItem('ff_fb_config');if(cfg)document.getElementById('sync-fb-config').value=cfg;}catch(e){}
+  // Restore team name in setup input
+  try{var tname=getActiveTeamName();var inp=document.getElementById('su-team');if(inp&&tname&&tname!=='My Team')inp.value=tname;}catch(e){}
 };
 
 /* ── START GAME ── */
@@ -1554,6 +1783,10 @@ function startGame(){
     G.date=document.getElementById('su-date').value;
     G.quarters=parseInt(document.getElementById('su-q').value);
     G.cq=1;G.expP=null;G.expR=null;G.last=null;G.tab='stats';
+    // Save team name into the teams list
+    var teams=loadTeams();
+    var tidx=teams.findIndex(function(t){return t.id===ACTIVE_TEAM_ID;});
+    if(tidx>=0&&teams[tidx].name!==teamName){teams[tidx].name=teamName;saveTeams(teams);var lbl=document.getElementById('tsw-name');if(lbl)lbl.textContent=teamName;}
     initState();
     document.getElementById('hdr-team').textContent=G.team.toUpperCase();
     document.getElementById('sc-us-name').textContent=G.team.toUpperCase().slice(0,9);
@@ -2088,7 +2321,7 @@ function endAndSave(){
     var score=qbt*10+t*10+ii*8+c*3+f*2+cv*4+qbc*4-qbi*3+bl*3-fu*4;
     playerStats[name]={catches:c,tds:t,flags:f,ints:ii,conv:cv,qbTDs:qbt,qbInts:qbi,qbConvs:qbc,fumbles:fu,blocks:bl,snapO:snapO,snapD:snapD,score:score};
   });
-  var game={id:Date.now(),date:G.date||new Date().toISOString().split('T')[0],team:G.team,opp:G.opp,us:us,them:them,quarters:G.quarters,qb:G.qb,mvp:mvps[0]?mvps[0].name:'',playerStats:playerStats};
+  var game={id:Date.now(),date:G.date||new Date().toISOString().split('T')[0],team:G.team,opp:G.opp,us:us,them:them,quarters:G.quarters,qb:G.qb,mvp:mvps[0]?mvps[0].name:'',playerStats:playerStats,absent:G.absent.slice()};
   var games=loadSeason();games.unshift(game);saveSeason(games);
   showToast('✅ Game saved!');
   setTimeout(function(){openSeason();},800);
@@ -3289,6 +3522,7 @@ function hostSession(){
     closeSyncModal();
     showSyncBar('Hosting · Code: '+code, 'online', code);
     showToast('📡 Hosting session '+code);
+    updateParentLinkUI();
     // Write initial state
     syncPush();
     // Listen for guest control inputs (in case guest is tracking rotations)
@@ -3349,6 +3583,10 @@ function syncPush(){
         stats:JSON.stringify(G.stats),
         cq:G.cq,qb:G.qb,
         team:G.team,opp:G.opp,
+        roster:JSON.stringify(ALL_PLAYERS),
+        absent:JSON.stringify(G.absent),
+        primary:TC.primary,secondary:TC.secondary,
+        quarters:G.quarters,date:G.date||'',
         ts:Date.now()
       });
     }catch(e){}
@@ -3364,6 +3602,40 @@ function showSyncBar(txt,status,code){
   if(dot)dot.className='sync-status-dot '+(status||'');
   if(label)label.textContent=txt;
   if(badge)badge.textContent=code||'——';
+}
+
+/* ── PARENT VIEW LINK ── */
+function generateParentLink(){
+  var raw=getFBConfig();
+  if(!raw||!syncSession)return null;
+  try{
+    var b64=btoa(JSON.stringify(raw));
+    var base=window.location.href.replace(/[^/]*$|app\.html[^/]*/,'');
+    return base+'parent.html?s='+encodeURIComponent(syncSession)+'&fb='+encodeURIComponent(b64);
+  }catch(e){return null;}
+}
+function updateParentLinkUI(){
+  var section=document.getElementById('parent-link-section');
+  var display=document.getElementById('parent-link-display');
+  var link=generateParentLink();
+  if(link&&section){
+    section.style.display='block';
+    if(display)display.textContent=link;
+  }
+}
+function copyParentLink(){
+  var link=generateParentLink();
+  if(!link){showToast('❌ Start hosting first to get the parent link');return;}
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(link).then(function(){showToast('✅ Parent link copied!');}).catch(fallbackCopy);
+  }else{fallbackCopy();}
+  function fallbackCopy(){
+    var ta=document.createElement('textarea');
+    ta.value=link;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.focus();ta.select();
+    try{document.execCommand('copy');showToast('✅ Parent link copied!');}catch(e){showToast('📋 Copy the link above');}
+    document.body.removeChild(ta);
+  }
 }
 </script>
 <script>

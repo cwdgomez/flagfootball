@@ -209,6 +209,7 @@ footer{
     <p>By using the App, you acknowledge you have read and understood this Privacy Policy. If you do not agree, please do not use the App.</p>
     <div class="doc-highlight">
       <p><strong>Key fact:</strong> FFTP is a locally-operated web application. All game data, rosters, and statistics you enter are stored exclusively in your device's local browser storage (localStorage). We do not operate servers that receive, store, or process your coaching data.</p>
+      <p style="margin-top:8px;"><strong>Optional Live Sync &amp; Parent View:</strong> FFTP includes an optional Live Sync feature that uses <strong>Firebase Realtime Database</strong> (by Google) for real-time co-coaching and the Live Parent Scoreboard. This feature is entirely opt-in and requires the coach to supply their own Firebase project configuration. When activated, live game data (scores, player stats, team name) is transmitted to and stored in that Firebase project. This data is governed by Google's Privacy Policy and the coach's own Firebase project settings, not by ITCC LLC.</p>
     </div>
   </div>
   <div class="doc-divider"></div>
@@ -227,7 +228,17 @@ footer{
       <li>Season history, MVP records, and quarter-by-quarter data</li>
       <li>Your access code validation token (a hashed indicator that a valid code was entered — the code itself is not stored in a recoverable form)</li>
       <li>Your selected team colors and app preferences</li>
+      <li>Multiple team profiles (team names and roster associations for coaches managing more than one team)</li>
+      <li>Per-game attendance records (which players were present or absent for each game)</li>
     </ul>
+    <p><strong>Optional: Live Sync &amp; Parent View data transmitted to Firebase</strong> (only when you activate this feature using your own Firebase project):</p>
+    <ul>
+      <li>Live game scores and per-player statistics (the same data visible to you in-app)</li>
+      <li>Team name, opponent name, and game date</li>
+      <li>Player roster names (first name + last initial format only)</li>
+      <li>Team colors and quarter configuration</li>
+    </ul>
+    <p>This data is transmitted to <strong>your own Firebase Realtime Database project</strong>. ITCC LLC does not have access to data stored in your Firebase project. Retention and deletion of this data is controlled by you through your Firebase project settings.</p>
     <p><strong>What we do NOT collect:</strong></p>
     <ul>
       <li>Full names, addresses, email addresses, or phone numbers of players</li>
@@ -263,8 +274,9 @@ footer{
     <h2>How We Use Information</h2>
     <p>Because FFTP operates locally on your device, we do not "use" your coaching data — we never receive it. The limited purposes for which information is processed are:</p>
     <ul>
-      <li><strong>App functionality:</strong> localStorage enables the App to save your roster, stats, and preferences between sessions. This processing occurs entirely on your device.</li>
+      <li><strong>App functionality:</strong> localStorage enables the App to save your roster, stats, preferences, team profiles, and attendance records between sessions. This processing occurs entirely on your device.</li>
       <li><strong>Access control:</strong> Your access code is validated locally against an embedded list. No code entry data is transmitted to our servers.</li>
+      <li><strong>Live Sync &amp; Parent View (optional):</strong> When you enable Live Sync using your own Firebase project, live game data is transmitted to Firebase for real-time display to assistant coaches and parents. This transmission only occurs while you are actively hosting a session, and only if you have configured a Firebase project. ITCC LLC does not receive or access this data.</li>
       <li><strong>Security and operations:</strong> Web server access logs (IP address, browser type, referrer) are used to protect against abuse, diagnose technical issues, and maintain availability.</li>
       <li><strong>Communications:</strong> If you contact us at <a href="mailto:cgomez@itcc.llc">cgomez@itcc.llc</a>, we will use your email address solely to respond to your inquiry.</li>
     </ul>
@@ -279,6 +291,7 @@ footer{
     <p>We may disclose information in the following limited circumstances:</p>
     <ul>
       <li><strong>Web hosting services:</strong> Our website is hosted by a third-party provider who may process web server access logs as described in Section 2. They are bound by contractual obligations consistent with applicable law.</li>
+      <li><strong>Firebase (Google) — optional feature only:</strong> If you choose to use the Live Sync or Live Parent Scoreboard feature, live game data is transmitted to Google's Firebase Realtime Database using a project you configure. This data is subject to <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>. ITCC LLC is not a party to that data processing and has no access to your Firebase project data.</li>
       <li><strong>Legal requirements:</strong> We may disclose information if required to do so by law, court order, or government regulation, or to protect the rights, safety, or property of ITCC LLC or others.</li>
       <li><strong>Business transitions:</strong> In the event of a merger, acquisition, or sale of ITCC LLC or its assets, any data we hold may be transferred as part of that transaction. We will notify affected users if this occurs.</li>
     </ul>
