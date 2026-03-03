@@ -189,10 +189,12 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .new-team-cancel{width:100%;background:none;border:none;padding:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--dimmer);cursor:pointer;margin-top:4px;}
 
 /* HEADER */
-.app-header{border-bottom:2px solid var(--s);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,0,0,.7);}
-.hdr-left{display:flex;align-items:center;gap:9px;}
-.hdr-helmet{width:32px;height:28px;flex-shrink:0;}
-.hdr-helmet svg{width:100%;height:100%;overflow:visible;}
+.app-header{border-bottom:2px solid var(--s);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,0,0,.7);background:var(--dark);overflow:hidden;}
+.hdr-left{display:flex;align-items:center;gap:9px;flex:1;overflow:hidden;}
+.hdr-center{flex:0 0 auto;display:flex;justify-content:center;align-items:center;padding:0 8px;}
+.hdr-right{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:6px;}
+.hdr-helmet{width:32px;height:28px;flex-shrink:0;overflow:hidden;}
+.hdr-helmet svg{width:100%;height:100%;overflow:hidden;}
 .header-team{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:2px;color:var(--s);line-height:1;}
 .header-game{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;color:var(--dim);text-transform:uppercase;}
 .nq-btn{border-radius:9px;padding:7px 11px;color:var(--s);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:transform .1s;white-space:nowrap;border:1px solid;}
@@ -769,6 +771,40 @@ body.light-mode .toast-msg{color:#1a1714;}
 .sync-status-dot.offline+.sync-status-txt,.sync-status-dot.error+.sync-status-txt{color:var(--dimmer);}
 .sync-code-badge{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;
   color:var(--teal);background:rgba(20,184,166,.1);border-radius:6px;padding:2px 8px;cursor:pointer;}
+.sync-parent-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;
+  color:var(--s);background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);border-radius:6px;
+  padding:3px 8px;cursor:pointer;white-space:nowrap;display:none;-webkit-tap-highlight-color:transparent;}
+.sync-parent-btn:active{background:rgba(255,215,0,.22);}
+
+/* ── PRO SYSTEM ── */
+.pro-badge{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;
+  letter-spacing:1.5px;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#111;
+  border-radius:4px;padding:1px 5px;vertical-align:middle;margin-left:5px;text-transform:uppercase;}
+.pro-lock-overlay{position:relative;display:inline-block;}
+.nav-tab .pro-badge{font-size:8px;padding:1px 4px;margin-left:3px;}
+.pro-upgrade-modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.93);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:20px;}
+.pro-upgrade-modal.show{display:flex;}
+.pro-upgrade-box{background:var(--sur);border:1px solid rgba(251,191,36,.25);border-radius:22px;
+  padding:28px 22px;width:100%;max-width:360px;text-align:center;}
+.pro-upgrade-star{font-size:52px;margin-bottom:10px;}
+.pro-upgrade-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;
+  background:linear-gradient(135deg,#f59e0b,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;margin-bottom:6px;}
+.pro-upgrade-sub{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;
+  color:var(--dim);letter-spacing:1px;margin-bottom:20px;}
+.pro-feature-list{text-align:left;background:var(--dark3);border-radius:12px;padding:14px 16px;margin-bottom:20px;}
+.pro-feature-item{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;
+  color:var(--txt);padding:5px 0;border-bottom:1px solid var(--dark5);display:flex;align-items:center;gap:8px;}
+.pro-feature-item:last-child{border-bottom:none;}
+.pro-cta-btn{width:100%;border:none;border-radius:14px;padding:15px;
+  background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#111;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;cursor:pointer;
+  margin-bottom:10px;transition:opacity .15s;}
+.pro-cta-btn:active{opacity:.85;}
+.pro-dismiss-btn{width:100%;background:none;border:1px solid var(--dark5);border-radius:12px;
+  padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
+  letter-spacing:2px;color:var(--dimmer);cursor:pointer;text-transform:uppercase;}
 
 .sync-modal{position:fixed;inset:0;z-index:680;background:rgba(0,0,0,.9);display:flex;
   align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
@@ -907,7 +943,7 @@ body.light-mode .toast-msg{color:#1a1714;}
         <div class="tsw-label">Active Team</div>
         <div class="tsw-name" id="tsw-name">My Team</div>
       </div>
-      <button type="button" class="tsw-btn" onclick="openTeamsModal()">⟳ Switch Team</button>
+      <button type="button" class="tsw-btn" onclick="proGate('teams',openTeamsModal)">⟳ Switch Team <span class="pro-badge">PRO</span></button>
     </div>
 
     <div class="setup-section-lbl">🏈 Team Info</div>
@@ -993,13 +1029,15 @@ body.light-mode .toast-msg{color:#1a1714;}
         <div class="header-game" id="hdr-info">vs. Opponent · Q1</div>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:6px;">
+    <div class="hdr-center">
+      <button type="button" class="nq-btn" id="nq-btn" onclick="advanceQ()">Next Q</button>
+    </div>
+    <div class="hdr-right">
       <div class="qtimer-wrap" id="qtimer-wrap" onclick="timerClick()">
         <span class="qtimer-display" id="qtimer-display">—:——</span>
         <span class="qtimer-play" id="qtimer-play">▶</span>
       </div>
       <button type="button" class="mode-toggle" id="mode-toggle" onclick="toggleLightMode()" title="Toggle light/dark mode">☀️</button>
-      <button type="button" class="nq-btn" id="nq-btn" onclick="advanceQ()">Next Q</button>
     </div>
   </div>
 
@@ -1031,19 +1069,20 @@ body.light-mode .toast-msg{color:#1a1714;}
   <div class="sync-bar hidden" id="sync-bar">
     <div class="sync-status-dot" id="sync-dot"></div>
     <span class="sync-status-txt" id="sync-txt">Not synced</span>
+    <button type="button" class="sync-parent-btn" id="sync-parent-btn" onclick="copyParentLink()" title="Copy parent live link">📱 Parent Link</button>
     <span class="sync-code-badge" id="sync-code-badge" onclick="openSyncModal()">——</span>
   </div>
   <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 12px 0;">
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--dimmer);text-transform:uppercase;"></div>
-    <button type="button" class="voice-btn" id="voice-btn" onclick="openVoice()">
-      <span class="voice-icon">🎙️</span><span>Voice Log</span>
+    <button type="button" class="voice-btn" id="voice-btn" onclick="proGate('voice',openVoice)">
+      <span class="voice-icon">🎙️</span><span>Voice Log<span class="pro-badge">PRO</span></span>
     </button>
   </div>
   <div class="nav-tabs">
     <div class="nav-tab active" onclick="switchTab('stats')">📊 Stats</div>
     <div class="nav-tab" onclick="switchTab('rotations')">🔄 Rotations</div>
     <div class="nav-tab" onclick="switchTab('summary')">🏆 Summary</div>
-    <div class="nav-tab" onclick="openSeason()">📚 Season</div>
+    <div class="nav-tab" onclick="proGate('season',openSeason)">📚 Season<span class="pro-badge">PRO</span></div>
   </div>
   <div id="panel-stats" class="panel active"><div class="player-list" id="player-list"></div></div>
   <div id="panel-rotations" class="panel"><div id="rot-content"></div></div>
@@ -1070,9 +1109,9 @@ body.light-mode .toast-msg{color:#1a1714;}
     <div class="season-actions">
       <button type="button" class="sact-btn" style="background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.35);color:var(--purple)" onclick="openQR()">📱 QR Code</button>
       <button type="button" class="sact-btn" style="background:rgba(20,184,166,.12);border-color:rgba(20,184,166,.35);color:var(--teal)" onclick="openTrend()">📈 Trends</button>
-      <button type="button" class="sact-btn sact-export" onclick="exportSeason()">⬇ JSON</button>
-      <button type="button" class="sact-btn sact-csv" onclick="exportCSV()">📊 CSV</button>
-      <button type="button" class="sact-btn sact-print" onclick="printReport()">🖨️ Print</button>
+      <button type="button" class="sact-btn sact-export" onclick="proGate('export',exportSeason)">⬇ JSON<span class="pro-badge">PRO</span></button>
+      <button type="button" class="sact-btn sact-csv" onclick="proGate('export',exportCSV)">📊 CSV<span class="pro-badge">PRO</span></button>
+      <button type="button" class="sact-btn sact-print" onclick="proGate('print',printReport)">🖨️ Print<span class="pro-badge">PRO</span></button>
       <button type="button" class="sact-btn sact-import" onclick="document.getElementById('import-file').click()">⬆ Import</button>
       <button type="button" class="sact-btn sact-clear" onclick="clearSeason()">🗑 Clear All</button>
     </div>
@@ -1178,12 +1217,14 @@ body.light-mode .toast-msg{color:#1a1714;}
     <div class="voice-commands">
       <strong>Stats:</strong> "Jaxon touchdown" · "Reed flag pull"<br>
       "Phoenix interception" · "Cade catch" · "Milo fumble"<br><br>
-      <strong>Set lineup:</strong><br>
-      "Offense is Jaxon Reed Cade Milo Nico Phoenix"<br>
-      "Defense is Jaxon Reed Cade Milo Nico Phoenix"<br><br>
+      <strong>Set lineup:</strong> "Offense is Jaxon Reed Cade…"<br><br>
       <strong>Score:</strong> "We scored" · "They scored"<br>
       <strong>Clear:</strong> "Clear offense" · "Clear defense"
     </div>
+    <a href="./help.html" target="_blank"
+      style="display:block;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;color:var(--s);text-decoration:none;margin:8px 0 12px;text-transform:uppercase;">
+      📋 See Full Voice Command Guide →
+    </a>
     <button type="button" class="voice-btn" id="voice-listen-btn" style="width:100%;justify-content:center;margin-bottom:10px;font-size:16px;" onclick="toggleVoice()">
       <span class="voice-icon">🎙️</span><span id="voice-btn-txt">Start Listening</span>
     </button>
@@ -1213,6 +1254,32 @@ body.light-mode .toast-msg{color:#1a1714;}
 </div>
 
 <!-- MULTIPLAYER SYNC MODAL -->
+<!-- PRO UPGRADE MODAL -->
+<div class="pro-upgrade-modal" id="pro-upgrade-modal">
+  <div class="pro-upgrade-box">
+    <div class="pro-upgrade-star">⭐</div>
+    <div class="pro-upgrade-title">CGMax Pro</div>
+    <div class="pro-upgrade-sub">Unlock the full coaching experience</div>
+    <div class="pro-feature-list">
+      <div class="pro-feature-item">🎙️ Voice Command Logging</div>
+      <div class="pro-feature-item">📚 Season Stats &amp; Leaderboard</div>
+      <div class="pro-feature-item">📡 Live Sync &amp; Parent View</div>
+      <div class="pro-feature-item">🏟️ Manage Multiple Teams</div>
+      <div class="pro-feature-item">📤 Export Game Reports</div>
+      <div class="pro-feature-item">🖨️ Print Game Summary</div>
+    </div>
+    <button type="button" class="pro-cta-btn" onclick="proContactUs()">✉️ Contact Us to Upgrade</button>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input type="text" id="pro-code-input" placeholder="Have a code? Enter it here"
+        style="flex:1;background:var(--dark3);border:1px solid var(--dark5);border-radius:9px;padding:9px 12px;color:var(--txt);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;outline:none;text-transform:uppercase;"
+        oninput="this.value=this.value.toUpperCase()">
+      <button type="button" onclick="var c=document.getElementById('pro-code-input').value;if(!proUnlockWithCode(c)){document.getElementById('pro-code-input').value='';showToast('❌ Invalid code');}"
+        style="background:var(--dark4);border:1px solid var(--dark5);border-radius:9px;padding:9px 14px;color:var(--s);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Unlock</button>
+    </div>
+    <button type="button" class="pro-dismiss-btn" onclick="closeProModal()">Maybe Later</button>
+  </div>
+</div>
+
 <div class="sync-modal" id="sync-modal">
   <div class="sync-box">
     <div class="sync-box-title">🔄 Live Sync</div>
@@ -1378,6 +1445,71 @@ var G={
   expP:null,expR:null,
   tab:'stats',last:null,timer:null
 };
+
+/* ── AUTO-SAVE / OFFLINE PERSISTENCE ── */
+var LS_GAME_STATE='ff_live_game_v1';
+var _autoSaveTimer=null;
+
+function saveGameState(){
+  try{
+    // Don't save if no game has been started (no team name)
+    if(!G.team)return;
+    var snap={
+      G:{
+        team:G.team,coach:G.coach,opp:G.opp,date:G.date,quarters:G.quarters,
+        qb:G.qb,cq:G.cq,scores:G.scores,stats:G.stats,rots:G.rots,
+        absent:G.absent,tab:G.tab,last:G.last
+      },
+      TC:{primary:TC.primary,secondary:TC.secondary},
+      ts:Date.now(),
+      screen:document.getElementById('screen-main').classList.contains('active')?'main':'setup'
+    };
+    localStorage.setItem(LS_GAME_STATE,JSON.stringify(snap));
+  }catch(e){}
+}
+
+function clearSavedGameState(){
+  try{localStorage.removeItem(LS_GAME_STATE);}catch(e){}
+}
+
+function scheduleAutoSave(){
+  if(_autoSaveTimer)clearTimeout(_autoSaveTimer);
+  _autoSaveTimer=setTimeout(saveGameState,500);
+}
+
+function checkRestoreGameState(){
+  try{
+    var raw=localStorage.getItem(LS_GAME_STATE);
+    if(!raw)return;
+    var snap=JSON.parse(raw);
+    if(!snap||!snap.G||!snap.G.team)return;
+    // Only offer restore if saved within last 24 hours
+    var age=Date.now()-(snap.ts||0);
+    if(age>24*60*60*1000){clearSavedGameState();return;}
+    var mins=Math.floor(age/60000);
+    var ageStr=mins<1?'just now':mins<60?mins+'m ago':Math.floor(mins/60)+'h ago';
+    var ok=confirm('📋 Resume game?\n\n'+snap.G.team+' vs '+snap.G.opp+'\nSaved '+ageStr+'\n\nTap OK to restore, Cancel to start fresh.');
+    if(!ok){clearSavedGameState();return;}
+    // Restore
+    Object.assign(G,snap.G);
+    if(snap.TC){TC.primary=snap.TC.primary;TC.secondary=snap.TC.secondary;}
+    applyTheme();
+    document.getElementById('screen-setup').classList.remove('active');
+    document.getElementById('screen-main').classList.add('active');
+    renderAll();
+    switchTab(G.tab||'stats');
+    showToast('✅ Game restored!');
+  }catch(e){clearSavedGameState();}
+}
+
+// Save on visibility change (phone switches app)
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden)saveGameState();
+});
+// Save on page hide (browser navigation away)
+window.addEventListener('pagehide',saveGameState);
+// Save on beforeunload (desktop refresh)
+window.addEventListener('beforeunload',saveGameState);
 
 function blankStats(){
   return{catches:0,tds:0,flags:0,ints:0,conv1:0,conv2:0,
@@ -1770,6 +1902,8 @@ window.onload=function(){
   try{var cfg=localStorage.getItem('ff_fb_config');if(cfg)document.getElementById('sync-fb-config').value=cfg;}catch(e){}
   // Restore team name in setup input
   try{var tname=getActiveTeamName();var inp=document.getElementById('su-team');if(inp&&tname&&tname!=='My Team')inp.value=tname;}catch(e){}
+  // Check if there's a saved in-progress game to restore
+  checkRestoreGameState();
 };
 
 /* ── START GAME ── */
@@ -1783,6 +1917,7 @@ function startGame(){
     G.date=document.getElementById('su-date').value;
     G.quarters=parseInt(document.getElementById('su-q').value);
     G.cq=1;G.expP=null;G.expR=null;G.last=null;G.tab='stats';
+    clearSavedGameState(); // fresh game — wipe any old saved state
     // Save team name into the teams list
     var teams=loadTeams();
     var tidx=teams.findIndex(function(t){return t.id===ACTIVE_TEAM_ID;});
@@ -1801,7 +1936,7 @@ function startGame(){
 }
 
 /* ── RENDER ALL ── */
-function renderAll(){updateHeader();renderQBar();renderScore();renderStats();renderRots();}
+function renderAll(){updateHeader();renderQBar();renderScore();renderStats();renderRots();scheduleAutoSave();}
 
 function updateHeader(){
   var d=G.date?' · '+new Date(G.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';
@@ -1946,8 +2081,10 @@ function renderRots(){
   var onD=presentPlayers.filter(function(n){return G.rots[n][q].onField==='def';});
 
   var snapCounts=getSnapCounts();
-  var needOff=snapCounts.filter(function(p){return p.onFieldNow!=='off'&&!isAbsent(p.name);}).sort(function(a,b){return a.totalOff-b.totalOff;}).slice(0,3);
-  var needDef=snapCounts.filter(function(p){return p.onFieldNow!=='def'&&!isAbsent(p.name);}).sort(function(a,b){return a.totalDef-b.totalDef;}).slice(0,3);
+  // Only show suggestions after at least one snap has been recorded
+  var gameStarted=snapCounts.some(function(p){return p.totalOff>0||p.totalDef>0||p.onFieldNow!==null;});
+  var needOff=gameStarted?snapCounts.filter(function(p){return p.onFieldNow!=='off'&&!isAbsent(p.name);}).sort(function(a,b){return a.totalOff-b.totalOff;}).slice(0,3):[];
+  var needDef=gameStarted?snapCounts.filter(function(p){return p.onFieldNow!=='def'&&!isAbsent(p.name);}).sort(function(a,b){return a.totalDef-b.totalDef;}).slice(0,3):[];
   var medals=['🥇','🥈','🥉'];
 
   var offChips=needOff.map(function(p,i){return '<span class="nup-chip" style="background:'+rgba(s,.12)+';border-color:'+rgba(s,.3)+';color:'+s+'"><span class="nup-rank">'+medals[i]+'</span>'+esc(firstName(p.name))+'</span>';}).join('');
@@ -1962,6 +2099,7 @@ function renderRots(){
   var oCountBadge='<span style="font-family:sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;opacity:.7;">'+oCount+'/'+MAX+'</span>';
   var dCountBadge='<span style="font-family:sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;opacity:.7;">'+dCount+'/'+MAX+'</span>';
 
+  var notStartedMsg='<span class="none-chip">Tap OFF/DEF to put players on field</span>';
   var html='<div class="next-up-box" style="background:'+rgba(s,.06)+';border-color:'+(oFull?rgba(s,.6):rgba(s,.22))+'">'
     +'<div class="next-up-title" style="color:'+s+';display:flex;justify-content:space-between">'
       +'<span>⚡ Needs Offense Plays</span>'
@@ -1969,7 +2107,7 @@ function renderRots(){
         +(oFull?'✅ FULL':''+oCount+'/'+MAX+' on field')
       +'</span>'
     +'</div>'
-    +'<div class="next-up-players">'+(oFull?'<span class="none-chip">Field is full — sub out first</span>':(offChips||'<span class="none-chip">All covered!</span>'))+'</div></div>'
+    +'<div class="next-up-players">'+(oFull?'<span class="none-chip">Field is full — sub out first</span>':(!gameStarted?notStartedMsg:(offChips||'<span class="none-chip">All covered!</span>')))+'</div></div>'
     +'<div class="next-up-box" style="background:rgba(59,130,246,.06);border-color:'+(dFull?'rgba(59,130,246,.6)':'rgba(59,130,246,.22)')+'">'
     +'<div class="next-up-title" style="color:#3B82F6;display:flex;justify-content:space-between">'
       +'<span>🛡 Needs Defense Plays</span>'
@@ -1977,7 +2115,7 @@ function renderRots(){
         +(dFull?'✅ FULL':''+dCount+'/'+MAX+' on field')
       +'</span>'
     +'</div>'
-    +'<div class="next-up-players">'+(dFull?'<span class="none-chip">Field is full — sub out first</span>':(defChips||'<span class="none-chip">All covered!</span>'))+'</div></div>'
+    +'<div class="next-up-players">'+(dFull?'<span class="none-chip">Field is full — sub out first</span>':(!gameStarted?notStartedMsg:(defChips||'<span class="none-chip">All covered!</span>')))+'</div></div>'
     +'<div class="rot-live-bar"><div class="rot-live-lbl">On Field Now:</div>'+(oC+dC||'<span class="none-chip">No one yet</span>')+'</div>'
     +'<div class="rot-sec-lbl">Q'+q+' · All Players · Max '+MAX+' on field each side</div>';
 
@@ -2086,7 +2224,37 @@ function advanceQ(){
     var wasHalf=(G.cq===Math.floor(G.quarters/2));
     G.cq++;renderAll();
     if(wasHalf)showHalftime();
+  } else {
+    // Already on final quarter — offer to end game and save
+    finalizeGame();
   }
+}
+
+function finalizeGame(){
+  var us=G.scores.us.reduce(function(a,b){return a+b;},0);
+  var them=G.scores.them.reduce(function(a,b){return a+b;},0);
+  var result=us>them?'WIN':us<them?'LOSS':'TIE';
+  var label=result==='WIN'?'🏆 '+G.team+' win '+us+'–'+them+'!':result==='LOSS'?'Final: '+us+'–'+them+' L':'Final: '+us+'–'+them+' TIE';
+  if(!confirm('🏁 End Game & Save to Season?\n\n'+label+'\n\nTap OK to save stats and view Season History.'))return;
+  // Build and save game record
+  var mvps=mvpCalc();
+  var playerStats={};
+  ALL_PLAYERS.filter(function(n){return !isAbsent(n);}).forEach(function(name){
+    var c=0,t=0,f=0,ii=0,cv=0,qbt=0,qbi=0,qbc=0,fu=0,bl=0,snapO=0,snapD=0;
+    for(var q=1;q<=G.quarters;q++){
+      var st=G.stats[name][q];c+=st.catches;t+=st.tds;f+=st.flags;ii+=st.ints;
+      cv+=st.conv1+st.conv2;qbt+=st.qbTDs;qbi+=st.qbInts;qbc+=st.qbConvs;fu+=st.fumbles||0;bl+=st.blocks||0;
+      var r=G.rots[name][q];snapO+=r.offSnaps+(r.onField==='off'?1:0);snapD+=r.defSnaps+(r.onField==='def'?1:0);
+    }
+    var score=qbt*10+t*10+ii*8+c*3+f*2+cv*4+qbc*4-qbi*3+bl*3-fu*4;
+    playerStats[name]={catches:c,tds:t,flags:f,ints:ii,conv:cv,qbTDs:qbt,qbInts:qbi,qbConvs:qbc,fumbles:fu,blocks:bl,snapO:snapO,snapD:snapD,score:score};
+  });
+  var game={id:Date.now(),date:G.date||new Date().toISOString().split('T')[0],team:G.team,opp:G.opp,us:us,them:them,quarters:G.quarters,qb:G.qb,mvp:mvps[0]?mvps[0].name:'',playerStats:playerStats,absent:G.absent.slice()};
+  var games=loadSeason();games.unshift(game);saveSeason(games);
+  clearSavedGameState();
+  showToast('🏁 Game saved to Season!');
+  vibe([30,15,30,15,50]);
+  setTimeout(function(){openSeason();},900);
 }
 
 /* ── MVP ── */
@@ -2199,7 +2367,7 @@ function renderSummary(){
       +'<span style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;color:var(--blue)">■ DEFENSE</span>'
     +'</div>'
     +'<div class="pt-section">'+ptRows+'</div>'
-    +'<button type="button" style="width:100%;background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.35);border-radius:14px;padding:12px;font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;color:var(--teal);cursor:pointer;margin-bottom:6px" onclick="openShareCard()">📤 Share Game Recap</button>'
+    +'<button type="button" style="width:100%;background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.35);border-radius:14px;padding:12px;font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;color:var(--teal);cursor:pointer;margin-bottom:6px" onclick="proGate(\'share\',openShareCard)">📤 Share Game Recap <span class=\'pro-badge\'>PRO</span></button>'
     +'<button type="button" class="end-game-btn" style="'+egStyle+'" onclick="endAndSave()">💾 End Game &amp; Save to Season</button>'
     +'<button type="button" class="reset-btn" onclick="doReset()">⚠ New Game (don\'t save)</button>';
 }
@@ -2358,7 +2526,7 @@ function renderSeasonScreen(){
   var rankClasses=['rank-gold','rank-silver','rank-bronze'];
   var tableRows=ranked.map(function(p,i){
     var rankDisp=i<3?'<span class="'+rankClasses[i]+'">'+rankIcons[i]+'</span>':''+(i+1);
-    return '<tr><td>'+esc(rankDisp)+'</td><td>'+esc(dispName(p.name))+'</td><td class="'+(p.tds?'hi':'')+'">'+p.tds+'</td><td>'+p.ints+'</td><td>'+p.flags+'</td><td>'+p.blocks+'</td><td class="hi">'+p.score+'</td></tr>';
+    return '<tr><td>'+rankDisp+'</td><td>'+esc(dispName(p.name))+'</td><td class="'+(p.tds?'hi':'')+'">'+p.tds+'</td><td>'+p.ints+'</td><td>'+p.flags+'</td><td>'+p.blocks+'</td><td class="hi">'+p.score+'</td></tr>';
   }).join('');
   document.getElementById('sl-table').innerHTML=tableRows||'<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--dimmer)">No stats yet</td></tr>';
   var gamesHtml=games.map(function(g,idx){
@@ -2372,7 +2540,7 @@ function renderSeasonScreen(){
         +(g.mvp?'<div class="ghc-mvp">⭐ MVP: '+dispName(g.mvp)+'</div>':'')
         +'</div>'
         +'<div style="display:flex;align-items:center;gap:8px">'
-          +'<div class="ghc-result '+result+'">'+(result==='win'?'W':'result'==='loss'?'L':'T')+' '+g.us+'–'+g.them+'</div>'
+          +'<div class="ghc-result '+result+'">'+(result==='win'?'W':result==='loss'?'L':'T')+' '+g.us+'–'+g.them+'</div>'
           +'<button type="button" class="ghc-del" onclick="deleteGame('+g.id+',event)">🗑</button>'
         +'</div>'
       +'</div></div>';
@@ -3103,6 +3271,43 @@ function getPlayerPhoto(name){
 /* ════════════════════════════════════════════════════════════
    VOICE STAT LOGGING  (Web Speech API)
 ════════════════════════════════════════════════════════════ */
+/* ── VOICE AUDIO FEEDBACK ── */
+var _audioCtx=null;
+function getAudioCtx(){
+  if(!_audioCtx){try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}
+  return _audioCtx;
+}
+function playVoiceSuccess(){
+  try{
+    var ctx=getAudioCtx();if(!ctx)return;
+    // Pleasant ding: two ascending tones
+    [880,1320].forEach(function(freq,i){
+      var osc=ctx.createOscillator();var gain=ctx.createGain();
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.type='sine';osc.frequency.setValueAtTime(freq,ctx.currentTime+i*0.12);
+      gain.gain.setValueAtTime(0,ctx.currentTime+i*0.12);
+      gain.gain.linearRampToValueAtTime(0.18,ctx.currentTime+i*0.12+0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.12+0.3);
+      osc.start(ctx.currentTime+i*0.12);osc.stop(ctx.currentTime+i*0.12+0.32);
+    });
+  }catch(e){}
+}
+function playVoiceFail(){
+  try{
+    var ctx=getAudioCtx();if(!ctx)return;
+    // Low double buzz
+    [220,180].forEach(function(freq,i){
+      var osc=ctx.createOscillator();var gain=ctx.createGain();
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.type='sawtooth';osc.frequency.setValueAtTime(freq,ctx.currentTime+i*0.18);
+      gain.gain.setValueAtTime(0,ctx.currentTime+i*0.18);
+      gain.gain.linearRampToValueAtTime(0.12,ctx.currentTime+i*0.18+0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.18+0.22);
+      osc.start(ctx.currentTime+i*0.18);osc.stop(ctx.currentTime+i*0.18+0.24);
+    });
+  }catch(e){}
+}
+
 var recognition=null;
 var voiceListening=false;
 // Stat keywords — longer phrases first (so 'flag pull' matches before 'flag')
@@ -3252,6 +3457,7 @@ function processVoiceCommand(text){
     });
     renderRots();if(G.tab==='summary')renderSummary();
     vibe([20,10,20]);
+    playVoiceSuccess();
     var sideLabel=lineupSide==='off'?'⚡ Offense':'🛡 Defense';
     if(res){
       res.className='voice-result success';
@@ -3322,13 +3528,17 @@ function processVoiceCommand(text){
       qbTDs:'TD Pass 🏈',qbInts:'INT Thrown ❌',qbConvs:'Conv Pass'};
     if(res){res.className='voice-result success';res.textContent='✅ '+dispName(matchedPlayer)+' — '+(label[matchedKey]||matchedKey);}
     vibe([30,10,30]);
+    playVoiceSuccess();
     setTimeout(function(){if(res)res.textContent='';},3000);
   } else if(matchedPlayer&&!matchedKey){
     if(res){res.className='voice-result error';res.textContent='⚠️ '+firstName(matchedPlayer)+' — which stat? Try "touchdown", "flag pull", "catch"...';}
+    playVoiceFail();
   } else if(!matchedPlayer&&matchedKey){
     if(res){res.className='voice-result error';res.textContent='⚠️ Which player? Say a player name first.';}
+    playVoiceFail();
   } else {
     if(res){res.className='voice-result error';res.textContent='❓ Try: "Jaxon touchdown" or "offense is Jaxon Reed Cade Milo Nico Phoenix"';}
+    playVoiceFail();
   }
 }
 
@@ -3617,10 +3827,14 @@ function generateParentLink(){
 function updateParentLinkUI(){
   var section=document.getElementById('parent-link-section');
   var display=document.getElementById('parent-link-display');
+  var barBtn=document.getElementById('sync-parent-btn');
   var link=generateParentLink();
-  if(link&&section){
-    section.style.display='block';
-    if(display)display.textContent=link;
+  if(link){
+    if(section){section.style.display='block';}
+    if(display){display.textContent=link;}
+    if(barBtn){barBtn.style.display='block';}
+  }else{
+    if(barBtn){barBtn.style.display='none';}
   }
 }
 function copyParentLink(){
@@ -3706,6 +3920,53 @@ window.onload=function(){
   if(_origOnload)_origOnload();
   initGate();
 };
+
+/* ════════════════════════════════════════════════════════════
+   PRO FEATURE GATING
+════════════════════════════════════════════════════════════ */
+var LS_PRO='ff_pro_v1';
+// PRO codes — separate from app access codes
+var PRO_CODES=['CGMAXPRO','PROFFTP1','COACH2026'];
+
+function isPro(){
+  return localStorage.getItem(LS_PRO)==='unlocked';
+}
+
+function proGate(feature,callback){
+  if(isPro()){
+    if(typeof callback==='function')callback();
+    return;
+  }
+  openProModal(feature,callback);
+}
+
+var _proCallback=null;
+function openProModal(feature,callback){
+  _proCallback=callback||null;
+  document.getElementById('pro-upgrade-modal').classList.add('show');
+}
+function closeProModal(){
+  document.getElementById('pro-upgrade-modal').classList.remove('show');
+  _proCallback=null;
+}
+function proContactUs(){
+  window.open('mailto:cgomez@itcc.llc?subject=CGMax%20FFTP%20Pro%20Upgrade&body=Hi%2C%20I%27d%20like%20to%20upgrade%20to%20CGMax%20FFTP%20Pro!','_blank');
+}
+// Allow entering a pro unlock code via the upgrade modal (for testing/gifting)
+function proUnlockWithCode(code){
+  if(!code)return false;
+  if(PRO_CODES.indexOf(code.toUpperCase().trim())>=0){
+    try{localStorage.setItem(LS_PRO,'unlocked');}catch(e){}
+    closeProModal();
+    showToast('⭐ Pro unlocked! Enjoy all features.');
+    vibe([30,15,30,15,50]);
+    // Re-render badges
+    try{document.querySelectorAll('.pro-badge').forEach(function(b){b.style.display='none';});}catch(e){}
+    if(typeof _proCallback==='function'){_proCallback();_proCallback=null;}
+    return true;
+  }
+  return false;
+}
 
 /* ════════════════════════════════════════════════════════════
    IMPROVED VOICE STAT LOGGING — noise filtering + better patterns

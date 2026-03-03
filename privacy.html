@@ -230,6 +230,8 @@ footer{
       <li>Your selected team colors and app preferences</li>
       <li>Multiple team profiles (team names and roster associations for coaches managing more than one team)</li>
       <li>Per-game attendance records (which players were present or absent for each game)</li>
+      <li><strong>In-game auto-save state</strong> (localStorage key: <code>ff_live_game_v1</code>): To prevent data loss when you switch apps or your screen turns off during a live game, the App automatically saves a snapshot of the active game state to localStorage. This snapshot is deleted when the game ends normally (saved to Season History) or when you start a new game. It is retained for up to 24 hours and is used solely to offer a "resume game" prompt on next app open.</li>
+      <li><strong>Pro tier status</strong> (localStorage key: <code>ff_pro_v1</code>): If you have entered a valid Pro unlock code, the App stores a flag locally indicating your Pro tier is active. The Pro unlock code itself is validated in-memory at the time of entry and is not stored in plain text in localStorage.</li>
     </ul>
     <p><strong>Optional: Live Sync &amp; Parent View data transmitted to Firebase</strong> (only when you activate this feature using your own Firebase project):</p>
     <ul>
@@ -247,6 +249,7 @@ footer{
       <li>Precise geolocation data</li>
       <li>Device identifiers, advertising IDs, or behavioral tracking data</li>
       <li>Any data from players who are minors — the App is designed so no minor's personal information is ever entered or transmitted</li>
+      <li>Audio recordings — voice commands are processed entirely by your device's on-device speech recognition engine (the browser's Speech Recognition API). The App receives only text transcriptions of recognized commands; no audio stream is captured or transmitted by ITCC LLC.</li>
     </ul>
     <p><strong>Web server access logs:</strong> Like all websites, our web host may automatically log basic access information such as your IP address, browser type, operating system, and pages visited for security and operational purposes. This data is controlled by our web hosting provider under their own privacy policy and is not linked to your coaching data.</p>
   </div>
@@ -278,6 +281,7 @@ footer{
       <li><strong>Access control:</strong> Your access code is validated locally against an embedded list. No code entry data is transmitted to our servers.</li>
       <li><strong>Live Sync &amp; Parent View (optional):</strong> When you enable Live Sync using your own Firebase project, live game data is transmitted to Firebase for real-time display to assistant coaches and parents. This transmission only occurs while you are actively hosting a session, and only if you have configured a Firebase project. ITCC LLC does not receive or access this data.</li>
       <li><strong>Security and operations:</strong> Web server access logs (IP address, browser type, referrer) are used to protect against abuse, diagnose technical issues, and maintain availability.</li>
+      <li><strong>Voice command audio feedback (Pro):</strong> When you use Voice Stat Logging, the App plays synthesized audio tones (a chime on success, a buzz on failure) using the browser's built-in Web Audio API. This sound synthesis is entirely local to your device — no audio is recorded, captured, transmitted, or stored by the App or by ITCC LLC at any point. The Web Audio API generates tones mathematically; it does not access your microphone for this purpose.</li>
       <li><strong>Communications:</strong> If you contact us at <a href="mailto:cgomez@itcc.llc">cgomez@itcc.llc</a>, we will use your email address solely to respond to your inquiry.</li>
     </ul>
   </div>
