@@ -1,32 +1,47 @@
 {
-  "name": "Flag Football Tracker",
-  "short_name": "FF Tracker",
-  "description": "Youth flag football coaching app — live stats, smart rotations, MVP rankings, and full season history.",
+  "name": "CGMax FFTP \u2014 Flag Football Tracker Pro",
+  "short_name": "CGMax FFTP",
+  "description": "Professional youth flag football coaching app by ITCC LLC. Live stats, smart rotations, MVP rankings.",
   "start_url": "./app.html",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#080808",
-  "theme_color": "#CC0000",
+  "background_color": "#060606",
+  "theme_color": "#AA0000",
   "icons": [
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
-  "categories": ["sports", "productivity"],
-  "screenshots": [
-    {
-      "src": "screenshot.png",
-      "sizes": "1170x2532",
-      "type": "image/png"
-    }
-  ]
+  "categories": [
+    "sports",
+    "productivity"
+  ],
+  "scope": "./"
 }
