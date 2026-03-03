@@ -174,18 +174,21 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
 <script>
 /* ═══════════════════════════════════════════════
    CGMax FFTP — Live Parent Scoreboard
-   Read-only real-time view via Firebase
+   Supabase-powered polling — no Firebase needed
+   Parents just open the link — zero setup!
 ═══════════════════════════════════════════════ */
 (function(){
   'use strict';
 
-  var params  = new URLSearchParams(window.location.search);
-  var SESSION = (params.get('s')||'').toUpperCase();
-  var FB_B64  = params.get('fb')||'';
+  var LIVE_GAME_URL = 'https://cgmax-fftp-backend.vercel.app/api/live-game';
+  var POLL_INTERVAL = 10000; // 10 seconds
 
-  var firebaseDb = null;
+  var params  = new URLSearchParams(window.location.search);
+  var CODE    = (params.get('code')||params.get('s')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+
+  var pollTimer  = null;
   var lastData   = null;
-  var lastTs     = 0;
+  var failCount  = 0;
 
   /* ── Color helpers ── */
   function hexToRgb(hex){
@@ -202,7 +205,7 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
   }
   function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-  /* ── Apply colors to CSS vars ── */
+  /* ── Apply team colors ── */
   function setColors(primary,secondary){
     var root=document.documentElement;
     if(primary){
@@ -221,34 +224,37 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
     if(secondary)root.style.setProperty('--s',secondary);
   }
 
-  /* ── Error display ── */
+  /* ── Error / status display ── */
   function showError(msg){var el=document.getElementById('error-banner');if(el){el.textContent=msg;el.style.display='block';}}
   function clearError(){var el=document.getElementById('error-banner');if(el)el.style.display='none';}
 
-  /* ── No config / bad link state ── */
-  function showNoConfig(){
+  function showNoCode(){
     document.getElementById('main-content').innerHTML=
       '<div class="center-box">'
       +'<div class="center-icon">🔗</div>'
       +'<div class="center-title">NEED GAME LINK</div>'
-      +'<div class="center-sub">Ask your coach to share today\'s live parent link.<br><br>Links are generated in the app\'s Live Sync menu.</div>'
+      +'<div class="center-sub">Ask your coach to share today\'s live parent link from the CGMax app.<br><br>Tap <strong>📡 Live Score</strong> in the app to generate your link.</div>'
       +'</div>';
     var badge=document.getElementById('live-status-badge');
     if(badge){badge.className='final-badge';badge.innerHTML='OFFLINE';}
   }
 
-  /* ── Guard: no session or config ── */
-  if(!SESSION||!FB_B64){showNoConfig();return;}
+  function showWaiting(){
+    document.getElementById('main-content').innerHTML=
+      '<div class="center-box">'
+      +'<div class="center-icon">⏳</div>'
+      +'<div class="center-title">WAITING FOR KICKOFF</div>'
+      +'<div class="center-sub">You\'re connected! Stats will appear here as soon as your coach starts the game.<br><br>Code: <strong>'+esc(CODE)+'</strong></div>'
+      +'</div>';
+  }
 
-  /* ── Decode Firebase config ── */
-  var fbConfig=null;
-  try{fbConfig=JSON.parse(atob(FB_B64));}catch(e){}
-  if(!fbConfig||!fbConfig.databaseURL){showNoConfig();return;}
+  if(!CODE||CODE.length!==6){showNoCode();return;}
 
   /* ════════════ RENDER ════════════ */
   function renderState(data){
     clearError();
     lastData=data;
+    failCount=0;
 
     var team     = data.team     || 'Us';
     var opp      = data.opp      || 'Them';
@@ -261,28 +267,23 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
     var ts       = data.ts       || 0;
 
     setColors(primary,secondary);
-    document.title=esc(team)+' vs '+esc(opp)+' · CGMax FFTP';
+    document.title=esc(team)+' vs '+esc(opp)+' · Live · CGMax FFTP';
 
-    /* Parse scores */
+    /* Scores */
     var scoresUs=[],scoresThem=[];
-    try{
-      var sc=JSON.parse(data.scores||'{}');
-      scoresUs=sc.us||[];scoresThem=sc.them||[];
-    }catch(e){}
+    try{var sc=JSON.parse(data.scores||'{}');scoresUs=sc.us||[];scoresThem=sc.them||[];}catch(e){}
     var usTotal  =scoresUs.reduce(function(a,b){return a+(b||0);},0);
     var themTotal=scoresThem.reduce(function(a,b){return a+(b||0);},0);
 
-    /* Parse stats */
+    /* Stats */
     var stats={};
     try{stats=JSON.parse(data.stats||'{}');}catch(e){}
 
-    /* Parse roster & absent */
-    var roster=[];
-    try{roster=JSON.parse(data.roster||'[]');}catch(e){}
-    var absent=[];
-    try{absent=JSON.parse(data.absent||'[]');}catch(e){}
+    /* Roster & absent */
+    var roster=[];try{roster=JSON.parse(data.roster||'[]');}catch(e){}
+    var absent=[];try{absent=JSON.parse(data.absent||'[]');}catch(e){}
 
-    /* Is game final? (no update in 3h, or cq > quarters) */
+    /* Is final? */
     var now=Date.now();
     var isFinal=(ts>0&&(now-ts)>3*60*60*1000)||(cq>quarters);
 
@@ -292,16 +293,15 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
       var cls=q<cq?'q-pip done':q===cq&&!isFinal?'q-pip current':'q-pip';
       pipsHtml+='<div class="'+cls+'"></div>';
     }
-    var qLabel=isFinal?'FINAL':('Q'+cq);
 
-    /* Status badge */
+    /* Badge */
     var badge=document.getElementById('live-status-badge');
     if(badge){
       if(isFinal){badge.className='final-badge';badge.innerHTML='FINAL';}
       else{badge.className='live-badge';badge.innerHTML='<div class="live-dot"></div>LIVE';}
     }
 
-    /* Last update string */
+    /* Last update */
     var lastUpdateStr='';
     if(ts){
       var mins=Math.floor((now-ts)/60000);
@@ -310,17 +310,16 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
       else lastUpdateStr='Updated '+Math.floor(mins/60)+'h ago';
     }
 
-    /* Player stat totals */
+    /* Player scores */
     var allPlayers=roster.length>0?roster:Object.keys(stats);
     var playerScores=[];
     allPlayers.forEach(function(name){
       if(absent.indexOf(name)>=0)return;
       var totC=0,totT=0,totF=0,totI=0,totCV=0,totQBT=0,totQBI=0,totQBC=0;
-      var qs=Object.keys(stats[name]||{});
-      qs.forEach(function(q){
+      Object.keys(stats[name]||{}).forEach(function(q){
         var st=(stats[name]||{})[q]||{};
-        totC  +=st.catches||0;totT+=st.tds||0;totF+=st.flags||0;totI+=st.ints||0;
-        totCV +=(st.conv1||0)+(st.conv2||0);
+        totC+=st.catches||0;totT+=st.tds||0;totF+=st.flags||0;totI+=st.ints||0;
+        totCV+=(st.conv1||0)+(st.conv2||0);
         totQBT+=st.qbTDs||0;totQBI+=st.qbInts||0;totQBC+=st.qbConvs||0;
       });
       var score=totQBT*10+totT*10+totI*8+totC*3+totF*2+totCV*4+totQBC*4-totQBI*3;
@@ -328,9 +327,8 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
     });
     playerScores.sort(function(a,b){return b.score-a.score;});
 
-    /* Build player rows */
-    var rankIcons=['🥇','🥈','🎖️'];
-    var rankCls  =['g1','g2','g3'];
+    /* Player rows */
+    var rankIcons=['🥇','🥈','🎖️'],rankCls=['g1','g2','g3'];
     var statsHtml=playerScores.map(function(p,i){
       var pills='';
       if(p.isQB){
@@ -356,7 +354,7 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
         +'</div>';
     }).join('');
 
-    /* Quarter-by-quarter score row */
+    /* Q-by-Q scores */
     var qScoreHtml='';
     if(scoresUs.length>1){
       qScoreHtml='<div class="q-score-row">';
@@ -367,112 +365,81 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
           +'<span class="q-us">'+(scoresUs[qi]||0)+'</span>'
           +'<span class="q-sep">–</span>'
           +'<span class="q-them">'+(scoresThem[qi]||0)+'</span>'
-          +'</div>'
-          +'</div>';
+          +'</div></div>';
       }
       qScoreHtml+='</div>';
     }
 
-    /* Format date */
+    /* Date */
     var dateLine='';
     if(dateStr){try{dateLine=new Date(dateStr+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}catch(e){}}
 
-    /* Assemble HTML */
-    var html='';
-
-    html+='<div class="matchup-section">';
+    /* Assemble */
+    var html='<div class="matchup-section">';
     if(dateLine)html+='<div class="matchup-date">'+dateLine+'</div>';
     html+='</div>';
-
-    html+='<div class="scoreboard">';
-    html+='<div class="score-team"><div class="score-name">'+esc(team)+'</div><div class="score-num us">'+usTotal+'</div></div>';
-    html+='<div class="score-sep">–</div>';
-    html+='<div class="score-team"><div class="score-name">'+esc(opp)+'</div><div class="score-num">'+themTotal+'</div></div>';
-    html+='</div>';
-
-    html+='<div class="quarter-bar">'+pipsHtml+'<div class="q-label">'+qLabel+'</div></div>';
-
+    html+='<div class="scoreboard">'
+      +'<div class="score-team"><div class="score-name">'+esc(team)+'</div><div class="score-num us">'+usTotal+'</div></div>'
+      +'<div class="score-sep">–</div>'
+      +'<div class="score-team"><div class="score-name">'+esc(opp)+'</div><div class="score-num">'+themTotal+'</div></div>'
+      +'</div>';
+    html+='<div class="quarter-bar">'+pipsHtml+'<div class="q-label">'+(isFinal?'FINAL':('Q'+cq))+'</div></div>';
     if(qScoreHtml)html+=qScoreHtml;
     if(lastUpdateStr)html+='<div class="last-update">'+lastUpdateStr+'</div>';
-
     if(playerScores.length>0){
-      html+='<hr class="section-div">';
-      html+='<div class="section-lbl">Player Performance</div>';
-      html+='<div class="stats-wrap"><div class="stat-card">'+statsHtml+'</div></div>';
+      html+='<hr class="section-div"><div class="section-lbl">Player Performance</div>'
+        +'<div class="stats-wrap"><div class="stat-card">'+statsHtml+'</div></div>';
     }else{
-      html+='<div class="center-box" style="padding-top:20px;padding-bottom:20px;">';
-      html+='<div class="center-icon">🏈</div>';
-      html+='<div class="center-title">GAME ON!</div>';
-      html+='<div class="center-sub">Stats will appear here as your coach logs plays.</div>';
-      html+='</div>';
+      html+='<div class="center-box" style="padding-top:20px;padding-bottom:20px;">'
+        +'<div class="center-icon">🏈</div>'
+        +'<div class="center-title">GAME ON!</div>'
+        +'<div class="center-sub">Stats will appear here as your coach logs plays.</div>'
+        +'</div>';
     }
-
     document.getElementById('main-content').innerHTML=html;
   }
 
-  /* ════════════ FIREBASE ════════════ */
-  function initFirebase(){
-    if(typeof firebase!=='undefined'){connectToSession();return;}
-    var s1=document.createElement('script');
-    s1.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
-    s1.onload=function(){
-      var s2=document.createElement('script');
-      s2.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js';
-      s2.onload=function(){connectToSession();};
-      s2.onerror=function(){showError('⚠ Could not load live data SDK. Check your connection.');};
-      document.head.appendChild(s2);
-    };
-    s1.onerror=function(){showError('⚠ Could not connect. Check your internet connection.');};
-    document.head.appendChild(s1);
-  }
-
-  function connectToSession(){
-    try{
-      var app=firebase.apps.length?firebase.apps[0]:firebase.initializeApp(fbConfig);
-      firebaseDb=firebase.database(app);
-
-      /* Real-time listener */
-      firebaseDb.ref('sessions/'+SESSION+'/state').on('value',function(snap){
-        var data=snap.val();
-        if(!data){
-          document.getElementById('main-content').innerHTML=
-            '<div class="center-box">'
-            +'<div class="center-icon">⏳</div>'
-            +'<div class="center-title">WAITING FOR GAME</div>'
-            +'<div class="center-sub">The coach hasn\'t started live tracking yet.<br>You\'re all set — stats will appear automatically!</div>'
-            +'</div>';
+  /* ════════════ POLLING ════════════ */
+  function poll(){
+    fetch(LIVE_GAME_URL+'?code='+encodeURIComponent(CODE))
+      .then(function(r){return r.json();})
+      .then(function(resp){
+        if(!resp.found){
+          if(!lastData)showWaiting();
           return;
         }
-        renderState(data);
-        lastTs=Date.now();
-        clearError();
-      },function(err){
-        showError('⚠ Connection error — '+err.message);
+        renderState(resp.game_data);
+      })
+      .catch(function(){
+        failCount++;
+        if(failCount>=3){
+          showError('⚠ Connection issue — retrying…');
+        }
       });
-
-      /* Connection monitor */
-      firebaseDb.ref('.info/connected').on('value',function(snap){
-        if(!snap.val()&&lastData){showError('⚠ Connection lost. Reconnecting…');}
-        else if(snap.val()){clearError();}
-      });
-    }catch(e){
-      showError('⚠ Setup error: '+e.message);
-    }
   }
 
-  /* ── Manual refresh ── */
+  /* Manual refresh */
   window.manualRefresh=function(){
-    if(firebaseDb){
-      clearError();
-      var btn=document.querySelector('.hdr-refresh');
-      if(btn){btn.textContent='✓';setTimeout(function(){btn.textContent='⟳';},1000);}
-    }else{
-      window.location.reload();
-    }
+    clearError();
+    poll();
+    var btn=document.querySelector('.hdr-refresh');
+    if(btn){btn.textContent='✓';setTimeout(function(){btn.textContent='⟳';},1000);}
   };
 
-  /* ── Start ── */
-  initFirebase();
+  /* Start polling */
+  showWaiting();
+  poll(); // immediate first fetch
+  pollTimer=setInterval(poll,POLL_INTERVAL);
+
+  /* Stop polling when tab hidden, resume when visible */
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden){
+      if(pollTimer){clearInterval(pollTimer);pollTimer=null;}
+    }else{
+      poll();
+      pollTimer=setInterval(poll,POLL_INTERVAL);
+    }
+  });
 
 })();
 </script>

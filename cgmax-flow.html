@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CGMax FFTP — System Architecture & Payment Flow</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #060606;
+    color: #F5F0E8;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+  }
+  h1 {
+    font-size: 28px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #FFD700;
+    text-align: center;
+    margin-bottom: 6px;
+    font-weight: 800;
+  }
+  .subtitle {
+    text-align: center;
+    color: rgba(255,215,0,.45);
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 48px;
+  }
+
+  /* ── FLOW CONTAINER ── */
+  .flow {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: center;
+  }
+
+  /* ── ROW ── */
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    width: 100%;
+  }
+  .row-3 { justify-content: space-between; }
+
+  /* ── NODE ── */
+  .node {
+    border-radius: 16px;
+    padding: 18px 20px;
+    text-align: center;
+    position: relative;
+    min-width: 140px;
+    max-width: 180px;
+    flex: 1;
+  }
+  .node-icon { font-size: 32px; margin-bottom: 8px; }
+  .node-label {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .node-sub {
+    font-size: 11px;
+    opacity: 0.6;
+    line-height: 1.4;
+  }
+  .node-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-top: 6px;
+  }
+
+  /* ── COLORS ── */
+  .n-user    { background: rgba(255,215,0,.08); border: 1.5px solid rgba(255,215,0,.3); }
+  .n-github  { background: rgba(255,255,255,.05); border: 1.5px solid rgba(255,255,255,.18); }
+  .n-stripe  { background: rgba(99,91,255,.12); border: 1.5px solid rgba(99,91,255,.4); }
+  .n-vercel  { background: rgba(255,255,255,.05); border: 1.5px solid rgba(255,255,255,.2); }
+  .n-supabase{ background: rgba(62,207,142,.1); border: 1.5px solid rgba(62,207,142,.35); }
+  .n-resend  { background: rgba(99,179,237,.1); border: 1.5px solid rgba(99,179,237,.35); }
+  .n-email   { background: rgba(255,215,0,.08); border: 1.5px solid rgba(255,215,0,.25); }
+  .n-app     { background: rgba(170,0,0,.18); border: 1.5px solid rgba(255,80,80,.35); }
+
+  .tag-free  { background: rgba(62,207,142,.2); color: #3ECF8E; }
+  .tag-paid  { background: rgba(99,91,255,.25); color: #a79fff; }
+  .tag-infra { background: rgba(255,255,255,.1); color: rgba(255,255,255,.5); }
+  .tag-email { background: rgba(99,179,237,.2); color: #63b3ed; }
+
+  /* ── ARROWS ── */
+  .arr {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 4px;
+    min-width: 50px;
+  }
+  .arr-line {
+    width: 2px;
+    background: rgba(255,215,0,.25);
+    flex: 1;
+    min-height: 32px;
+  }
+  .arr-h {
+    height: 2px;
+    background: rgba(255,215,0,.25);
+    flex: 1;
+    min-width: 24px;
+  }
+  .arr-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,215,0,.45);
+    text-align: center;
+    white-space: nowrap;
+    padding: 2px 0;
+  }
+  .arr-head { font-size: 14px; color: rgba(255,215,0,.5); line-height: 1; }
+
+  /* ── SECTION HEADERS ── */
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,215,0,.3);
+    text-align: center;
+    margin: 20px 0 12px;
+    width: 100%;
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    max-width: 960px;
+    margin: 48px auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: rgba(255,255,255,.55);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* ── STEP NUMBERS ── */
+  .step-badge {
+    position: absolute;
+    top: -10px; left: -10px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #FFD700;
+    color: #000;
+    font-size: 11px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 100%;
+    max-width: 960px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,215,0,.15), transparent);
+    margin: 32px 0;
+  }
+
+  /* ── SIDE BRANCH ── */
+  .branch-row {
+    display: flex;
+    width: 100%;
+    max-width: 960px;
+    gap: 0;
+    align-items: stretch;
+    justify-content: center;
+  }
+  .branch-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+  }
+  .branch-h {
+    height: 2px;
+    background: rgba(255,215,0,.2);
+    width: 100%;
+  }
+
+  .note {
+    max-width: 960px;
+    width: 100%;
+    background: rgba(255,215,0,.04);
+    border: 1px solid rgba(255,215,0,.12);
+    border-left: 3px solid rgba(255,215,0,.4);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    font-size: 12px;
+    color: rgba(255,255,255,.55);
+    line-height: 1.7;
+    margin-top: 8px;
+  }
+  .note strong { color: rgba(255,215,0,.75); }
+
+  svg.connector {
+    overflow: visible;
+  }
+</style>
+</head>
+<body>
+
+<h1>CGMax FFTP — System Architecture</h1>
+<div class="subtitle">Payment Flow &amp; Service Connections</div>
+
+<div class="flow">
+
+  <!-- ══ SECTION 1: COACH JOURNEY ══ -->
+  <div class="section-label">① Coach Discovers &amp; Subscribes</div>
+
+  <div class="row">
+    <!-- Coach -->
+    <div class="node n-user">
+      <div class="node-icon">🏈</div>
+      <div class="node-label">Coach</div>
+      <div class="node-sub">Visits app URL on phone or desktop</div>
+      <span class="node-tag tag-free">User</span>
+    </div>
+
+    <!-- Arrow -->
+    <div class="arr">
+      <div class="arr-h"></div>
+      <div class="arr-label">visits</div>
+      <div class="arr-h"></div>
+      <div class="arr-head">▶</div>
+    </div>
+
+    <!-- GitHub Pages -->
+    <div class="node n-github">
+      <div class="node-icon">🌐</div>
+      <div class="node-label">GitHub Pages</div>
+      <div class="node-sub">cwdgomez.github.io/flagfootball</div>
+      <span class="node-tag tag-infra">Hosting (Free)</span>
+    </div>
+
+    <!-- Arrow -->
+    <div class="arr">
+      <div class="arr-h"></div>
+      <div class="arr-label">serves</div>
+      <div class="arr-h"></div>
+      <div class="arr-head">▶</div>
+    </div>
+
+    <!-- App -->
+    <div class="node n-app" style="max-width:200px;">
+      <div class="node-icon">📱</div>
+      <div class="node-label">CGMax FFTP App</div>
+      <div class="node-sub">index.html · app.html · PWA</div>
+      <span class="node-tag tag-free">Lite = Free</span>
+    </div>
+  </div>
+
+  <!-- Down arrow -->
+  <div class="arr" style="min-width:0; padding: 4px 0;">
+    <div class="arr-line"></div>
+    <div class="arr-label">clicks Go Pro</div>
+    <div class="arr-line"></div>
+    <div class="arr-head">▼</div>
+  </div>
+
+  <!-- ══ SECTION 2: PAYMENT ══ -->
+  <div class="section-label">② Payment via Stripe</div>
+
+  <div class="row">
+    <div class="node n-stripe" style="max-width:220px;">
+      <div class="step-badge">2</div>
+      <div class="node-icon">💳</div>
+      <div class="node-label">Stripe Checkout</div>
+      <div class="node-sub">$9.99/mo or $79.99/yr<br>Coupon: CGBETA2026</div>
+      <span class="node-tag tag-paid">Payment Processor</span>
+    </div>
+  </div>
+
+  <!-- Down arrow after payment -->
+  <div class="arr" style="min-width:0; padding: 4px 0;">
+    <div class="arr-line"></div>
+    <div class="arr-label">payment success → webhook</div>
+    <div class="arr-line"></div>
+    <div class="arr-head">▼</div>
+  </div>
+
+  <!-- ══ SECTION 3: BACKEND ══ -->
+  <div class="section-label">③ Backend Processes Subscription</div>
+
+  <div class="row" style="gap: 0; align-items: flex-start; max-width: 960px; width: 100%;">
+
+    <!-- Vercel -->
+    <div class="branch-col">
+      <div class="node n-vercel" style="width:100%; max-width:none;">
+        <div class="step-badge">3</div>
+        <div class="node-icon">⚡</div>
+        <div class="node-label">Vercel Functions</div>
+        <div class="node-sub">stripe-webhook.js<br>validate-license.js</div>
+        <span class="node-tag tag-infra">Serverless Backend</span>
+      </div>
+      <div class="arr" style="min-width:0; padding: 4px 0; height: 40px;">
+        <div class="arr-line"></div>
+        <div class="arr-label">reads/writes</div>
+        <div class="arr-line"></div>
+        <div class="arr-head">▼</div>
+      </div>
+      <!-- Supabase -->
+      <div class="node n-supabase" style="width:100%; max-width:none;">
+        <div class="step-badge">4</div>
+        <div class="node-icon">🗄️</div>
+        <div class="node-label">Supabase DB</div>
+        <div class="node-sub">Stores: email · license key<br>plan · status · period end</div>
+        <span class="node-tag tag-infra">License Database</span>
+      </div>
+    </div>
+
+    <!-- Center connector -->
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding: 20px 12px 0; gap: 6px; min-width: 80px;">
+      <div style="font-size:11px; color:rgba(255,215,0,.35); letter-spacing:1px; text-transform:uppercase; writing-mode:vertical-lr; transform:rotate(180deg);">also sends email</div>
+      <div style="width:2px; flex:1; background:rgba(99,179,237,.3); min-height:60px;"></div>
+      <div style="font-size:14px; color:rgba(99,179,237,.5);">▶</div>
+    </div>
+
+    <!-- Resend + Email -->
+    <div class="branch-col">
+      <div class="node n-resend" style="width:100%; max-width:none;">
+        <div class="step-badge">5</div>
+        <div class="node-icon">📨</div>
+        <div class="node-label">Resend</div>
+        <div class="node-sub">Sends license key email<br>from pro-version@itcc.llc</div>
+        <span class="node-tag tag-email">Email Delivery</span>
+      </div>
+      <div class="arr" style="min-width:0; padding: 4px 0; height: 40px;">
+        <div class="arr-line" style="background:rgba(99,179,237,.3);"></div>
+        <div class="arr-label">delivers to</div>
+        <div class="arr-line" style="background:rgba(99,179,237,.3);"></div>
+        <div class="arr-head" style="color:rgba(99,179,237,.6);">▼</div>
+      </div>
+      <!-- Coach Inbox -->
+      <div class="node n-email" style="width:100%; max-width:none;">
+        <div class="step-badge">6</div>
+        <div class="node-icon">📬</div>
+        <div class="node-label">Coach's Inbox</div>
+        <div class="node-sub">Receives CGMAX-XXXX-XXXX-XXXX<br>license key + setup instructions</div>
+        <span class="node-tag tag-free">Coach</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Down arrow after backend -->
+  <div class="arr" style="min-width:0; padding: 4px 0;">
+    <div class="arr-line"></div>
+    <div class="arr-label">enters license key in app</div>
+    <div class="arr-line"></div>
+    <div class="arr-head">▼</div>
+  </div>
+
+  <!-- ══ SECTION 4: VALIDATION ══ -->
+  <div class="section-label">④ Real-Time License Validation</div>
+
+  <div class="row">
+    <div class="node n-app" style="max-width:200px;">
+      <div class="node-icon">📱</div>
+      <div class="node-label">CGMax App</div>
+      <div class="node-sub">Coach enters license key in Pro modal</div>
+    </div>
+
+    <div class="arr">
+      <div class="arr-h"></div>
+      <div class="arr-label">POST /api/validate-license</div>
+      <div class="arr-h"></div>
+      <div class="arr-head">▶</div>
+    </div>
+
+    <div class="node n-vercel">
+      <div class="node-icon">⚡</div>
+      <div class="node-label">Vercel</div>
+      <div class="node-sub">Checks Supabase for active subscription</div>
+    </div>
+
+    <div class="arr">
+      <div class="arr-h"></div>
+      <div class="arr-label">✓ valid / ✗ expired</div>
+      <div class="arr-h"></div>
+      <div class="arr-head">▶</div>
+    </div>
+
+    <div class="node n-user">
+      <div class="node-icon">⭐</div>
+      <div class="node-label">Pro Unlocked</div>
+      <div class="node-sub">All Pro features enabled instantly</div>
+      <span class="node-tag tag-paid">Pro Active</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ LEGEND ══ -->
+  <div class="section-label" style="margin-top:0;">Service Overview</div>
+
+  <div style="max-width:960px; width:100%; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-top:8px;">
+
+    <div style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:16px;">
+      <div style="font-size:18px; margin-bottom:6px;">🌐</div>
+      <div style="font-size:12px; font-weight:800; letter-spacing:1px; color:rgba(255,255,255,.8); margin-bottom:4px;">GitHub Pages</div>
+      <div style="font-size:11px; color:rgba(255,255,255,.4); line-height:1.5;">Hosts your static PWA files. Free. Served via HTTPS. Auto-deploys when you push to main.</div>
+    </div>
+
+    <div style="background:rgba(99,91,255,.08); border:1px solid rgba(99,91,255,.3); border-radius:12px; padding:16px;">
+      <div style="font-size:18px; margin-bottom:6px;">💳</div>
+      <div style="font-size:12px; font-weight:800; letter-spacing:1px; color:rgba(255,255,255,.8); margin-bottom:4px;">Stripe</div>
+      <div style="font-size:11px; color:rgba(255,255,255,.4); line-height:1.5;">Handles all payments. $9.99/mo or $79.99/yr. Sends webhooks on every billing event. Never touches your servers.</div>
+    </div>
+
+    <div style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:16px;">
+      <div style="font-size:18px; margin-bottom:6px;">⚡</div>
+      <div style="font-size:12px; font-weight:800; letter-spacing:1px; color:rgba(255,255,255,.8); margin-bottom:4px;">Vercel</div>
+      <div style="font-size:11px; color:rgba(255,255,255,.4); line-height:1.5;">Runs your two serverless functions. Receives Stripe webhooks and validates license keys on demand. Free tier.</div>
+    </div>
+
+    <div style="background:rgba(62,207,142,.07); border:1px solid rgba(62,207,142,.3); border-radius:12px; padding:16px;">
+      <div style="font-size:18px; margin-bottom:6px;">🗄️</div>
+      <div style="font-size:12px; font-weight:800; letter-spacing:1px; color:rgba(255,255,255,.8); margin-bottom:4px;">Supabase</div>
+      <div style="font-size:11px; color:rgba(255,255,255,.4); line-height:1.5;">PostgreSQL database storing license keys, emails, subscription status, and billing period. Free tier. Row-level security enabled.</div>
+    </div>
+
+    <div style="background:rgba(99,179,237,.07); border:1px solid rgba(99,179,237,.3); border-radius:12px; padding:16px;">
+      <div style="font-size:18px; margin-bottom:6px;">📨</div>
+      <div style="font-size:12px; font-weight:800; letter-spacing:1px; color:rgba(255,255,255,.8); margin-bottom:4px;">Resend</div>
+      <div style="font-size:11px; color:rgba(255,255,255,.4); line-height:1.5;">Sends the license key delivery email from pro-version@itcc.llc. Triggered automatically on every new subscription. Free tier.</div>
+    </div>
+
+    <div style="background:rgba(170,0,0,.12); border:1px solid rgba(255,80,80,.25); border-radius:12px; padding:16px;">
+      <div style="font-size:18px; margin-bottom:6px;">📱</div>
+      <div style="font-size:12px; font-weight:800; letter-spacing:1px; color:rgba(255,255,255,.8); margin-bottom:4px;">CGMax FFTP App</div>
+      <div style="font-size:11px; color:rgba(255,255,255,.4); line-height:1.5;">PWA on GitHub Pages. All coaching data stays on-device (localStorage). Only license key is sent to backend for validation.</div>
+    </div>
+
+  </div>
+
+  <div class="note" style="margin-top:24px;">
+    <strong>Monthly cost at current scale: ~$0.</strong> All services run on free tiers. Stripe charges 2.9% + 30¢ per transaction (deducted from revenue automatically). First paid customer is pure profit minus Stripe fees.
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1253,63 +1253,32 @@ body.light-mode .toast-msg{color:#1a1714;}
   </div>
 </div>
 
-<!-- MULTIPLAYER SYNC MODAL -->
-<!-- PRO UPGRADE MODAL -->
-<div class="pro-upgrade-modal" id="pro-upgrade-modal">
-  <div class="pro-upgrade-box">
-    <div class="pro-upgrade-star">⭐</div>
-    <div class="pro-upgrade-title">CGMax Pro</div>
-    <div class="pro-upgrade-sub">Unlock the full coaching experience</div>
-    <div class="pro-feature-list">
-      <div class="pro-feature-item">🎙️ Voice Command Logging</div>
-      <div class="pro-feature-item">📚 Season Stats &amp; Leaderboard</div>
-      <div class="pro-feature-item">📡 Live Sync &amp; Parent View</div>
-      <div class="pro-feature-item">🏟️ Manage Multiple Teams</div>
-      <div class="pro-feature-item">📤 Export Game Reports</div>
-      <div class="pro-feature-item">🖨️ Print Game Summary</div>
-    </div>
-    <button type="button" class="pro-cta-btn" onclick="proContactUs()">✉️ Contact Us to Upgrade</button>
-    <div style="display:flex;gap:8px;margin-bottom:10px;">
-      <input type="text" id="pro-code-input" placeholder="Have a code? Enter it here"
-        style="flex:1;background:var(--dark3);border:1px solid var(--dark5);border-radius:9px;padding:9px 12px;color:var(--txt);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;outline:none;text-transform:uppercase;"
-        oninput="this.value=this.value.toUpperCase()">
-      <button type="button" onclick="var c=document.getElementById('pro-code-input').value;if(!proUnlockWithCode(c)){document.getElementById('pro-code-input').value='';showToast('❌ Invalid code');}"
-        style="background:var(--dark4);border:1px solid var(--dark5);border-radius:9px;padding:9px 14px;color:var(--s);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Unlock</button>
-    </div>
-    <button type="button" class="pro-dismiss-btn" onclick="closeProModal()">Maybe Later</button>
-  </div>
-</div>
-
+<!-- LIVE PARENT SCOREBOARD MODAL -->
 <div class="sync-modal" id="sync-modal">
   <div class="sync-box">
-    <div class="sync-box-title">🔄 Live Sync</div>
-    <div class="sync-box-sub">Real-time multiplayer · Two coaches, one game</div>
+    <div class="sync-box-title">📡 Live Parent Score</div>
+    <div class="sync-box-sub">Parents see live scores on their phone · No app needed</div>
     <div class="sync-tabs">
-      <button type="button" class="sync-tab active" id="sync-tab-host" onclick="syncSwitchTab('host')">Host Game</button>
-      <button type="button" class="sync-tab" id="sync-tab-join" onclick="syncSwitchTab('join')">Join Game</button>
+      <button type="button" class="sync-tab active" id="sync-tab-host" onclick="syncSwitchTab('host')">Go Live</button>
+      <button type="button" class="sync-tab" id="sync-tab-join" onclick="syncSwitchTab('join')">View a Game</button>
     </div>
     <div class="sync-panel active" id="sync-panel-host">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;">Share this code with your assistant coach:</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;">Your game code — share with parents:</div>
       <div class="sync-code-display" id="sync-host-code">——</div>
       <button type="button" class="sync-copy-btn" onclick="copySessionCode()">📋 Copy Code</button>
-      <div class="sync-fb-note">Requires a free Firebase project.<br>Paste your config in the Firebase Setup section below.<br>Assistant coach sees stats live as you tap.</div>
-      <button type="button" class="sync-join-btn" onclick="hostSession()" style="background:linear-gradient(135deg,var(--teal),#0f766e);color:#fff;">📡 Start Hosting</button>
-      <!-- PARENT LINK — shown after hosting starts -->
+      <div class="sync-fb-note">Tap Go Live → text parents the link. Scores update automatically every 15 seconds. Works on any phone, no app required.</div>
+      <button type="button" class="sync-join-btn" onclick="hostSession()" style="background:linear-gradient(135deg,var(--teal),#0f766e);color:#fff;">📡 Go Live Now</button>
       <div id="parent-link-section" style="display:none;margin-top:12px;background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.18);border-radius:10px;padding:10px 12px;">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--s);text-transform:uppercase;margin-bottom:5px;">📱 Parent View Link</div>
-        <div style="font-family:'Barlow',sans-serif;font-size:11px;color:var(--dim);margin-bottom:7px;">Send this to parents for a live read-only view</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--s);text-transform:uppercase;margin-bottom:5px;">📱 Parent Link — Text This!</div>
         <div id="parent-link-display" style="background:var(--dark2);border:1px solid var(--dark5);border-radius:6px;padding:6px 8px;font-family:monospace;font-size:9px;color:var(--dim);word-break:break-all;margin-bottom:7px;max-height:52px;overflow:hidden;">—</div>
-        <button type="button" class="sync-copy-btn" onclick="copyParentLink()" style="width:100%;font-size:12px;">📋 Copy Parent Link</button>
+        <button type="button" class="sync-copy-btn" onclick="copyParentLink()" style="width:100%;font-size:12px;">📋 Copy &amp; Share Link</button>
+        <button type="button" class="sync-copy-btn" onclick="stopLiveSync();closeSyncModal();" style="width:100%;font-size:12px;margin-top:6px;background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#ef4444;">⏹ Stop Live Score</button>
       </div>
     </div>
     <div class="sync-panel" id="sync-panel-join">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;">Enter the 6-letter code from the host coach:</div>
-      <input type="text" class="sync-join-input" id="sync-join-code-input" maxlength="6" placeholder="ABC123" oninput="this.value=this.value.toUpperCase()">
-      <button type="button" class="sync-join-btn" onclick="joinSession()" style="background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;">🔌 Join Game</button>
-    </div>
-    <div style="margin-top:12px;">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--dimmer);text-transform:uppercase;margin-bottom:6px;">Firebase Config (paste yours)</div>
-      <textarea id="sync-fb-config" rows="3" style="width:100%;background:var(--dark3);border:1px solid var(--dark5);border-radius:8px;padding:8px;color:var(--dim);font-family:monospace;font-size:10px;resize:none;outline:none;" placeholder='{"apiKey":"...","databaseURL":"https://your-project.firebaseio.com",...}'></textarea>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;">Enter a 6-character game code to view live:</div>
+      <input type="text" class="sync-join-input" id="sync-join-code-input" maxlength="6" placeholder="A3F9K2" oninput="this.value=this.value.toUpperCase()">
+      <button type="button" class="sync-join-btn" onclick="joinSession()" style="background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;">📱 Open Live View</button>
     </div>
     <button type="button" class="sync-dismiss" onclick="closeSyncModal()">Dismiss</button>
   </div>
@@ -1577,7 +1546,7 @@ function applyTheme(){
   }
 
   var hdr=document.getElementById('app-header');
-  if(hdr) hdr.style.background='linear-gradient(180deg,'+rgba(pSafe,.4)+' 0%,var(--dark2) 100%)';
+  if(hdr) hdr.style.background='linear-gradient(180deg,var(--dark2) 0%,'+rgba(pSafe,.18)+' 100%)';
 
   var sb=document.getElementById('scoreboard');
   if(sb) sb.style.background='linear-gradient(135deg,'+rgba(pSafe,.18)+' 0%,var(--dark2) 100%)';
@@ -2759,6 +2728,34 @@ function copyShareText(){
 }
 
 </script>
+
+<!-- PRO UPGRADE MODAL — must be a direct child of body to avoid stacking context issues -->
+<div class="pro-upgrade-modal" id="pro-upgrade-modal">
+  <div class="pro-upgrade-box">
+    <div class="pro-upgrade-star">⭐</div>
+    <div class="pro-upgrade-title">CGMax Pro</div>
+    <div class="pro-upgrade-sub">Unlock the full coaching experience</div>
+    <div class="pro-feature-list">
+      <div class="pro-feature-item">🎙️ Voice Command Logging</div>
+      <div class="pro-feature-item">📚 Season Stats &amp; Leaderboard</div>
+      <div class="pro-feature-item">📡 Live Sync &amp; Parent View</div>
+      <div class="pro-feature-item">🏟️ Manage Multiple Teams</div>
+      <div class="pro-feature-item">📤 Export Game Reports</div>
+      <div class="pro-feature-item">🖨️ Print Game Summary</div>
+    </div>
+    <button type="button" class="pro-cta-btn" onclick="proUpgradeAnnual()" style="margin-bottom:6px;">⭐ Go Pro — $79.99 / year</button>
+    <button type="button" onclick="proUpgradeMonthly()" style="width:100%;background:none;border:1px solid rgba(251,191,36,.35);border-radius:12px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:#f59e0b;cursor:pointer;margin-bottom:14px;">or $9.99 / month</button>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input type="text" id="pro-code-input" placeholder="License key: CGMAX-XXXX-XXXX-XXXX"
+        style="flex:1;background:var(--dark3);border:1px solid var(--dark5);border-radius:9px;padding:9px 12px;color:var(--txt);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;outline:none;text-transform:uppercase;"
+        oninput="this.value=this.value.toUpperCase()">
+      <button type="button" onclick="proUnlockWithCode(document.getElementById('pro-code-input').value)"
+        style="background:var(--dark4);border:1px solid var(--dark5);border-radius:9px;padding:9px 14px;color:var(--s);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Unlock</button>
+    </div>
+    <button type="button" class="pro-dismiss-btn" onclick="closeProModal()">Maybe Later</button>
+  </div>
+</div>
+
 </body>
 </html>
 <script>
@@ -3646,65 +3643,31 @@ function exportCSV(){
 }
 
 /* ════════════════════════════════════════════════════════════
-   LIVE MULTIPLAYER SYNC  (Firebase Realtime Database)
-   ─ Works only when user provides their Firebase config
-   ─ Graceful no-op when Firebase is not configured
+   LIVE PARENT SCOREBOARD  (Supabase-powered — no setup needed)
+   ─ Pro feature — requires active license key
+   ─ Coach taps one button → gets 6-char code + shareable link
+   ─ Parents open link, scores auto-refresh every 10 seconds
 ════════════════════════════════════════════════════════════ */
-var FB=null; // Firebase database instance
 var syncSession=null;
-var syncRole=null; // 'host' or 'guest'
+var syncActive=false;
+var syncInterval=null;
 var syncPushPending=false;
-var LS_FB_CONFIG='ff_fb_config';
-
-function getFBConfig(){
-  try{
-    var raw=document.getElementById('sync-fb-config').value.trim();
-    if(!raw)raw=localStorage.getItem(LS_FB_CONFIG)||'';
-    if(!raw)return null;
-    var cfg=JSON.parse(raw);
-    if(!cfg.databaseURL)return null;
-    return cfg;
-  }catch(e){return null;}
-}
-
-function initFirebase(cfg){
-  return new Promise(function(resolve,reject){
-    if(FB){resolve(FB);return;}
-    if(typeof firebase!=='undefined'){
-      try{
-        var app=firebase.apps.length?firebase.apps[0]:firebase.initializeApp(cfg);
-        FB=firebase.database(app);resolve(FB);
-      }catch(e){reject(e);}
-      return;
-    }
-    // Dynamically load Firebase
-    var s1=document.createElement('script');
-    s1.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
-    s1.onload=function(){
-      var s2=document.createElement('script');
-      s2.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js';
-      s2.onload=function(){
-        try{
-          var app=firebase.apps.length?firebase.apps[0]:firebase.initializeApp(cfg);
-          FB=firebase.database(app);resolve(FB);
-        }catch(e){reject(e);}
-      };
-      s2.onerror=function(){reject(new Error('Failed to load Firebase database SDK'));};
-      document.head.appendChild(s2);
-    };
-    s1.onerror=function(){reject(new Error('Failed to load Firebase SDK'));};
-    document.head.appendChild(s1);
-  });
-}
+var LIVE_GAME_URL='https://cgmax-fftp-backend.vercel.app/api/live-game';
 
 function genSessionCode(){
-  return Math.random().toString(36).substr(2,6).toUpperCase();
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var code='';
+  for(var i=0;i<6;i++)code+=chars.charAt(Math.floor(Math.random()*chars.length));
+  return code;
 }
 
 function openSyncModal(){
-  syncSession=syncSession||genSessionCode();
-  document.getElementById('sync-host-code').textContent=syncSession;
-  document.getElementById('sync-modal').classList.add('show');
+  proGate('liveSync',function(){
+    if(!syncSession)syncSession=genSessionCode();
+    document.getElementById('sync-host-code').textContent=syncSession;
+    document.getElementById('sync-modal').classList.add('show');
+    if(syncActive)updateParentLinkUI();
+  });
 }
 function closeSyncModal(){document.getElementById('sync-modal').classList.remove('show');}
 function syncSwitchTab(tab){
@@ -3715,92 +3678,83 @@ function syncSwitchTab(tab){
 }
 function copySessionCode(){
   var code=document.getElementById('sync-host-code').textContent;
-  if(navigator.clipboard)navigator.clipboard.writeText(code).then(function(){showToast('Session code copied: '+code);});
+  if(navigator.clipboard)navigator.clipboard.writeText(code).then(function(){showToast('📋 Code copied: '+code);});
 }
 
 function hostSession(){
-  var cfg=getFBConfig();
-  if(!cfg){
-    showToast('❌ Paste your Firebase config first');return;
+  var licenseKey=localStorage.getItem(LS_LICENSE)||'';
+  if(!licenseKey){showToast('❌ Pro license required — enter your key first');return;}
+  syncActive=true;
+  closeSyncModal();
+  showSyncBar('Live · Code: '+syncSession,'online',syncSession);
+  updateParentLinkUI();
+  showToast('📡 Live scoreboard ON! Parents can open the link now.');
+  syncPush();
+  if(syncInterval)clearInterval(syncInterval);
+  syncInterval=setInterval(function(){if(syncActive)syncPush();},15000);
+}
+
+function stopLiveSync(){
+  if(!syncActive)return;
+  syncActive=false;
+  if(syncInterval){clearInterval(syncInterval);syncInterval=null;}
+  var licenseKey=localStorage.getItem(LS_LICENSE)||'';
+  if(syncSession&&licenseKey){
+    fetch(LIVE_GAME_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({game_code:syncSession,license_key:licenseKey,action:'end'})
+    }).catch(function(){});
   }
-  // Save config
-  try{localStorage.setItem(LS_FB_CONFIG,JSON.stringify(cfg));}catch(e){}
-  syncRole='host';
-  var code=document.getElementById('sync-host-code').textContent;
-  syncSession=code;
-  initFirebase(cfg).then(function(db){
-    closeSyncModal();
-    showSyncBar('Hosting · Code: '+code, 'online', code);
-    showToast('📡 Hosting session '+code);
-    updateParentLinkUI();
-    // Write initial state
-    syncPush();
-    // Listen for guest control inputs (in case guest is tracking rotations)
-    db.ref('sessions/'+code+'/from_guest').on('value',function(snap){
-      var data=snap.val();
-      if(!data)return;
-      // Merge guest's rotation data into G
-      try{
-        if(data.rots){
-          Object.keys(data.rots).forEach(function(p){
-            if(G.rots[p])Object.assign(G.rots[p],data.rots[p]);
-          });
-          renderRots();
-        }
-      }catch(e){}
-    });
-  }).catch(function(e){showToast('❌ Firebase error: '+e.message);});
+  showSyncBar('Ended','','——');
+  var section=document.getElementById('parent-link-section');
+  if(section)section.style.display='none';
+  var barBtn=document.getElementById('sync-parent-btn');
+  if(barBtn)barBtn.style.display='none';
 }
 
 function joinSession(){
-  var cfg=getFBConfig();
-  if(!cfg){showToast('❌ Paste your Firebase config first');return;}
   var code=document.getElementById('sync-join-code-input').value.trim().toUpperCase();
-  if(code.length!==6){showToast('❌ Enter the 6-character session code');return;}
-  try{localStorage.setItem(LS_FB_CONFIG,JSON.stringify(cfg));}catch(e){}
-  syncRole='guest';syncSession=code;
-  initFirebase(cfg).then(function(db){
-    closeSyncModal();
-    showSyncBar('Joined · '+code,'online',code);
-    showToast('🔌 Joined session '+code);
-    // Subscribe to host state
-    db.ref('sessions/'+code+'/state').on('value',function(snap){
-      var data=snap.val();
-      if(!data)return;
-      try{
-        // Merge host's score and stats into G (host has authority)
-        if(data.scores)G.scores=JSON.parse(data.scores);
-        if(data.stats)G.stats=JSON.parse(data.stats);
-        if(data.cq)G.cq=data.cq;
-        if(data.qb)G.qb=data.qb;
-        renderAll();
-        // Update QB list display
-        buildQBList();
-      }catch(e){}
-    });
-  }).catch(function(e){showToast('❌ Firebase error: '+e.message);});
+  if(code.length!==6){showToast('❌ Enter the 6-character game code');return;}
+  closeSyncModal();
+  var base=window.location.href.replace(/[^/]*$|app\.html[^/]*/,'');
+  window.open(base+'parent.html?code='+encodeURIComponent(code),'_blank');
+  showToast('📱 Opening parent view for code: '+code);
 }
 
 function syncPush(){
-  if(syncRole!=='host'||!FB||!syncSession)return;
+  if(!syncActive||!syncSession)return;
+  var licenseKey=localStorage.getItem(LS_LICENSE)||'';
+  if(!licenseKey){showToast('❌ Pro license required');syncActive=false;return;}
   if(syncPushPending)return;
   syncPushPending=true;
   setTimeout(function(){
     syncPushPending=false;
-    try{
-      FB.ref('sessions/'+syncSession+'/state').set({
-        scores:JSON.stringify(G.scores),
-        stats:JSON.stringify(G.stats),
-        cq:G.cq,qb:G.qb,
-        team:G.team,opp:G.opp,
-        roster:JSON.stringify(ALL_PLAYERS),
-        absent:JSON.stringify(G.absent),
-        primary:TC.primary,secondary:TC.secondary,
-        quarters:G.quarters,date:G.date||'',
-        ts:Date.now()
-      });
-    }catch(e){}
-  },200); // 200ms debounce
+    var gameData={
+      scores:JSON.stringify(G.scores),
+      stats:JSON.stringify(G.stats),
+      cq:G.cq,qb:G.qb,
+      team:G.team,opp:G.opp,
+      roster:JSON.stringify(ALL_PLAYERS),
+      absent:JSON.stringify(G.absent),
+      primary:TC.primary,secondary:TC.secondary,
+      quarters:G.quarters,date:G.date||'',
+      ts:Date.now()
+    };
+    fetch(LIVE_GAME_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({game_code:syncSession,game_data:gameData,license_key:licenseKey})
+    }).then(function(r){return r.json();}).then(function(data){
+      if(!data.success){
+        syncActive=false;
+        if(syncInterval){clearInterval(syncInterval);syncInterval=null;}
+        showSyncBar('Error — check Pro status','','——');
+      }
+    }).catch(function(){
+      showSyncBar('Reconnecting…','','——');
+    });
+  },200);
 }
 
 function showSyncBar(txt,status,code){
@@ -3814,32 +3768,27 @@ function showSyncBar(txt,status,code){
   if(badge)badge.textContent=code||'——';
 }
 
-/* ── PARENT VIEW LINK ── */
 function generateParentLink(){
-  var raw=getFBConfig();
-  if(!raw||!syncSession)return null;
-  try{
-    var b64=btoa(JSON.stringify(raw));
-    var base=window.location.href.replace(/[^/]*$|app\.html[^/]*/,'');
-    return base+'parent.html?s='+encodeURIComponent(syncSession)+'&fb='+encodeURIComponent(b64);
-  }catch(e){return null;}
+  if(!syncSession)return null;
+  var base=window.location.href.replace(/[^/]*$|app\.html[^/]*/,'');
+  return base+'parent.html?code='+encodeURIComponent(syncSession);
 }
 function updateParentLinkUI(){
   var section=document.getElementById('parent-link-section');
   var display=document.getElementById('parent-link-display');
   var barBtn=document.getElementById('sync-parent-btn');
   var link=generateParentLink();
-  if(link){
-    if(section){section.style.display='block';}
-    if(display){display.textContent=link;}
-    if(barBtn){barBtn.style.display='block';}
+  if(link&&syncActive){
+    if(section)section.style.display='block';
+    if(display)display.textContent=link;
+    if(barBtn)barBtn.style.display='block';
   }else{
-    if(barBtn){barBtn.style.display='none';}
+    if(barBtn)barBtn.style.display='none';
   }
 }
 function copyParentLink(){
   var link=generateParentLink();
-  if(!link){showToast('❌ Start hosting first to get the parent link');return;}
+  if(!link||!syncActive){showToast('❌ Tap "Go Live" first');return;}
   if(navigator.clipboard){
     navigator.clipboard.writeText(link).then(function(){showToast('✅ Parent link copied!');}).catch(fallbackCopy);
   }else{fallbackCopy();}
@@ -3925,8 +3874,8 @@ window.onload=function(){
    PRO FEATURE GATING
 ════════════════════════════════════════════════════════════ */
 var LS_PRO='ff_pro_v1';
-// PRO codes — separate from app access codes
-var PRO_CODES=['CGMAXPRO','PROFFTP1','COACH2026'];
+var LS_LICENSE='ff_license_key';
+var VALIDATE_URL='https://cgmax-fftp-backend.vercel.app/api/validate-license';
 
 function isPro(){
   return localStorage.getItem(LS_PRO)==='unlocked';
@@ -3949,23 +3898,42 @@ function closeProModal(){
   document.getElementById('pro-upgrade-modal').classList.remove('show');
   _proCallback=null;
 }
-function proContactUs(){
-  window.open('mailto:cgomez@itcc.llc?subject=CGMax%20FFTP%20Pro%20Upgrade&body=Hi%2C%20I%27d%20like%20to%20upgrade%20to%20CGMax%20FFTP%20Pro!','_blank');
+function proUpgradeMonthly(){
+  window.open('https://buy.stripe.com/cNibJ0alkfIh7yg9FZ24000','_blank');
 }
-// Allow entering a pro unlock code via the upgrade modal (for testing/gifting)
+function proUpgradeAnnual(){
+  window.open('https://buy.stripe.com/aFa5kC9hg53D4m48BV24001','_blank');
+}
+// Validate license key against live backend
 function proUnlockWithCode(code){
-  if(!code)return false;
-  if(PRO_CODES.indexOf(code.toUpperCase().trim())>=0){
-    try{localStorage.setItem(LS_PRO,'unlocked');}catch(e){}
-    closeProModal();
-    showToast('⭐ Pro unlocked! Enjoy all features.');
-    vibe([30,15,30,15,50]);
-    // Re-render badges
-    try{document.querySelectorAll('.pro-badge').forEach(function(b){b.style.display='none';});}catch(e){}
-    if(typeof _proCallback==='function'){_proCallback();_proCallback=null;}
-    return true;
+  if(!code)return;
+  code=code.toUpperCase().trim();
+  if(!/^CGMAX-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)){
+    showToast('❌ Format: CGMAX-XXXX-XXXX-XXXX');
+    return;
   }
-  return false;
+  showToast('🔍 Validating license…');
+  fetch(VALIDATE_URL,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({license_key:code})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.valid){
+      try{localStorage.setItem(LS_PRO,'unlocked');localStorage.setItem(LS_LICENSE,code);}catch(e){}
+      closeProModal();
+      showToast('⭐ Pro unlocked! Enjoy all features.');
+      vibe([30,15,30,15,50]);
+      try{document.querySelectorAll('.pro-badge').forEach(function(b){b.style.display='none';});}catch(e){}
+      if(typeof _proCallback==='function'){_proCallback();_proCallback=null;}
+    } else {
+      showToast('❌ Invalid or expired license key');
+    }
+  })
+  .catch(function(){
+    showToast('❌ Network error — check your connection');
+  });
 }
 
 /* ════════════════════════════════════════════════════════════
