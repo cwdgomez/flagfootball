@@ -1026,6 +1026,31 @@ body.light-mode .toast-msg{color:#1a1714;}
 
     <button type="button" class="btn-kickoff" id="kickoff-btn" onclick="startGame()">⚡ KICK OFF</button>
 
+    <!-- COACH TOOLS SECTION -->
+    <div style="margin-top:18px;border-top:1px solid rgba(255,255,255,.07);padding-top:16px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:10px;">⚡ Coach Tools</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+        <button type="button" onclick="proGate('tournament',function(){window.open('./tournament.html','_blank')})"
+          style="background:rgba(170,0,0,.12);border:1px solid rgba(170,0,0,.35);border-radius:12px;padding:14px 8px;cursor:pointer;text-align:center;transition:all .2s;">
+          <div style="font-size:24px;margin-bottom:4px;">🏆</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.8);">Tournament</div>
+          <span class="pro-badge" style="margin-top:4px;">PRO</span>
+        </button>
+        <button type="button" onclick="proGate('playdesigner',function(){window.open('./playdesigner.html','_blank')})"
+          style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:14px 8px;cursor:pointer;text-align:center;transition:all .2s;">
+          <div style="font-size:24px;margin-bottom:4px;">🎨</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.8);">Play Designer</div>
+          <span class="pro-badge" style="margin-top:4px;">PRO</span>
+        </button>
+        <button type="button" onclick="proGate('livescore',function(){openSyncModal()})"
+          style="background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.3);border-radius:12px;padding:14px 8px;cursor:pointer;text-align:center;transition:all .2s;">
+          <div style="font-size:24px;margin-bottom:4px;">📡</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.8);">Live Score</div>
+          <span class="pro-badge" style="margin-top:4px;">PRO</span>
+        </button>
+      </div>
+    </div>
+
     <!-- PRO ACTIVATION STRIP -->
     <div id="setup-pro-strip" style="margin-top:14px;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;display:flex;align-items:center;justify-content:space-between;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.35);">⭐ PRO FEATURES INACTIVE</div>
@@ -1133,7 +1158,12 @@ body.light-mode .toast-msg{color:#1a1714;}
     <span class="sync-code-badge" id="sync-code-badge" onclick="openSyncModal()">——</span>
   </div>
   <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 12px 0;">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--dimmer);text-transform:uppercase;"></div>
+    <div style="display:flex;gap:6px;">
+      <button type="button" onclick="proGate('tournament',function(){window.open('./tournament.html','_blank')})"
+        style="background:rgba(170,0,0,.1);border:1px solid rgba(170,0,0,.25);border-radius:6px;padding:3px 8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.5);">🏆 Tournament<span class="pro-badge" style="margin-left:3px;">PRO</span></button>
+      <button type="button" onclick="proGate('playdesigner',function(){window.open('./playdesigner.html','_blank')})"
+        style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:6px;padding:3px 8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.5);">🎨 Plays<span class="pro-badge" style="margin-left:3px;">PRO</span></button>
+    </div>
     <button type="button" class="voice-btn" id="voice-btn" onclick="proGate('voice',openVoice)">
       <span class="voice-icon">🎙️</span><span>Voice Log<span class="pro-badge">PRO</span></span>
     </button>
