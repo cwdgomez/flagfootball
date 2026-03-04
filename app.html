@@ -1157,11 +1157,29 @@ body.light-mode .toast-msg{color:#1a1714;}
   </div>
 
   <div class="qbar" id="qbar"></div>
-  <div class="sync-bar hidden" id="sync-bar">
-    <div class="sync-status-dot" id="sync-dot"></div>
-    <span class="sync-status-txt" id="sync-txt">Not synced</span>
-    <button type="button" class="sync-parent-btn" id="sync-parent-btn" onclick="copyParentLink()" title="Copy parent live link">📱 Parent Link</button>
-    <span class="sync-code-badge" id="sync-code-badge" onclick="openSyncModal()">——</span>
+  <div class="sync-bar" id="sync-bar">
+    <!-- INACTIVE STATE: Go Live button (visible by default) -->
+    <div id="sync-inactive" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:12px;">📡</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.4);">LIVE PARENT SCOREBOARD</span>
+      </div>
+      <button type="button" onclick="openSyncModal()"
+        style="background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.4);border-radius:6px;padding:4px 12px;
+               font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;
+               color:var(--teal);cursor:pointer;">GO LIVE<span class="pro-badge" style="margin-left:4px;">PRO</span></button>
+    </div>
+    <!-- ACTIVE STATE: live status (hidden by default, shown when sync starts) -->
+    <div id="sync-active" style="display:none;align-items:center;justify-content:space-between;width:100%;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="sync-status-dot" id="sync-dot"></div>
+        <span class="sync-status-txt" id="sync-txt">Not synced</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <button type="button" class="sync-parent-btn" id="sync-parent-btn" onclick="copyParentLink()" title="Copy parent live link">📱 Parent Link</button>
+        <span class="sync-code-badge" id="sync-code-badge" onclick="openSyncModal()">——</span>
+      </div>
+    </div>
   </div>
   <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 12px 0;">
     <div style="display:flex;gap:6px;">
@@ -3886,11 +3904,9 @@ function stopLiveSync(){
       body:JSON.stringify({game_code:syncSession,license_key:licenseKey,action:'end'})
     }).catch(function(){});
   }
-  showSyncBar('Ended','','——');
+  resetSyncBar();
   var section=document.getElementById('parent-link-section');
   if(section)section.style.display='none';
-  var barBtn=document.getElementById('sync-parent-btn');
-  if(barBtn)barBtn.style.display='none';
 }
 
 function joinSession(){
@@ -3938,14 +3954,23 @@ function syncPush(){
 }
 
 function showSyncBar(txt,status,code){
-  var bar=document.getElementById('sync-bar');
+  var inactive=document.getElementById('sync-inactive');
+  var active=document.getElementById('sync-active');
   var dot=document.getElementById('sync-dot');
   var label=document.getElementById('sync-txt');
   var badge=document.getElementById('sync-code-badge');
-  if(bar)bar.classList.remove('hidden');
+  // Switch to active state
+  if(inactive)inactive.style.display='none';
+  if(active)active.style.display='flex';
   if(dot)dot.className='sync-status-dot '+(status||'');
   if(label)label.textContent=txt;
   if(badge)badge.textContent=code||'——';
+}
+function resetSyncBar(){
+  var inactive=document.getElementById('sync-inactive');
+  var active=document.getElementById('sync-active');
+  if(inactive)inactive.style.display='flex';
+  if(active)active.style.display='none';
 }
 
 function generateParentLink(){
