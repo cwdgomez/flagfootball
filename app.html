@@ -4002,11 +4002,7 @@ function submitGateCode(){
       if(btn)btn.textContent='⭐ PRO UNLOCKED!';
       if(err){err.style.color='#22C55E';err.textContent='PRO activated! Welcome, Coach.';}
       vibe([30,15,30,15,50]);
-      try{document.querySelectorAll('.pro-badge').forEach(function(b){b.style.display='none';});}catch(e){}
-      try{
-        var pb=document.getElementById('pro-hdr-btn');
-        if(pb){pb.textContent='✅ PRO';pb.classList.add('unlocked');pb.onclick=null;pb.title='Pro is active';}
-      }catch(e){}
+      updateProUI();
       setTimeout(hideGate,1200);
     } else {
       if(btn)btn.textContent='⭐ UNLOCK PRO';
@@ -4039,22 +4035,8 @@ var _origOnload=window.onload;
 window.onload=function(){
   if(_origOnload)_origOnload();
   initGate();
-  // If already Pro, show the button as active
-  try{
-    if(localStorage.getItem('ff_pro_v1')==='unlocked'){
-      var pb=document.getElementById('pro-hdr-btn');
-      if(pb){pb.textContent='✅ PRO';pb.classList.add('unlocked');pb.onclick=null;pb.title='Pro is active';}
-      document.querySelectorAll('.pro-badge').forEach(function(b){b.style.display='none';});
-      // Hide setup screen pro strip when already unlocked
-      var strip=document.getElementById('setup-pro-strip');
-      if(strip){
-        var sd=strip.querySelector('div');
-        if(sd){sd.textContent='✅ PRO ACTIVE';sd.style.color='#22C55E';}
-        var sbtn=document.getElementById('setup-pro-btn');
-        if(sbtn)sbtn.style.display='none';
-      }
-    }
-  }catch(e){}
+  // If already Pro, update all UI elements
+  if(isPro()) updateProUI();
 };
 
 /* ════════════════════════════════════════════════════════════
@@ -4066,6 +4048,26 @@ var VALIDATE_URL='https://cgmax-fftp-backend.vercel.app/api/validate-license';
 
 function isPro(){
   return localStorage.getItem(LS_PRO)==='unlocked';
+}
+
+// Central function — updates ALL pro-related UI in one place.
+// Called from: submitGateCode, proUnlockWithCode, and window.onload.
+function updateProUI(){
+  try{
+    // Hide all PRO badges on gated features
+    document.querySelectorAll('.pro-badge').forEach(function(b){b.style.display='none';});
+    // Update header button
+    var pb=document.getElementById('pro-hdr-btn');
+    if(pb){pb.textContent='✅ PRO';pb.classList.add('unlocked');pb.onclick=null;pb.title='Pro is active';}
+    // Update setup screen strip
+    var strip=document.getElementById('setup-pro-strip');
+    if(strip){
+      var sd=strip.querySelector('div');
+      if(sd){sd.textContent='✅ PRO ACTIVE';sd.style.color='#22C55E';}
+      var sbtn=document.getElementById('setup-pro-btn');
+      if(sbtn)sbtn.style.display='none';
+    }
+  }catch(e){}
 }
 
 function proGate(feature,callback){
@@ -4112,19 +4114,7 @@ function proUnlockWithCode(code){
       closeProModal();
       showToast('⭐ Pro unlocked! Enjoy all features.');
       vibe([30,15,30,15,50]);
-      try{document.querySelectorAll('.pro-badge').forEach(function(b){b.style.display='none';});}catch(e){}
-      // Hide/dim the PRO header button once unlocked
-      try{var pb=document.getElementById('pro-hdr-btn');if(pb){pb.textContent='✅ PRO';pb.classList.add('unlocked');pb.onclick=null;pb.title='Pro is active';}}catch(e){}
-      // Update setup screen pro strip
-      try{
-        var strip=document.getElementById('setup-pro-strip');
-        if(strip){
-          var sd=strip.querySelector('div');
-          if(sd){sd.textContent='✅ PRO ACTIVE';sd.style.color='#22C55E';}
-          var sbtn=document.getElementById('setup-pro-btn');
-          if(sbtn)sbtn.style.display='none';
-        }
-      }catch(e){}
+      updateProUI();
       if(typeof _proCallback==='function'){_proCallback();_proCallback=null;}
     } else {
       showToast('❌ Invalid or expired license key');
