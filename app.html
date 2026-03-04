@@ -63,7 +63,7 @@ body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--txt);-we
 .asi-cg{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:3px;color:var(--s,#FFD700);line-height:1;text-shadow:0 2px 8px rgba(0,0,0,.8);}
 .asi-max{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:2px;color:#fff;line-height:.88;text-shadow:0 3px 12px rgba(0,0,0,.9);}
 .asi-fftp{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:4px;color:rgba(255,215,0,.62);margin-top:2px;}
-/* Gate (access-code screen) shield — fixed dark red, no dynamic color */
+/* Gate (tier selection screen) shield — fixed dark red, no dynamic color */
 .gate-shield{width:160px;height:160px;clip-path:polygon(50% 0%,100% 14%,100% 64%,50% 100%,0% 64%,0% 14%);background:linear-gradient(155deg,#AA0000 0%,#660000 45%,#1a0000 100%);display:flex;align-items:center;justify-content:center;position:relative;margin:0 auto;box-shadow:0 0 50px rgba(170,0,0,.6),inset 0 1px 0 rgba(255,215,0,.18);}
 .gate-shield::before{content:'';position:absolute;inset:5px;clip-path:polygon(50% 0%,100% 14%,100% 64%,50% 100%,0% 64%,0% 14%);border:2px solid rgba(255,215,0,.28);}
 /* Tap-ripple for visual haptic feedback on iOS */
@@ -78,6 +78,27 @@ body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--txt);-we
 .stat-btn-flash{animation:btnFlash .2s ease-out;}
 @keyframes btnFlash{0%{filter:brightness(2.5);}100%{filter:brightness(1);}}
 /* Code gate screen */
+/* ── ToS Consent Overlay ── */
+.tos-overlay{
+  position:fixed;inset:0;z-index:960;
+  background:radial-gradient(ellipse 120% 80% at 50% 0%,rgba(170,0,0,.25) 0%,transparent 60%),#060606;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 20px;
+}
+.tos-overlay.hidden{display:none;}
+.tos-box{max-width:380px;text-align:center;}
+.tos-box h2{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#fff;margin:0 0 12px;}
+.tos-box p{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;margin:0 0 20px;}
+.tos-box a{color:#FFD700;text-decoration:underline;}
+.tos-check-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;text-align:left;}
+.tos-check-row input[type="checkbox"]{width:20px;height:20px;accent-color:#CC2200;flex-shrink:0;margin-top:2px;}
+.tos-check-row label{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:rgba(255,255,255,.6);line-height:1.5;cursor:pointer;}
+.tos-agree-btn{width:100%;border:none;border-radius:50px;padding:14px 24px;
+  font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;
+  background:linear-gradient(135deg,#FFD700,#FFF5B0 50%,#CC9900);color:#0a0a0a;
+  opacity:.4;pointer-events:none;transition:opacity .2s;}
+.tos-agree-btn.enabled{opacity:1;pointer-events:auto;}
+
 .gate-screen{
   position:fixed;inset:0;z-index:950;
   background:radial-gradient(ellipse 120% 80% at 50% 0%,rgba(170,0,0,.35) 0%,transparent 60%),#060606;
@@ -864,6 +885,23 @@ body.light-mode .toast-msg{color:#1a1714;}
 <body>
 <div id="grid-bg"></div>
 
+<!-- TOS / PRIVACY CONSENT -->
+<div class="tos-overlay hidden" id="tos-overlay">
+  <div class="tos-box">
+    <h2>WELCOME TO CGMAX FFTP</h2>
+    <p>Before you get started, please review and accept our Terms&nbsp;of&nbsp;Service and Privacy&nbsp;Policy.</p>
+    <p style="margin-bottom:24px;">
+      <a href="./terms.html" target="_blank">Terms of Service</a> &nbsp;·&nbsp;
+      <a href="./privacy.html" target="_blank">Privacy Policy</a>
+    </p>
+    <div class="tos-check-row">
+      <input type="checkbox" id="tos-check" onchange="document.getElementById('tos-agree-btn').classList.toggle('enabled',this.checked)">
+      <label for="tos-check">I have read and agree to the Terms&nbsp;of&nbsp;Service and Privacy&nbsp;Policy.</label>
+    </div>
+    <button type="button" class="tos-agree-btn" id="tos-agree-btn" onclick="acceptTos()">CONTINUE</button>
+  </div>
+</div>
+
 <!-- CODE GATE -->
 <div class="gate-screen hidden" id="code-gate">
   <div class="gate-logo-wrap">
@@ -915,7 +953,7 @@ body.light-mode .toast-msg{color:#1a1714;}
   </div>
   <div class="gate-contact">
     Need access or want to purchase?<br>
-    Contact: <a href="mailto:cgomez@itcc.llc" style="color:rgba(255,215,0,.6);text-decoration:none;">cgomez@itcc.llc</a><br>
+    Contact: <a href="mailto:cgmaxfftp@itcc.llc" style="color:rgba(255,215,0,.6);text-decoration:none;">cgmaxfftp@itcc.llc</a><br>
     <span style="opacity:.5;font-size:10px;letter-spacing:1px;margin-top:4px;display:block;">
       © ITCC LLC · All Rights Reserved · Youth Sports Technology
     </span>
@@ -1012,6 +1050,15 @@ body.light-mode .toast-msg{color:#1a1714;}
       <select id="su-q">
         <option value="2">2 Quarters</option>
         <option value="4">4 Quarters</option>
+      </select>
+    </div>
+    <div class="fg"><label>Players on Field</label>
+      <select id="su-field">
+        <option value="4">4 per side</option>
+        <option value="5">5 per side</option>
+        <option value="6" selected>6 per side</option>
+        <option value="7">7 per side</option>
+        <option value="8">8 per side</option>
       </select>
     </div>
 
@@ -1217,6 +1264,8 @@ body.light-mode .toast-msg{color:#1a1714;}
       <thead><tr><th>#</th><th>Player</th><th>TDs</th><th>INT</th><th>Flags</th><th>Blk</th><th>Pts</th></tr></thead>
       <tbody id="sl-table"></tbody>
     </table></div>
+    <div class="season-sec">🏆 MVP Awards</div>
+    <div id="sl-mvp-awards"></div>
     <div class="season-sec">Game History</div>
     <div id="sl-games"></div>
     <div class="season-sec">Data</div>
@@ -1227,6 +1276,8 @@ body.light-mode .toast-msg{color:#1a1714;}
       <button type="button" class="sact-btn sact-csv" onclick="proGate('export',exportCSV)">📊 CSV<span class="pro-badge">PRO</span></button>
       <button type="button" class="sact-btn sact-print" onclick="proGate('print',printReport)">🖨️ Print<span class="pro-badge">PRO</span></button>
       <button type="button" class="sact-btn sact-import" onclick="document.getElementById('import-file').click()">⬆ Import</button>
+      <button type="button" class="sact-btn" style="background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.35);color:#818cf8" onclick="proGate('cloudBackup',cloudBackup)">☁️ Backup<span class="pro-badge">PRO</span></button>
+      <button type="button" class="sact-btn" style="background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.25);color:#818cf8" onclick="proGate('cloudRestore',cloudRestore)">☁️ Restore<span class="pro-badge">PRO</span></button>
       <button type="button" class="sact-btn sact-clear" onclick="clearSeason()">🗑 Clear All</button>
     </div>
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="importSeason(event)">
@@ -1333,7 +1384,8 @@ body.light-mode .toast-msg{color:#1a1714;}
       "Phoenix interception" · "Cade catch" · "Milo fumble"<br><br>
       <strong>Set lineup:</strong> "Offense is Jaxon Reed Cade…"<br><br>
       <strong>Score:</strong> "We scored" · "They scored"<br>
-      <strong>Clear:</strong> "Clear offense" · "Clear defense"
+      <strong>Clear:</strong> "Clear offense" · "Clear defense"<br><br>
+      <strong>🔊 Audio:</strong> Chime = command recognized · Buzz = not recognized
     </div>
     <a href="./help.html" target="_blank"
       style="display:block;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;color:var(--s);text-decoration:none;margin:8px 0 12px;text-transform:uppercase;">
@@ -1531,6 +1583,7 @@ function addPenalty(side){
   if(side==='us'){penUs++;document.getElementById('pen-us').textContent=penUs;}
   else{penThem++;document.getElementById('pen-them').textContent=penThem;}
   vibe([15]);
+  if(isPro()){playPenaltySound();}
 }
 function undoPenalty(side){
   if(side==='us'){penUs=Math.max(0,penUs-1);document.getElementById('pen-us').textContent=penUs;}
@@ -1564,6 +1617,7 @@ function saveGameState(){
     var snap={
       G:{
         team:G.team,coach:G.coach,opp:G.opp,date:G.date,quarters:G.quarters,
+        maxOnField:G.maxOnField,
         qb:G.qb,cq:G.cq,scores:G.scores,stats:G.stats,rots:G.rots,
         absent:G.absent,tab:G.tab,last:G.last
       },
@@ -1599,6 +1653,8 @@ function checkRestoreGameState(){
     if(!ok){clearSavedGameState();return;}
     // Restore
     Object.assign(G,snap.G);
+    if(!G.maxOnField)G.maxOnField=6; // fallback for saves before configurable field size
+    MAX_ON_FIELD=G.maxOnField;
     if(snap.TC){TC.primary=snap.TC.primary;TC.secondary=snap.TC.secondary;}
     applyTheme();
     document.getElementById('screen-setup').classList.remove('active');
@@ -2023,6 +2079,8 @@ function startGame(){
     G.opp=document.getElementById('su-opp').value.trim()||'Opponent';
     G.date=document.getElementById('su-date').value;
     G.quarters=parseInt(document.getElementById('su-q').value);
+    G.maxOnField=parseInt(document.getElementById('su-field').value)||6;
+    MAX_ON_FIELD=G.maxOnField;
     G.cq=1;G.expP=null;G.expR=null;G.last=null;G.tab='stats';
     clearSavedGameState(); // fresh game — wipe any old saved state
     // Save team name into the teams list
@@ -2258,14 +2316,14 @@ function renderRots(){
   content.innerHTML=html;
 }
 
-var MAX_ON_FIELD=6; // League rule: max 6 players on field per side
+var MAX_ON_FIELD=6; // Default — updated from G.maxOnField when game starts
 
 function rotToggle(name,side){
   var r=G.rots[name][G.cq];
   var removing=r.onField===side;
 
   if(!removing){
-    // Check if adding this player would exceed the 6-player limit for this side
+    // Check if adding this player would exceed the MAX_ON_FIELD limit for this side
     var presentPlayers=ALL_PLAYERS.filter(function(n){return !isAbsent(n);});
     var currentOnSide=presentPlayers.filter(function(n){
       return G.rots[n][G.cq].onField===side;
@@ -2304,6 +2362,18 @@ function addScore(team,pts){
   showToast((team==='us'?G.team:G.opp)+' · '+lbl);
   renderScore();
   if(team==='us')triggerScoreAnim();
+  if(pts===6&&team==='us'){
+    if(isPro()){playTDFanfare();}
+    // Spoken "Touchdown!" via text-to-speech
+    try{
+      if(window.speechSynthesis){
+        var u=new SpeechSynthesisUtterance('Touchdown!');
+        u.volume=0.9;u.rate=1.0;u.pitch=1.2;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
+      }
+    }catch(e){}
+  }
   if(G.tab==='summary')renderSummary();
 }
 function undoScore(team){G.scores[team][G.cq-1]=Math.max(0,G.scores[team][G.cq-1]-1);renderScore();if(G.tab==='summary')renderSummary();}
@@ -2614,6 +2684,7 @@ function renderSeasonScreen(){
     document.getElementById('sl-record').innerHTML='<div class="wl-stat wins"><div class="wl-num">0</div><div class="wl-lbl">Wins</div></div><div class="wl-stat loss"><div class="wl-num">0</div><div class="wl-lbl">Losses</div></div><div class="wl-stat ties"><div class="wl-num">0</div><div class="wl-lbl">Ties</div></div><div class="wl-stat pts"><div class="wl-num">0</div><div class="wl-lbl">Pts Scored</div></div>';
     document.getElementById('sl-table').innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--dimmer)">No games saved yet</td></tr>';
     document.getElementById('sl-games').innerHTML='<div class="no-games">No games saved yet.<br>Finish a game and tap Save to Season!</div>';
+    document.getElementById('sl-mvp-awards').innerHTML='<div style="text-align:center;padding:16px;color:var(--dimmer);font-family:\'Barlow Condensed\',sans-serif;font-size:13px">No MVP awards yet</div>';
     return;
   }
   var wins=0,losses=0,ties=0,totalPts=0;
@@ -2639,9 +2710,39 @@ function renderSeasonScreen(){
   var rankClasses=['rank-gold','rank-silver','rank-bronze'];
   var tableRows=ranked.map(function(p,i){
     var rankDisp=i<3?'<span class="'+rankClasses[i]+'">'+rankIcons[i]+'</span>':''+(i+1);
-    return '<tr><td>'+rankDisp+'</td><td>'+esc(dispName(p.name))+'</td><td class="'+(p.tds?'hi':'')+'">'+p.tds+'</td><td>'+p.ints+'</td><td>'+p.flags+'</td><td>'+p.blocks+'</td><td class="hi">'+p.score+'</td></tr>';
+    return '<tr><td>'+rankDisp+'</td><td><span style="cursor:pointer;text-decoration:underline;text-decoration-color:rgba(255,215,0,.3);text-underline-offset:3px" onclick="openTrendFromSeason(\''+esc(p.name)+'\')">'+esc(dispName(p.name))+'</span></td><td class="'+(p.tds?'hi':'')+'">'+p.tds+'</td><td>'+p.ints+'</td><td>'+p.flags+'</td><td>'+p.blocks+'</td><td class="hi">'+p.score+'</td></tr>';
   }).join('');
   document.getElementById('sl-table').innerHTML=tableRows||'<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--dimmer)">No stats yet</td></tr>';
+
+  // MVP Awards podium
+  var mvpCounts={};
+  games.forEach(function(g){if(g.mvp){mvpCounts[g.mvp]=(mvpCounts[g.mvp]||0)+1;}});
+  var mvpRanked=Object.keys(mvpCounts).map(function(n){return {name:n,count:mvpCounts[n]};}).sort(function(a,b){return b.count-a.count;});
+  var mvpEl=document.getElementById('sl-mvp-awards');
+  if(mvpRanked.length===0){
+    mvpEl.innerHTML='<div style="text-align:center;padding:16px;color:var(--dimmer);font-family:\'Barlow Condensed\',sans-serif;font-size:13px">No MVP awards yet</div>';
+  } else {
+    var medals=['🥇','🥈','🥉'];
+    var podColors=['rgba(255,215,0,.15)','rgba(192,192,192,.12)','rgba(205,127,50,.10)'];
+    var podBorders=['rgba(255,215,0,.4)','rgba(192,192,192,.35)','rgba(205,127,50,.3)'];
+    var podHtml='<div style="display:flex;flex-wrap:wrap;gap:8px;padding:4px 0">';
+    var rank=0;
+    for(var mi=0;mi<mvpRanked.length;mi++){
+      if(mi>0&&mvpRanked[mi].count<mvpRanked[mi-1].count)rank=mi;
+      if(rank>=3)break;
+      var m=mvpRanked[mi];
+      var medal=medals[rank]||'🎖️';
+      var bg=podColors[rank]||'rgba(255,255,255,.05)';
+      var bd=podBorders[rank]||'rgba(255,255,255,.15)';
+      podHtml+='<div style="background:'+bg+';border:1px solid '+bd+';border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px;flex:1;min-width:120px">'
+        +'<span style="font-size:22px">'+medal+'</span>'
+        +'<div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,.85)">'+dispName(m.name)+'</div>'
+        +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:rgba(255,255,255,.4)">'+m.count+' MVP'+(m.count>1?'s':'')+'</div></div></div>';
+    }
+    podHtml+='</div>';
+    mvpEl.innerHTML=podHtml;
+  }
+
   var gamesHtml=games.map(function(g,idx){
     var result=g.us>g.them?'win':g.us<g.them?'loss':'tie';
     var dateStr=g.date?new Date(g.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
@@ -2691,6 +2792,57 @@ function importSeason(event){
   };
   reader.readAsText(file);
   event.target.value='';
+}
+
+/* ── Cloud Backup / Restore (Pro) ── */
+var BACKUP_URL='https://cgmax-fftp-backend.vercel.app/api/backup-season';
+
+function cloudBackup(){
+  var key=localStorage.getItem('ff_license_key');
+  if(!key){showToast('❌ Pro license required');return;}
+  var season=loadSeason();
+  if(!season||!season.length){showToast('⚠️ No season data to backup');return;}
+  var backupData={season:season,team:getActiveTeamName(),teamId:ACTIVE_TEAM_ID,exported:new Date().toISOString()};
+  showToast('☁️ Uploading backup…');
+  fetch(BACKUP_URL,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({license_key:key,backup_data:backupData})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.success){
+      showToast('✅ Season backed up to cloud!');
+    } else {
+      showToast('❌ Backup failed: '+(data.error||'Unknown error'));
+    }
+  })
+  .catch(function(err){
+    showToast('❌ Network error — check connection');
+  });
+}
+
+function cloudRestore(){
+  var key=localStorage.getItem('ff_license_key');
+  if(!key){showToast('❌ Pro license required');return;}
+  showToast('☁️ Fetching backup…');
+  fetch(BACKUP_URL+'?license_key='+encodeURIComponent(key))
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(!data.success){showToast('❌ '+(data.error||'Restore failed'));return;}
+    if(!data.found){showToast('⚠️ No cloud backup found for this license');return;}
+    var bd=data.backup_data;
+    var games=bd.season||bd;
+    if(!Array.isArray(games)||!games.length){showToast('⚠️ Backup is empty');return;}
+    var when=data.updated_at?new Date(data.updated_at).toLocaleDateString():'unknown date';
+    if(!confirm('Restore '+games.length+' game(s) from cloud backup ('+when+')?\n\nThis replaces current season history.')){return;}
+    saveSeason(games);
+    renderSeasonScreen();
+    showToast('✅ Restored '+games.length+' games from cloud!');
+  })
+  .catch(function(){
+    showToast('❌ Network error — check connection');
+  });
 }
 
 /* ══ ROSTER MANAGER ══ */
@@ -2974,6 +3126,23 @@ function playTick(freq,dur,vol){
   }catch(e){}
 }
 
+function playPenaltySound(){
+  // Harsh buzzer for penalty flags
+  var ctx=getAudioCtx();
+  if(!ctx)return;
+  try{
+    var o=ctx.createOscillator();
+    var g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.frequency.value=160;
+    o.type='sawtooth';
+    g.gain.setValueAtTime(0.35,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.45);
+    o.start(ctx.currentTime);
+    o.stop(ctx.currentTime+0.45);
+  }catch(e){}
+}
+
 function playTDFanfare(){
   // Ascending C-E-G-C fanfare for touchdowns 🏈
   var ctx=getAudioCtx();
@@ -3092,6 +3261,16 @@ function _renderQR(canvas, text){
 var trendSelectedPlayer=null;
 var trendFromScreen='season';
 
+function openTrendFromSeason(name){
+  trendFromScreen='season';
+  ['screen-season','screen-main','screen-setup','screen-roster'].forEach(function(id){
+    document.getElementById(id).classList.remove('active');
+  });
+  document.getElementById('screen-trend').classList.add('active');
+  trendSelectedPlayer=name;
+  renderTrendScreen();
+}
+
 function openTrend(){
   var fromSeason=document.getElementById('screen-season').classList.contains('active');
   trendFromScreen=fromSeason?'season':'main';
@@ -3122,7 +3301,13 @@ function renderTrendScreen(){
 
   grid.innerHTML=names.map(function(name){
     var isSel=trendSelectedPlayer===name;
-    return '<div class="trend-player-btn'+(isSel?' sel':'')+'" onclick="selectTrendPlayer(\''+esc(name)+'\')">'
+    var photoKey='ff_photo_'+ACTIVE_TEAM_ID+'_'+name;
+    var photo=null;try{photo=localStorage.getItem(photoKey);}catch(e){}
+    var photoHtml=photo
+      ?'<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,215,0,.3);flex-shrink:0;margin-bottom:4px"><img src="'+photo+'" style="width:100%;height:100%;object-fit:cover" alt=""></div>'
+      :'<div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:rgba(255,255,255,.4);flex-shrink:0;margin-bottom:4px">'+dispName(name).charAt(0)+'</div>';
+    return '<div class="trend-player-btn'+(isSel?' sel':'')+'" onclick="selectTrendPlayer(\''+esc(name)+'\')" style="align-items:center">'
+      +photoHtml
       +'<div class="tpb-name">'+dispName(name)+'</div>'
       +'<div class="tpb-num">#'+jerseyNum(name)+(name===G.qb?' · QB':'')+'</div>'
       +'</div>';
@@ -3626,7 +3811,7 @@ function processVoiceCommand(text){
       if(res){res.className='voice-result error';res.textContent='⚠️ No player names recognized. Try "offense is Jaxon Reed Cade"';}
       return;
     }
-    // Enforce 6-player limit
+    // Enforce MAX_ON_FIELD limit
     if(linePlayers.length>MAX_ON_FIELD){
       if(res){res.className='voice-result error';res.textContent='⚠️ Too many players! Max '+MAX_ON_FIELD+' on field. Found: '+linePlayers.map(firstName).join(', ');}
       return;
@@ -4017,11 +4202,57 @@ function openConsentForm(){
 </script>
 <script>
 /* ════════════════════════════════════════════════════════════
-   ACCESS CODE GATE
-   10 access codes — silently embedded, never displayed
+   TOS / PRIVACY CONSENT
+════════════════════════════════════════════════════════════ */
+var LS_TOS_CONSENT='ff_tos_consent';
+var TOS_VERSION='1.0';
+
+function checkTosConsent(){
+  // If user has already consented, skip overlay and proceed to gate
+  if(localStorage.getItem(LS_TOS_CONSENT)){
+    initGate();
+    return;
+  }
+  // Show consent overlay
+  var overlay=document.getElementById('tos-overlay');
+  if(overlay)overlay.classList.remove('hidden');
+}
+
+function acceptTos(){
+  var cb=document.getElementById('tos-check');
+  if(!cb||!cb.checked)return;
+  var consent={version:TOS_VERSION,timestamp:new Date().toISOString(),userAgent:navigator.userAgent};
+  try{localStorage.setItem(LS_TOS_CONSENT,JSON.stringify(consent));}catch(e){}
+  // Hide overlay
+  var overlay=document.getElementById('tos-overlay');
+  if(overlay)overlay.classList.add('hidden');
+  // Proceed to gate
+  initGate();
+  // If Pro, send consent record to backend
+  sendConsentToBackend();
+}
+
+function sendConsentToBackend(){
+  try{
+    var key=localStorage.getItem('ff_license_key');
+    if(!key)return; // Only send for Pro users
+    var consent=JSON.parse(localStorage.getItem(LS_TOS_CONSENT)||'{}');
+    fetch('https://cgmax-fftp-backend.vercel.app/api/save-consent',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        license_key:key,
+        consent_version:consent.version||TOS_VERSION,
+        consented_at:consent.timestamp||new Date().toISOString()
+      })
+    }).catch(function(){});
+  }catch(e){}
+}
+
+/* ════════════════════════════════════════════════════════════
+   TIER GATE — Lite (free) or Pro (license key)
 ════════════════════════════════════════════════════════════ */
 // Gate key — stores 'lite' (free tier) or 'pro' (PRO activated at gate)
-// Old 8-char beta access codes have been retired.
 var LS_GATE='ff_access_v1';
 var GATE_ACTIVE=false;
 
@@ -4068,6 +4299,8 @@ function submitGateCode(){
         localStorage.setItem('ff_pro_v1','unlocked');
         localStorage.setItem('ff_license_key',code);
         localStorage.setItem(LS_GATE,'pro');
+        localStorage.setItem(LS_PRO_LAST_CHECK,String(Date.now()));
+        localStorage.removeItem(LS_PRO_FAIL_SINCE);
       }catch(e){}
       if(btn)btn.textContent='⭐ PRO UNLOCKED!';
       if(err){err.style.color='#22C55E';err.textContent='PRO activated! Welcome, Coach.';}
@@ -4078,7 +4311,7 @@ function submitGateCode(){
       if(btn)btn.textContent='⭐ UNLOCK PRO';
       vibe([20,10,20]);
       if(inp){inp.classList.remove('shake');void inp.offsetWidth;inp.classList.add('shake');}
-      if(err)err.textContent='❌ Invalid or already-used license key. Contact cgomez@itcc.llc';
+      if(err)err.textContent='❌ Invalid or already-used license key. Contact cgmaxfftp@itcc.llc';
       if(inp)inp.value='';
       setTimeout(function(){if(inp)inp.classList.remove('shake');},500);
     }
@@ -4100,13 +4333,17 @@ function hideGate(){
   if(g)g.classList.add('hidden');
 }
 
-// Override window.onload to check gate first
+// Override window.onload to check ToS consent first, then gate
 var _origOnload=window.onload;
 window.onload=function(){
   if(_origOnload)_origOnload();
-  initGate();
+  checkTosConsent();
   // If already Pro, update all UI elements
   if(isPro()) updateProUI();
+  // Silently re-validate Pro license in background (max once every 3 days)
+  setTimeout(scheduleProRecheck, 3000);
+  // Send ToS consent for Pro users who consented before upgrading
+  sendConsentToBackend();
 };
 
 /* ════════════════════════════════════════════════════════════
@@ -4114,10 +4351,57 @@ window.onload=function(){
 ════════════════════════════════════════════════════════════ */
 var LS_PRO='ff_pro_v1';
 var LS_LICENSE='ff_license_key';
+var LS_PRO_LAST_CHECK='ff_pro_last_check';  // timestamp of last successful validation
+var LS_PRO_FAIL_SINCE='ff_pro_fail_since';  // timestamp of first failed recheck (grace period)
+var PRO_RECHECK_INTERVAL=3*24*60*60*1000;   // 3 days in ms
+var PRO_GRACE_PERIOD=7*24*60*60*1000;       // 7-day offline grace period
 var VALIDATE_URL='https://cgmax-fftp-backend.vercel.app/api/validate-license';
 
 function isPro(){
   return localStorage.getItem(LS_PRO)==='unlocked';
+}
+
+/* ── Background Pro re-validation (runs silently on app load) ── */
+function scheduleProRecheck(){
+  if(!isPro())return;
+  var key=localStorage.getItem(LS_LICENSE);
+  if(!key)return;
+  var lastCheck=parseInt(localStorage.getItem(LS_PRO_LAST_CHECK)||'0',10);
+  var now=Date.now();
+  if(now-lastCheck<PRO_RECHECK_INTERVAL)return; // checked recently — skip
+  // Attempt silent revalidation
+  fetch(VALIDATE_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({license_key:key})})
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(data.valid){
+        // Successful — reset fail timer, store check time
+        localStorage.setItem(LS_PRO_LAST_CHECK,String(Date.now()));
+        localStorage.removeItem(LS_PRO_FAIL_SINCE);
+      } else {
+        // Key is invalid/cancelled — revoke Pro immediately
+        localStorage.removeItem(LS_PRO);
+        localStorage.removeItem(LS_LICENSE);
+        localStorage.removeItem(LS_PRO_LAST_CHECK);
+        localStorage.removeItem(LS_PRO_FAIL_SINCE);
+        showToast('⚠️ Pro subscription inactive. Reverted to Lite.');
+      }
+    })
+    .catch(function(){
+      // Network failure — start or check grace period
+      var failSince=parseInt(localStorage.getItem(LS_PRO_FAIL_SINCE)||'0',10);
+      if(!failSince){
+        localStorage.setItem(LS_PRO_FAIL_SINCE,String(Date.now()));
+      } else if(Date.now()-failSince>PRO_GRACE_PERIOD){
+        // Grace period expired — suspend Pro features until next successful check
+        localStorage.removeItem(LS_PRO);
+        localStorage.removeItem(LS_LICENSE);
+        localStorage.removeItem(LS_PRO_LAST_CHECK);
+        localStorage.removeItem(LS_PRO_FAIL_SINCE);
+        showToast('⚠️ Could not verify Pro license after 7 days offline. Reverted to Lite.');
+      } else {
+        showToast('🔄 Pro working offline — will verify when connected.','',2200);
+      }
+    });
 }
 
 // Central function — updates ALL pro-related UI in one place.

@@ -844,7 +844,6 @@
                     <h3>Format</h3>
                     <div class="format-options">
                         <button class="option-btn selected" data-format="single">Single Elimination</button>
-                        <button class="option-btn" data-format="double" disabled>Double Elimination (Coming Soon)</button>
                         <button class="option-btn" data-format="roundrobin">Round Robin</button>
                     </div>
                 </div>
@@ -1193,8 +1192,7 @@
             container.innerHTML = '';
 
             document.getElementById('bracketTitle').textContent = state.tournament.name;
-            document.getElementById('bracketSubtitle').textContent =
-                state.format === 'double' ? 'Double Elimination' : 'Single Elimination';
+            document.getElementById('bracketSubtitle').textContent = 'Single Elimination';
 
             const bracket = state.tournament.bracket;
 

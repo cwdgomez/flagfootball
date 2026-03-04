@@ -70,10 +70,10 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
   <div class="doc-rule"></div>
 
   <div class="doc-meta">
-    <div class="doc-meta-item"><strong>Effective Date:</strong> January 1, 2025</div>
+    <div class="doc-meta-item"><strong>Effective Date:</strong> January 1, 2026</div>
     <div class="doc-meta-item"><strong>Last Updated:</strong> March 2026</div>
     <div class="doc-meta-item"><strong>Operator:</strong> ITCC LLC</div>
-    <div class="doc-meta-item"><strong>Contact:</strong> <a href="mailto:cgomez@itcc.llc">cgomez@itcc.llc</a></div>
+    <div class="doc-meta-item"><strong>Contact:</strong> <a href="mailto:cgmaxfftp@itcc.llc">cgmaxfftp@itcc.llc</a></div>
   </div>
 
   <!-- 1 -->
@@ -81,7 +81,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
     <div class="doc-section-num">Section 01</div>
     <h2>Agreement to These Terms</h2>
     <p>These Terms of Service ("Terms") constitute a legally binding agreement between you ("User," "Coach," or "you") and <strong>ITCC LLC</strong> ("Company," "we," "our," or "us") governing your access to and use of <strong>CGMax FFTP — Flag Football Tracker Pro</strong> (the "App" or "Service").</p>
-    <p>By accessing the App — whether by entering an access code, using any feature, or installing the App on your device — you represent that you have read, understood, and agree to be bound by these Terms in full. If you do not agree to these Terms, you must immediately cease all use of the App.</p>
+    <p>By accessing the App — whether by opening the App, using any feature, or installing the App on your device — you represent that you have read, understood, and agree to be bound by these Terms in full. If you do not agree to these Terms, you must immediately cease all use of the App.</p>
     <div class="doc-highlight">
       <p><strong>Important:</strong> The App is intended solely for use by adult coaches and authorized team staff. If you are using the App in connection with a youth sports program involving minors, you represent that you have obtained all required parental consents and comply with all applicable laws governing youth sports activities.</p>
     </div>
@@ -106,40 +106,37 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
       <li>Attendance tracking — mark players present or absent before each game</li>
       <li>Live Sync — optional real-time co-coaching via ITCC LLC's secure backend (Vercel + Supabase)</li>
       <li>Live Parent Scoreboard — optional shareable read-only live game link for parents, powered by ITCC LLC's Supabase backend</li>
-      <li>Tournament Mode — bracket management for single elimination, double elimination, and round robin formats</li>
+      <li>Tournament Mode — bracket management for single elimination and round robin formats</li>
       <li>Play Designer — canvas-based playbook tool for drawing and saving plays</li>
       <li>Penalty Tracker — live in-game flag count for both teams, saved with the game summary</li>
       <li>Player Development Trends — season-long per-player stat charts across all saved games</li>
+      <li>Cloud Backup &amp; Restore — optional Pro feature to back up season history to ITCC LLC's secure cloud and restore it on any device</li>
+      <li>Configurable Field Size — set the number of players per side (4, 5, 6, 7, or 8) to match your league rules</li>
     </ul>
-    <p>The App operates primarily via client-side local storage on your device. ITCC LLC does not store your coaching data, rosters, or game statistics on its servers.</p>
+    <p>The App operates primarily via client-side local storage on your device. ITCC LLC does not store your coaching data, rosters, or game statistics on its servers, with the exception of the optional Live Sync / Parent Scoreboard feature (which temporarily stores live game data), the optional Cloud Backup feature (which stores season history data persistently), and the optional Parent Media Consent Form (which transmits consent records via email for COPPA compliance). See our Privacy Policy for full details.</p>
 
-    <p><strong>Service Tiers — Lite and Pro:</strong> CGMax FFTP is offered in two tiers. The <strong>Lite tier</strong> is available at no cost to coaches who possess a valid app access code and includes core game-day features: live scoring, player stats, smart rotations, MVP rankings, roster management (single team), attendance tracking, penalty tracker, and full offline functionality. The <strong>Pro tier</strong> unlocks advanced features including voice-activated stat logging with audio feedback, season history and leaderboard, Live Parent Scoreboard, multiple team management, Tournament Mode, Play Designer, Player Development Trends, game export, share card generation, and print summaries. Pro access is granted through a license key (format: CGMAX-XXXX-XXXX-XXXX) emailed after payment and validated by ITCC LLC's backend. ITCC LLC reserves the right to modify the features included in each tier at any time.</p>
+    <p><strong>Service Tiers — Lite and Pro:</strong> CGMax FFTP is offered in two tiers. The <strong>Lite tier</strong> is available at no cost to any coach — no account, no code, and no payment is required. The Lite tier includes core game-day features: live scoring, player stats, smart rotations, in-game MVP rankings, roster management (single team), attendance tracking, quarter timer, penalty tracker, player photos, and full offline functionality. The <strong>Pro tier</strong> unlocks advanced features including voice-activated stat logging with audio feedback, season history and leaderboard, season summary report, Live Parent Scoreboard, multiple team management, Tournament Mode, Play Designer, Player Development Trends, game export, share card generation, print summaries, touchdown fanfare, and penalty sound effects. Pro access is granted through a license key (format: CGMAX-XXXX-XXXX-XXXX) emailed after payment and validated by ITCC LLC's backend. ITCC LLC reserves the right to modify the features included in each tier at any time.</p>
 
     <p><strong>Live Sync and Parent View (optional, Pro):</strong> These features use ITCC LLC's secure backend infrastructure (Vercel serverless functions + Supabase database) to transmit live game data. Use of these features is entirely optional — the coach activates the session in-app. No external configuration is required. By using these optional features, you acknowledge that live game data (scores, stats, player names in first name + last initial format, team name, opponent name) will be temporarily transmitted to and stored in ITCC LLC's Supabase database, automatically expiring after 12 hours. This data is accessible by any person who possesses the parent view link you share.</p>
+
+    <p><strong>Cloud Backup &amp; Restore (optional, Pro):</strong> This feature allows you to back up your season history data to ITCC LLC's secure backend and restore it on any device using the same Pro license key. By using Cloud Backup, you acknowledge that your season data (game scores, player statistics, MVP records, team name, player names in first name + last initial format) will be transmitted to and stored in ITCC LLC's Supabase database. One backup per license key is retained; each new backup replaces the previous one. Backups persist until replaced or deleted upon your request. ITCC LLC is not responsible for any data loss due to service interruption, and Cloud Backup is provided on an "as is" basis without guarantee of availability.</p>
   </div>
   <div class="doc-divider"></div>
 
   <!-- 3 -->
   <div class="doc-section">
     <div class="doc-section-num">Section 03</div>
-    <h2>Access Codes and Authorized Use</h2>
-    <p>Access to CGMax FFTP is controlled through two distinct types of codes issued by ITCC LLC:</p>
+    <h2>Authorized Use and Pro License Keys</h2>
+    <p><strong>Lite Tier — Free Access:</strong> The Lite tier of CGMax FFTP is freely accessible to any coach without an account, payment, or access code. By using the App, even the free Lite tier, you agree to be bound by these Terms in full.</p>
 
-    <p><strong>App Access Codes (Lite tier):</strong> A valid app access code is required to use the App in any capacity. This code grants access to the Lite tier feature set. By accepting and using an app access code, you agree to the following:</p>
+    <p><strong>Pro Subscriptions and License Keys:</strong> Pro-tier access requires a paid subscription purchased through our payment processor, Stripe. Upon successful payment, a unique license key in the format <code>CGMAX-XXXX-XXXX-XXXX</code> is emailed to your billing address. By subscribing and using a Pro license key, you agree that:</p>
     <ul>
-      <li><strong>Personal use only:</strong> Your access code is issued to you individually and may not be shared, resold, sublicensed, transferred, or distributed to any other individual or entity without prior written consent from ITCC LLC.</li>
-      <li><strong>Authorized coaches only:</strong> Access codes may only be used by the individual coach or authorized team staff member to whom they were issued.</li>
-      <li><strong>No reverse engineering:</strong> You may not attempt to reverse-engineer, extract, or reproduce the access code validation mechanism embedded in the App.</li>
-      <li><strong>Revocation:</strong> ITCC LLC reserves the right to revoke any access code at any time, with or without notice, for any violation of these Terms or for any other reason at its sole discretion.</li>
-    </ul>
-
-    <p><strong>Pro Subscriptions and License Keys (Pro tier):</strong> Pro-tier access requires a paid subscription purchased through our payment processor, Stripe. Upon successful payment, a unique license key in the format <code>CGMAX-XXXX-XXXX-XXXX</code> is emailed to your billing address. By subscribing and using a Pro license key, you agree that:</p>
-    <ul>
-      <li>Your license key is personal to you and may not be shared, redistributed, or published in any form.</li>
-      <li>License keys are validated in real time against ITCC LLC's secure backend servers. Your license key and subscription status are transmitted to our servers each time you activate or re-validate Pro access on a device.</li>
-      <li>Pro access is tied to an active Stripe subscription. If your subscription lapses, is cancelled, or a payment fails, Pro features will become inaccessible upon the next validation.</li>
-      <li>Subscriptions are billed monthly or annually as selected at checkout. You may cancel at any time through the Stripe customer portal; cancellation takes effect at the end of the current billing period. No refunds are issued for partial billing periods unless required by applicable law.</li>
-      <li>ITCC LLC reserves the right to revoke a license key at any time in cases of suspected misuse, sharing, or violation of these Terms.</li>
+      <li><strong>Personal use only:</strong> Your license key is personal to you and may not be shared, resold, sublicensed, redistributed, or published in any form.</li>
+      <li><strong>Validation:</strong> License keys are periodically validated against ITCC LLC's secure backend servers (at most every 3 days while you are online). Your license key and subscription status are transmitted to our servers during validation. No other personal data is transmitted.</li>
+      <li><strong>Offline grace period:</strong> If your device cannot reach our validation server, Pro features will continue to function for up to 7 days. After 7 consecutive days without successful validation, Pro features will be suspended until connectivity is restored and the key is re-validated.</li>
+      <li><strong>Subscription status:</strong> Pro access is tied to an active Stripe subscription. If your subscription lapses, is cancelled, or a payment fails, Pro features will become inaccessible upon the next successful validation.</li>
+      <li><strong>Billing:</strong> Subscriptions are billed monthly or annually as selected at checkout. You may cancel at any time through the Stripe customer portal; cancellation takes effect at the end of the current billing period. No refunds are issued for partial billing periods unless required by applicable law.</li>
+      <li><strong>Revocation:</strong> ITCC LLC reserves the right to revoke a license key at any time in cases of suspected misuse, sharing, or violation of these Terms.</li>
       <li>All payments are processed by Stripe, Inc. ITCC LLC does not store your credit card or payment information. Use of Stripe is subject to <a href="https://stripe.com/legal" target="_blank" rel="noopener">Stripe's Terms of Service</a> and <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</li>
     </ul>
   </div>
@@ -230,7 +227,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
     <p>ITCC LLC reserves the right, at its sole discretion, to modify, update, suspend, or discontinue the App or any part thereof at any time, with or without notice. This includes the right to:</p>
     <ul>
       <li>Add, remove, or change features</li>
-      <li>Modify access code requirements or distribution policies</li>
+      <li>Modify tier access requirements or distribution policies</li>
       <li>Change pricing or introduce new service tiers</li>
       <li>Discontinue the App entirely</li>
     </ul>
@@ -266,11 +263,11 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
     <h2>Contact Us</h2>
     <div class="doc-contact">
       <div class="doc-contact-title">ITCC LLC — Legal Inquiries</div>
-      <p>For questions about these Terms of Service, to report a violation, or to request an access code, contact us:</p>
-      <p style="margin-top:12px;"><strong>Email:</strong> <a href="mailto:cgomez@itcc.llc">cgomez@itcc.llc</a></p>
+      <p>For questions about these Terms of Service, to report a violation, or for Pro subscription inquiries, contact us:</p>
+      <p style="margin-top:12px;"><strong>Email:</strong> <a href="mailto:cgmaxfftp@itcc.llc">cgmaxfftp@itcc.llc</a></p>
       <p><strong>Company:</strong> ITCC LLC</p>
       <p><strong>Product:</strong> CGMax FFTP — Flag Football Tracker Pro</p>
-      <p style="margin-top:12px;font-size:13px;color:rgba(255,255,255,.4);">We aim to respond to all legal inquiries within 5 business days. These Terms were prepared in good faith and will be reviewed by qualified legal counsel prior to large-scale commercial deployment.</p>
+      <p style="margin-top:12px;font-size:13px;color:rgba(255,255,255,.4);">We aim to respond to all legal inquiries within 15 business days. These Terms were prepared in good faith and will be reviewed by qualified legal counsel prior to large-scale commercial deployment.</p>
     </div>
   </div>
 
