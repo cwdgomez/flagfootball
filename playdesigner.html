@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#AA0000">
+    <title>Play Designer — CGMax FFTP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #FFD700;
+            --gold2: #CC9900;
+            --red: #AA0000;
+            --red2: #770000;
+            --dark: #060606;
+            --dark2: #0D0D0D;
+            --dark3: #161616;
+            --dark4: #1f1f1f;
+            --dark5: #2a2a2a;
+            --txt: #F5F0E8;
+            --dim: #888;
+            --green: #22C55E;
+            --teal: #14B8A6;
+            --purple: #A855F7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--dark);
+            color: var(--txt);
+            font-family: 'Barlow', sans-serif;
+            font-size: 16px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Fixed Navigation */
+        nav {
+            background: var(--dark2);
+            border-bottom: 2px solid var(--gold);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Bebas Neue', serif;
+            font-size: 20px;
+            letter-spacing: 2px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        nav .logo {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        nav a {
+            color: var(--gold);
+            text-decoration: none;
+            font-size: 16px;
+            font-family: 'Barlow', sans-serif;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--gold2);
+        }
+
+        /* Pro Gate */
+        .pro-gate {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(6, 6, 6, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .pro-gate-content {
+            text-align: center;
+            background: var(--dark3);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            padding: 40px 30px;
+            max-width: 400px;
+        }
+
+        .pro-gate-content h1 {
+            font-family: 'Bebas Neue', serif;
+            font-size: 32px;
+            color: var(--gold);
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+
+        .pro-gate-content p {
+            color: var(--dim);
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .pro-pricing {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .price-btn {
+            flex: 1;
+            padding: 14px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .price-btn.monthly {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .price-btn.monthly:hover {
+            background: var(--gold2);
+            transform: translateY(-2px);
+        }
+
+        .price-btn.annual {
+            background: var(--red);
+            color: var(--txt);
+        }
+
+        .price-btn.annual:hover {
+            background: var(--red2);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-top: 60px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 60px auto 0;
+            width: 100%;
+        }
+
+        .designer-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            flex-wrap: wrap;
+        }
+
+        .canvas-section {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .canvas-wrapper {
+            background: var(--dark3);
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            padding: 12px;
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            max-width: 560px;
+            height: auto;
+            background: #1a4a1a;
+            border-radius: 4px;
+            touch-action: none;
+            cursor: crosshair;
+        }
+
+        .mode-indicators {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--dark4);
+            border-radius: 4px;
+            border: 1px solid var(--dim);
+            font-size: 13px;
+        }
+
+        .mode-badge.active {
+            border-color: var(--gold);
+            background: var(--dark5);
+            color: var(--gold);
+        }
+
+        .play-info {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"],
+        textarea {
+            background: var(--dark4);
+            border: 1px solid var(--dim);
+            color: var(--txt);
+            padding: 10px 12px;
+            border-radius: 4px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: var(--dark5);
+        }
+
+        input[type="text"].play-name {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        textarea {
+            width: 100%;
+            resize: vertical;
+            min-height: 60px;
+            font-size: 13px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 16px;
+            background: var(--dark3);
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            margin-top: auto;
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .btn-primary:hover {
+            background: var(--gold2);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary.active {
+            background: var(--gold);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--red);
+            color: var(--txt);
+        }
+
+        .btn-secondary:hover {
+            background: var(--red2);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary.active {
+            background: var(--red);
+            box-shadow: 0 0 12px rgba(170, 0, 0, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--dim);
+            color: var(--txt);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .btn-danger {
+            background: var(--red2);
+            color: var(--txt);
+        }
+
+        .btn-danger:hover {
+            background: var(--red);
+        }
+
+        .btn-success {
+            background: var(--green);
+            color: var(--dark);
+        }
+
+        .btn-success:hover {
+            background: var(--teal);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .defense-toggle {
+            background: var(--dark3);
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .defense-toggle h3 {
+            font-size: 14px;
+            color: var(--gold);
+            margin-bottom: 12px;
+            font-family: 'Barlow Condensed', sans-serif;
+        }
+
+        .switch {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle-checkbox {
+            appearance: none;
+            width: 44px;
+            height: 24px;
+            background: var(--dark5);
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid var(--dim);
+            transition: all 0.3s;
+        }
+
+        .toggle-checkbox:checked {
+            background: var(--green);
+            border-color: var(--green);
+        }
+
+        .toggle-checkbox::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .toggle-checkbox:checked::before {
+            left: 22px;
+        }
+
+        .toggle-label {
+            font-size: 13px;
+            color: var(--txt);
+        }
+
+        /* Playbook */
+        .playbook {
+            background: var(--dark3);
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .playbook h3 {
+            font-size: 14px;
+            color: var(--gold);
+            margin-bottom: 12px;
+            font-family: 'Barlow Condensed', sans-serif;
+        }
+
+        .play-count {
+            font-size: 12px;
+            color: var(--dim);
+            margin-bottom: 12px;
+        }
+
+        .playbook-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .play-thumbnail {
+            background: var(--dark5);
+            border: 2px solid var(--dark4);
+            border-radius: 4px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            aspect-ratio: 2 / 1;
+        }
+
+        .play-thumbnail:hover {
+            border-color: var(--gold);
+            transform: scale(1.02);
+        }
+
+        .play-thumbnail-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border-radius: 2px;
+        }
+
+        .play-thumbnail-label {
+            position: absolute;
+            bottom: 6px;
+            left: 6px;
+            right: 6px;
+            background: rgba(6, 6, 6, 0.8);
+            color: var(--txt);
+            font-size: 11px;
+            padding: 4px;
+            border-radius: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .play-thumbnail.deleting {
+            opacity: 0.5;
+            border-color: var(--red);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark4);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--dim);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gold);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            main {
+                margin-top: 60px;
+                padding: 12px;
+            }
+
+            .designer-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .playbook-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .play-info {
+                flex-direction: column;
+            }
+
+            input[type="text"].play-name {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav {
+                padding: 10px 12px;
+                font-size: 16px;
+            }
+
+            main {
+                margin-top: 50px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .playbook-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            color: var(--dim);
+            padding: 20px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Pro Gate -->
+    <div id="proGate" class="pro-gate" style="display: none;">
+        <div class="pro-gate-content">
+            <h1>🔒 PLAY DESIGNER</h1>
+            <p>Pro feature — Unlock advanced play design tools with a subscription</p>
+            <div class="pro-pricing">
+                <button class="price-btn monthly" onclick="goToStripe('https://buy.stripe.com/cNibJ0alkfIh7yg9FZ24000')">
+                    Monthly<br><small>$9.99/mo</small>
+                </button>
+                <button class="price-btn annual" onclick="goToStripe('https://buy.stripe.com/aFa5kC9hg53D4m48BV24001')">
+                    Annual<br><small>$79.99/yr</small>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fixed Navigation -->
+    <nav>
+        <div class="logo">CGMAX · FFTP</div>
+        <a href="./app.html">← Back</a>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <div class="designer-container">
+            <!-- Canvas Section -->
+            <div class="canvas-section">
+                <div class="mode-indicators">
+                    <div class="mode-badge" id="modeMove">🏃 Move Players</div>
+                    <div class="mode-badge" id="modeRoute">✏️ Draw Routes</div>
+                </div>
+
+                <div class="canvas-wrapper">
+                    <canvas id="playCanvas"></canvas>
+                </div>
+
+                <div class="play-info">
+                    <input type="text" id="playName" class="play-name" placeholder="Play name (e.g. Fly Right)">
+                </div>
+
+                <textarea id="playNotes" placeholder="Play notes and instructions..."></textarea>
+
+                <div class="toolbar">
+                    <div class="toolbar-group">
+                        <button class="btn-primary active" id="btnMove" onclick="setMode('move')">🏃 Move</button>
+                        <button class="btn-secondary" id="btnRoute" onclick="setMode('route')">✏️ Routes</button>
+                    </div>
+                    <div class="toolbar-group">
+                        <button class="btn-outline" id="btnClearRoutes" onclick="clearRoutes()">Clear Routes</button>
+                        <button class="btn-outline" id="btnUndo" onclick="undoRoute()">↶ Undo</button>
+                    </div>
+                    <div class="toolbar-group">
+                        <button class="btn-success" onclick="savePlay()">💾 Save Play</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Defense Toggle -->
+                <div class="defense-toggle">
+                    <h3>🛡️ DEFENSE</h3>
+                    <div class="switch">
+                        <input type="checkbox" id="defenseToggle" class="toggle-checkbox" onchange="toggleDefense()">
+                        <label for="defenseToggle" class="toggle-label">Show Defense</label>
+                    </div>
+                </div>
+
+                <!-- Playbook -->
+                <div class="playbook">
+                    <h3>📋 PLAYBOOK</h3>
+                    <div class="play-count"><span id="playCount">0</span> / 20 plays saved</div>
+                    <div class="playbook-grid" id="playbookGrid">
+                        <div class="empty-state">No plays yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // State
+        let state = {
+            mode: 'move', // move or route
+            players: [], // { x, y, label, color, type }
+            defenders: [], // { x, y, label, color }
+            routes: [], // { playerId, points: [[x,y], ...], color }
+            selectedPlayer: null,
+            isDrawing: false,
+            showDefense: false,
+            plays: [],
+            currentPlay: {
+                name: '',
+                notes: '',
+                players: [],
+                defenders: [],
+                routes: []
+            }
+        };
+
+        // Canvas Setup
+        const canvas = document.getElementById('playCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+
+        function resizeCanvas() {
+            const wrapper = canvas.parentElement;
+            const width = Math.min(wrapper.clientWidth - 24, 560);
+            canvas.width = width;
+            canvas.height = width * 0.65;
+            draw();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Initialize field with default formations
+        function initializePlay() {
+            state.players = [
+                { x: canvas.width / 2, y: canvas.height * 0.5, label: 'C', type: 'center', color: '#FFD700' },
+                { x: canvas.width / 2, y: canvas.height * 0.35, label: 'QB', type: 'qb', color: '#FFD700' },
+                { x: canvas.width * 0.25, y: canvas.height * 0.15, label: 'WR1', type: 'wr', color: '#FFD700' },
+                { x: canvas.width * 0.75, y: canvas.height * 0.15, label: 'WR2', type: 'wr', color: '#FFD700' },
+                { x: canvas.width * 0.15, y: canvas.height * 0.75, label: 'WR3', type: 'wr', color: '#FFD700' },
+                { x: canvas.width * 0.85, y: canvas.height * 0.75, label: 'WR4', type: 'wr', color: '#FFD700' }
+            ];
+
+            state.defenders = [
+                { x: canvas.width / 2, y: canvas.height * 0.5, label: 'D1', color: '#AA0000' },
+                { x: canvas.width * 0.2, y: canvas.height * 0.3, label: 'D2', color: '#AA0000' },
+                { x: canvas.width * 0.8, y: canvas.height * 0.3, label: 'D3', color: '#AA0000' },
+                { x: canvas.width * 0.3, y: canvas.height * 0.7, label: 'D4', color: '#AA0000' },
+                { x: canvas.width * 0.7, y: canvas.height * 0.7, label: 'D5', color: '#AA0000' },
+                { x: canvas.width / 2, y: canvas.height * 0.85, label: 'D6', color: '#AA0000' }
+            ];
+
+            state.routes = [];
+            state.selectedPlayer = null;
+            draw();
+        }
+
+        // Drawing Functions
+        function draw() {
+            ctx.fillStyle = '#1a4a1a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grid lines (yard markers)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            const spacing = canvas.width / 8;
+            for (let i = 0; i <= 8; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * spacing, 0);
+                ctx.lineTo(i * spacing, canvas.height);
+                ctx.stroke();
+            }
+
+            // Horizontal lines
+            const hSpacing = canvas.height / 4;
+            for (let i = 0; i <= 4; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, i * hSpacing);
+                ctx.lineTo(canvas.width, i * hSpacing);
+                ctx.stroke();
+            }
+
+            // End zones
+            ctx.fillStyle = 'rgba(26, 74, 26, 0.5)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height * 0.15);
+            ctx.fillRect(0, canvas.height * 0.85, canvas.width, canvas.height * 0.15);
+
+            // Line of scrimmage (dashed)
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height * 0.5);
+            ctx.lineTo(canvas.width, canvas.height * 0.5);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw routes
+            state.routes.forEach(route => {
+                if (route.points.length > 0) {
+                    ctx.strokeStyle = route.color;
+                    ctx.lineWidth = 2.5;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+
+                    ctx.beginPath();
+                    ctx.moveTo(route.points[0][0], route.points[0][1]);
+                    for (let i = 1; i < route.points.length; i++) {
+                        ctx.lineTo(route.points[i][0], route.points[i][1]);
+                    }
+                    ctx.stroke();
+
+                    // Arrow at end
+                    if (route.points.length > 1) {
+                        const lastIdx = route.points.length - 1;
+                        const lastPoint = route.points[lastIdx];
+                        const prevPoint = route.points[lastIdx - 1];
+                        drawArrow(prevPoint[0], prevPoint[1], lastPoint[0], lastPoint[1], route.color);
+                    }
+                }
+            });
+
+            // Draw defenders
+            if (state.showDefense) {
+                state.defenders.forEach((defender, idx) => {
+                    drawPlayer(defender.x, defender.y, defender.label, defender.color, false);
+                });
+            }
+
+            // Draw players
+            state.players.forEach((player, idx) => {
+                const isSelected = state.selectedPlayer === idx;
+                drawPlayer(player.x, player.y, player.label, player.color, isSelected);
+            });
+
+            updateModeIndicators();
+        }
+
+        function drawPlayer(x, y, label, color, isSelected) {
+            const radius = 20;
+
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (isSelected) {
+                ctx.strokeStyle = '#FFD700';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 12px "Barlow Condensed"';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, x, y);
+        }
+
+        function drawArrow(fromX, fromY, toX, toY, color) {
+            const headlen = 10;
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Mode Functions
+        function setMode(mode) {
+            state.mode = mode;
+            state.selectedPlayer = null;
+
+            document.getElementById('btnMove').classList.toggle('active', mode === 'move');
+            document.getElementById('btnRoute').classList.toggle('active', mode === 'route');
+
+            document.getElementById('modeMove').classList.toggle('active', mode === 'move');
+            document.getElementById('modeRoute').classList.toggle('active', mode === 'route');
+
+            if (mode === 'move') {
+                canvas.style.cursor = 'grab';
+            } else {
+                canvas.style.cursor = 'crosshair';
+            }
+
+            draw();
+        }
+
+        function updateModeIndicators() {
+            document.getElementById('modeMove').classList.toggle('active', state.mode === 'move');
+            document.getElementById('modeRoute').classList.toggle('active', state.mode === 'route');
+        }
+
+        // Touch and Mouse Events
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            let x, y;
+            if (e.touches) {
+                x = (e.touches[0].clientX - rect.left) * scaleX;
+                y = (e.touches[0].clientY - rect.top) * scaleY;
+            } else {
+                x = (e.clientX - rect.left) * scaleX;
+                y = (e.clientY - rect.top) * scaleY;
+            }
+            return { x, y };
+        }
+
+        function getPlayerAtPoint(x, y) {
+            for (let i = 0; i < state.players.length; i++) {
+                const p = state.players[i];
+                const dist = Math.sqrt((p.x - x) ** 2 + (p.y - y) ** 2);
+                if (dist < 25) return i;
+            }
+            return -1;
+        }
+
+        function getDefenderAtPoint(x, y) {
+            for (let i = 0; i < state.defenders.length; i++) {
+                const d = state.defenders[i];
+                const dist = Math.sqrt((d.x - x) ** 2 + (d.y - y) ** 2);
+                if (dist < 25) return i;
+            }
+            return -1;
+        }
+
+        canvas.addEventListener('mousedown', handleStart);
+        canvas.addEventListener('touchstart', handleStart);
+        canvas.addEventListener('mousemove', handleMove);
+        canvas.addEventListener('touchmove', handleMove);
+        canvas.addEventListener('mouseup', handleEnd);
+        canvas.addEventListener('touchend', handleEnd);
+
+        let draggedPlayerIdx = -1;
+        let draggedDefenderIdx = -1;
+        let currentRoutePoints = [];
+
+        function handleStart(e) {
+            e.preventDefault();
+            const pos = getMousePos(e);
+
+            if (state.mode === 'move') {
+                draggedPlayerIdx = getPlayerAtPoint(pos.x, pos.y);
+                if (draggedPlayerIdx === -1 && state.showDefense) {
+                    draggedDefenderIdx = getDefenderAtPoint(pos.x, pos.y);
+                }
+                state.isDrawing = draggedPlayerIdx !== -1 || draggedDefenderIdx !== -1;
+            } else {
+                const playerIdx = getPlayerAtPoint(pos.x, pos.y);
+                if (playerIdx !== -1) {
+                    state.selectedPlayer = playerIdx;
+                    currentRoutePoints = [[pos.x, pos.y]];
+                    state.isDrawing = true;
+                }
+            }
+
+            draw();
+        }
+
+        function handleMove(e) {
+            e.preventDefault();
+            if (!state.isDrawing) return;
+
+            const pos = getMousePos(e);
+
+            if (state.mode === 'move') {
+                if (draggedPlayerIdx !== -1) {
+                    state.players[draggedPlayerIdx].x = pos.x;
+                    state.players[draggedPlayerIdx].y = pos.y;
+                }
+                if (draggedDefenderIdx !== -1) {
+                    state.defenders[draggedDefenderIdx].x = pos.x;
+                    state.defenders[draggedDefenderIdx].y = pos.y;
+                }
+            } else {
+                if (state.selectedPlayer !== null && currentRoutePoints.length > 0) {
+                    const lastPoint = currentRoutePoints[currentRoutePoints.length - 1];
+                    const dist = Math.sqrt((pos.x - lastPoint[0]) ** 2 + (pos.y - lastPoint[1]) ** 2);
+                    if (dist > 5) {
+                        currentRoutePoints.push([pos.x, pos.y]);
+                    }
+                }
+            }
+
+            draw();
+
+            // Draw preview route while drawing
+            if (state.mode === 'route' && currentRoutePoints.length > 0) {
+                ctx.strokeStyle = getColorForPlayer(state.selectedPlayer);
+                ctx.lineWidth = 2.5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                ctx.moveTo(currentRoutePoints[0][0], currentRoutePoints[0][1]);
+                for (let i = 1; i < currentRoutePoints.length; i++) {
+                    ctx.lineTo(currentRoutePoints[i][0], currentRoutePoints[i][1]);
+                }
+                ctx.stroke();
+            }
+        }
+
+        function handleEnd(e) {
+            e.preventDefault();
+
+            if (state.mode === 'route' && currentRoutePoints.length > 1 && state.selectedPlayer !== null) {
+                state.routes.push({
+                    playerId: state.selectedPlayer,
+                    points: currentRoutePoints,
+                    color: getColorForPlayer(state.selectedPlayer)
+                });
+            }
+
+            state.isDrawing = false;
+            draggedPlayerIdx = -1;
+            draggedDefenderIdx = -1;
+            currentRoutePoints = [];
+            draw();
+        }
+
+        function getColorForPlayer(idx) {
+            const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
+            return colors[idx % colors.length];
+        }
+
+        // Play Management
+        function clearRoutes() {
+            state.routes = [];
+            draw();
+        }
+
+        function undoRoute() {
+            if (state.routes.length > 0) {
+                state.routes.pop();
+                draw();
+            }
+        }
+
+        function toggleDefense() {
+            state.showDefense = document.getElementById('defenseToggle').checked;
+            draw();
+        }
+
+        function savePlay() {
+            const name = document.getElementById('playName').value.trim() || 'Unnamed Play';
+            const notes = document.getElementById('playNotes').value.trim();
+
+            if (state.plays.length >= 20) {
+                alert('Maximum 20 plays reached. Delete a play to save more.');
+                return;
+            }
+
+            const play = {
+                id: Date.now(),
+                name,
+                notes,
+                players: JSON.parse(JSON.stringify(state.players)),
+                defenders: JSON.parse(JSON.stringify(state.defenders)),
+                routes: JSON.parse(JSON.stringify(state.routes)),
+                timestamp: new Date().toISOString()
+            };
+
+            state.plays.push(play);
+            localStorage.setItem('ff_plays', JSON.stringify(state.plays));
+            loadPlays();
+
+            // Reset form
+            document.getElementById('playName').value = '';
+            document.getElementById('playNotes').value = '';
+            clearRoutes();
+        }
+
+        function loadPlays() {
+            const stored = localStorage.getItem('ff_plays');
+            state.plays = stored ? JSON.parse(stored) : [];
+
+            document.getElementById('playCount').textContent = state.plays.length;
+            renderPlaybook();
+        }
+
+        function renderPlaybook() {
+            const grid = document.getElementById('playbookGrid');
+
+            if (state.plays.length === 0) {
+                grid.innerHTML = '<div class="empty-state">No plays yet</div>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            state.plays.forEach((play, idx) => {
+                const thumbnail = document.createElement('div');
+                thumbnail.className = 'play-thumbnail';
+
+                const canvas2 = document.createElement('canvas');
+                canvas2.className = 'play-thumbnail-canvas';
+                canvas2.width = 200;
+                canvas2.height = 100;
+                drawPlayPreview(canvas2, play);
+
+                thumbnail.appendChild(canvas2);
+
+                const label = document.createElement('div');
+                label.className = 'play-thumbnail-label';
+                label.textContent = play.name;
+                thumbnail.appendChild(label);
+
+                thumbnail.addEventListener('click', () => loadPlay(play));
+                thumbnail.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    deletePlay(play.id);
+                });
+
+                // Long press detection for mobile
+                let longPressTimer;
+                thumbnail.addEventListener('touchstart', () => {
+                    longPressTimer = setTimeout(() => deletePlay(play.id), 500);
+                });
+                thumbnail.addEventListener('touchend', () => clearTimeout(longPressTimer));
+
+                grid.appendChild(thumbnail);
+            });
+        }
+
+        function drawPlayPreview(canvas, play) {
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#1a4a1a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Field grid
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 0.5;
+            const spacing = canvas.width / 8;
+            for (let i = 0; i <= 8; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * spacing, 0);
+                ctx.lineTo(i * spacing, canvas.height);
+                ctx.stroke();
+            }
+
+            // Line of scrimmage
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height * 0.5);
+            ctx.lineTo(canvas.width, canvas.height * 0.5);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw routes
+            play.routes.forEach(route => {
+                if (route.points.length > 1) {
+                    const scaledPoints = route.points.map(p => [
+                        p[0] * canvas.width / 560,
+                        p[1] * canvas.height / 364
+                    ]);
+
+                    ctx.strokeStyle = route.color;
+                    ctx.lineWidth = 1.5;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+
+                    ctx.beginPath();
+                    ctx.moveTo(scaledPoints[0][0], scaledPoints[0][1]);
+                    for (let i = 1; i < scaledPoints.length; i++) {
+                        ctx.lineTo(scaledPoints[i][0], scaledPoints[i][1]);
+                    }
+                    ctx.stroke();
+                }
+            });
+
+            // Draw players
+            play.players.forEach(player => {
+                const x = player.x * canvas.width / 560;
+                const y = player.y * canvas.height / 364;
+                const radius = 6;
+
+                ctx.fillStyle = player.color;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 7px "Barlow Condensed"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(player.label.substring(0, 1), x, y);
+            });
+        }
+
+        function loadPlay(play) {
+            state.players = JSON.parse(JSON.stringify(play.players));
+            state.defenders = JSON.parse(JSON.stringify(play.defenders));
+            state.routes = JSON.parse(JSON.stringify(play.routes));
+            state.selectedPlayer = null;
+
+            document.getElementById('playName').value = play.name;
+            document.getElementById('playNotes').value = play.notes;
+
+            draw();
+        }
+
+        function deletePlay(playId) {
+            if (confirm('Delete this play?')) {
+                state.plays = state.plays.filter(p => p.id !== playId);
+                localStorage.setItem('ff_plays', JSON.stringify(state.plays));
+                loadPlays();
+            }
+        }
+
+        // Pro Check
+        function checkPro() {
+            const isPro = localStorage.getItem('ff_pro_v1') === 'unlocked';
+            document.getElementById('proGate').style.display = isPro ? 'none' : 'flex';
+            return isPro;
+        }
+
+        function goToStripe(url) {
+            window.location.href = url;
+        }
+
+        // Initialize
+        if (checkPro()) {
+            initializePlay();
+            loadPlays();
+        }
+    </script>
+</body>
+</html>

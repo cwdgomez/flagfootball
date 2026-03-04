@@ -220,6 +220,20 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .score-particle{position:absolute;top:50%;left:50%;width:8px;height:8px;border-radius:50%;pointer-events:none;animation:particlePop .55s ease-out forwards;}
 .sc-num.scoring{animation:scoreExplode .5s cubic-bezier(.36,.07,.19,.97) both;}
 
+/* PENALTY BAR */
+.pen-bar{display:flex;align-items:center;justify-content:space-between;background:rgba(220,38,38,.07);
+  border-bottom:1px solid rgba(220,38,38,.15);padding:5px 12px;gap:8px;}
+.pen-team{flex:1;display:flex;align-items:center;gap:8px;justify-content:center;}
+.pen-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;letter-spacing:2px;
+  color:rgba(220,38,38,.6);text-transform:uppercase;white-space:nowrap;}
+.pen-controls{display:flex;align-items:center;gap:5px;}
+.pen-btn{background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:7px;
+  color:#ef4444;font-size:12px;font-weight:700;padding:3px 8px;cursor:pointer;line-height:1;}
+.pen-btn.pen-undo{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:var(--dimmer);font-size:11px;}
+.pen-count{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#ef4444;line-height:1;min-width:20px;text-align:center;}
+.pen-div{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;letter-spacing:2px;
+  color:var(--dimmer);text-transform:uppercase;flex-shrink:0;}
+
 /* QUARTER BAR */
 .qbar{display:flex;background:var(--dark2);border-bottom:1px solid var(--dark5);}
 .qtab{flex:1;padding:8px 0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;color:var(--dimmer);cursor:pointer;border-bottom:3px solid transparent;transition:color .2s,border-color .2s;text-transform:uppercase;}
@@ -616,6 +630,11 @@ body.light-mode .toast-msg{color:#1a1714;}
 .mode-toggle{background:none;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:5px 9px;
   font-size:16px;cursor:pointer;line-height:1;transition:border-color .2s;}
 .mode-toggle:hover{border-color:rgba(255,255,255,.5);}
+.pro-hdr-btn{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#111;border:none;border-radius:8px;
+  padding:5px 10px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;
+  letter-spacing:1.5px;cursor:pointer;line-height:1;transition:opacity .2s;text-transform:uppercase;}
+.pro-hdr-btn:hover{opacity:.85;}
+.pro-hdr-btn.unlocked{background:rgba(255,255,255,.08);color:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.1);}
 
 /* ── ONBOARDING OVERLAY ── */
 .onboard-overlay{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.96);
@@ -1037,6 +1056,7 @@ body.light-mode .toast-msg{color:#1a1714;}
         <span class="qtimer-display" id="qtimer-display">—:——</span>
         <span class="qtimer-play" id="qtimer-play">▶</span>
       </div>
+      <button type="button" class="pro-hdr-btn" id="pro-hdr-btn" onclick="openProModal('header',null)" title="Activate Pro">⭐ PRO</button>
       <button type="button" class="mode-toggle" id="mode-toggle" onclick="toggleLightMode()" title="Toggle light/dark mode">☀️</button>
     </div>
   </div>
@@ -1062,6 +1082,27 @@ body.light-mode .toast-msg{color:#1a1714;}
         <button type="button" class="sb p2" onclick="addScore('them',2)">+2pt</button>
         <button type="button" class="sb un" onclick="undoScore('them')">↩</button>
       </div>
+    </div>
+  </div>
+
+  <!-- PENALTY TRACKER -->
+  <div class="pen-bar" id="pen-bar">
+    <div class="pen-team">
+      <span class="pen-label" id="pen-us-label">US FLAGS</span>
+      <div class="pen-controls">
+        <button type="button" class="pen-btn" onclick="addPenalty('us')">+🚩</button>
+        <span class="pen-count" id="pen-us">0</span>
+        <button type="button" class="pen-btn pen-undo" onclick="undoPenalty('us')">↩</button>
+      </div>
+    </div>
+    <div class="pen-div">PENALTIES</div>
+    <div class="pen-team">
+      <div class="pen-controls">
+        <button type="button" class="pen-btn pen-undo" onclick="undoPenalty('them')">↩</button>
+        <span class="pen-count" id="pen-them">0</span>
+        <button type="button" class="pen-btn" onclick="addPenalty('them')">+🚩</button>
+      </div>
+      <span class="pen-label" id="pen-them-label">OPP FLAGS</span>
     </div>
   </div>
 
@@ -1410,6 +1451,23 @@ function firstName(full){return (full||'Player').split(' ')[0];}
 // HTML escape — prevents XSS when injecting any user-supplied string into innerHTML
 // Delegates to escHtml() which is defined below for unification
 function esc(s){if(s==null)return '';return escHtml(String(s)).replace(/'/g,'&#39;');}
+
+/* ── PENALTY TRACKER STATE ── */
+var penUs=0,penThem=0;
+function addPenalty(side){
+  if(side==='us'){penUs++;document.getElementById('pen-us').textContent=penUs;}
+  else{penThem++;document.getElementById('pen-them').textContent=penThem;}
+  vibe([15]);
+}
+function undoPenalty(side){
+  if(side==='us'){penUs=Math.max(0,penUs-1);document.getElementById('pen-us').textContent=penUs;}
+  else{penThem=Math.max(0,penThem-1);document.getElementById('pen-them').textContent=penThem;}
+}
+function resetPenalties(){
+  penUs=0;penThem=0;
+  var pu=document.getElementById('pen-us');if(pu)pu.textContent='0';
+  var pt=document.getElementById('pen-them');if(pt)pt.textContent='0';
+}
 
 /* ── GAME STATE ── */
 var G={
@@ -1899,9 +1957,13 @@ function startGame(){
     var tidx=teams.findIndex(function(t){return t.id===ACTIVE_TEAM_ID;});
     if(tidx>=0&&teams[tidx].name!==teamName){teams[tidx].name=teamName;saveTeams(teams);var lbl=document.getElementById('tsw-name');if(lbl)lbl.textContent=teamName;}
     initState();
+    resetPenalties();
     document.getElementById('hdr-team').textContent=G.team.toUpperCase();
     document.getElementById('sc-us-name').textContent=G.team.toUpperCase().slice(0,9);
     document.getElementById('sc-opp-name').textContent=G.opp.toUpperCase().slice(0,9);
+    // Update penalty labels with team names
+    var penUsLbl=document.getElementById('pen-us-label');if(penUsLbl)penUsLbl.textContent=G.team.toUpperCase().slice(0,8)+' FLAGS';
+    var penThemLbl=document.getElementById('pen-them-label');if(penThemLbl)penThemLbl.textContent=G.opp.toUpperCase().slice(0,8)+' FLAGS';
     applyTheme();
     document.getElementById('screen-setup').classList.remove('active');
     document.getElementById('screen-main').classList.add('active');
@@ -2327,6 +2389,7 @@ function renderSummary(){
         +'<div class="qb-stat gcv"><div class="qv">'+qbCv+'</div><div class="ql">Conv</div></div>'
         +'<div class="qb-stat gi"><div class="qv">'+qbInt+'</div><div class="ql">INTs</div></div>'
       +'</div></div>'
+    +(penUs+penThem>0?'<div class="sum-lbl">🚩 Penalties</div><div style="display:flex;gap:16px;padding:10px 0;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;"><span style="color:#ef4444">'+G.team+': '+penUs+' flag'+(penUs!==1?'s':'')+'</span><span style="color:var(--dimmer)">|</span><span style="color:rgba(255,255,255,.5)">'+G.opp+': '+penThem+' flag'+(penThem!==1?'s':'')+'</span></div>':'')
     +'<div class="sum-lbl">📊 Score by Quarter</div>'
     +'<div class="qs-wrap"><table class="qt"><thead><tr>'+qh+'</tr></thead><tbody>'
       +'<tr class="ur"><td>'+G.team+'</td>'+uc+'<td class="tot">'+ut+'</td></tr>'
@@ -2425,6 +2488,7 @@ function undoLast(){
 /* ── RESET ── */
 function doReset(){
   if(!confirm('Start a new game? Current data will be cleared.'))return;
+  resetPenalties();
   G.cq=1;G.expP=null;G.expR=null;G.last=null;G.tab='stats';G.absent=[];G.notes={};
   if(G.timer){clearTimeout(G.timer);G.timer=null;}
   document.getElementById('toast').classList.remove('show');
@@ -2839,6 +2903,28 @@ function playTick(freq,dur,vol){
   }catch(e){}
 }
 
+function playTDFanfare(){
+  // Ascending C-E-G-C fanfare for touchdowns 🏈
+  var ctx=getAudioCtx();
+  if(!ctx)return;
+  var notes=[{f:523,t:0},{f:659,t:0.13},{f:784,t:0.26},{f:1047,t:0.39}]; // C5 E5 G5 C6
+  notes.forEach(function(n){
+    try{
+      var o=ctx.createOscillator();
+      var g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=n.f;
+      o.type='triangle';
+      var t=ctx.currentTime+n.t;
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(0.28,t+0.04);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+      o.start(t);
+      o.stop(t+0.32);
+    }catch(e){}
+  });
+}
+
 function vibe(pattern,ev){
   // Haptic vibration (Android Chrome — not supported on iOS)
   if(navigator.vibrate){try{navigator.vibrate(pattern||[12]);}catch(e){}}
@@ -3100,6 +3186,7 @@ logStat=function(name,key,ev){
 var _origAddScore=addScore;
 addScore=function(team,pts){
   vibe(pts===6?[50,20,50,20,50]:[20]);
+  if(pts===6)playTDFanfare();
   _origAddScore(team,pts);
   syncPush();
 };
@@ -3313,11 +3400,7 @@ function getPlayerPhoto(name){
    VOICE STAT LOGGING  (Web Speech API)
 ════════════════════════════════════════════════════════════ */
 /* ── VOICE AUDIO FEEDBACK ── */
-var _audioCtx=null;
-function getAudioCtx(){
-  if(!_audioCtx){try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}
-  return _audioCtx;
-}
+// Note: getAudioCtx() and _audioCtx are defined in the main audio section above
 function playVoiceSuccess(){
   try{
     var ctx=getAudioCtx();if(!ctx)return;
@@ -3912,6 +3995,14 @@ var _origOnload=window.onload;
 window.onload=function(){
   if(_origOnload)_origOnload();
   initGate();
+  // If already Pro, show the button as active
+  try{
+    if(localStorage.getItem('ff_pro_v1')==='unlocked'){
+      var pb=document.getElementById('pro-hdr-btn');
+      if(pb){pb.textContent='✅ PRO';pb.classList.add('unlocked');pb.onclick=null;pb.title='Pro is active';}
+      document.querySelectorAll('.pro-badge').forEach(function(b){b.style.display='none';});
+    }
+  }catch(e){}
 };
 
 /* ════════════════════════════════════════════════════════════
@@ -3970,6 +4061,8 @@ function proUnlockWithCode(code){
       showToast('⭐ Pro unlocked! Enjoy all features.');
       vibe([30,15,30,15,50]);
       try{document.querySelectorAll('.pro-badge').forEach(function(b){b.style.display='none';});}catch(e){}
+      // Hide/dim the PRO header button once unlocked
+      try{var pb=document.getElementById('pro-hdr-btn');if(pb){pb.textContent='✅ PRO';pb.classList.add('unlocked');pb.onclick=null;pb.title='Pro is active';}}catch(e){}
       if(typeof _proCallback==='function'){_proCallback();_proCallback=null;}
     } else {
       showToast('❌ Invalid or expired license key');
