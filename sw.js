@@ -2,7 +2,7 @@
 // Cache-first for assets, network-first for navigation, stale-while-revalidate for fonts
 // Update CACHE_VERSION when deploying new app versions to bust the cache
 
-const CACHE_VERSION = 'fftp-v7::2026-03-04';
+const CACHE_VERSION = 'fftp-v8::2026-03-04';
 const FONT_CACHE    = 'fftp-fonts-v1';  // Separate long-lived cache for Google Fonts
 const OFFLINE_URL   = './app.html';
 
@@ -13,6 +13,7 @@ const PRECACHE_ASSETS = [
   './manifest.json',
   './privacy.html',
   './terms.html',
+  './help.html',
   './apple-touch-icon.png',
   './icon-192.png',
   './icon-512.png',

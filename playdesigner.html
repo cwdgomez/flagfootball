@@ -12,7 +12,7 @@
             --gold2: #CC9900;
             --red: #AA0000;
             --red2: #770000;
-            --dark: #060606;
+            --dark: #080808;
             --dark2: #0D0D0D;
             --dark3: #161616;
             --dark4: #1f1f1f;
@@ -589,8 +589,8 @@
 
     <!-- Fixed Navigation -->
     <nav>
-        <div class="logo">CGMAX · FFTP</div>
-        <a href="./app.html">← Back</a>
+        <div class="logo">CGMax · FFTP</div>
+        <a href="#" onclick="goBack()">← Back</a>
     </nav>
 
     <!-- Main Content -->
@@ -670,6 +670,18 @@
                 routes: []
             }
         };
+
+        // Unsaved changes tracking
+        let hasUnsavedChanges = false;
+
+        // Warn before leaving if there are unsaved changes
+        window.addEventListener('beforeunload', function(e) {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        });
 
         // Canvas Setup
         const canvas = document.getElementById('playCanvas');
@@ -932,10 +944,12 @@
                 if (draggedPlayerIdx !== -1) {
                     state.players[draggedPlayerIdx].x = pos.x;
                     state.players[draggedPlayerIdx].y = pos.y;
+                    hasUnsavedChanges = true;
                 }
                 if (draggedDefenderIdx !== -1) {
                     state.defenders[draggedDefenderIdx].x = pos.x;
                     state.defenders[draggedDefenderIdx].y = pos.y;
+                    hasUnsavedChanges = true;
                 }
             } else {
                 if (state.selectedPlayer !== null && currentRoutePoints.length > 0) {
@@ -943,6 +957,7 @@
                     const dist = Math.sqrt((pos.x - lastPoint[0]) ** 2 + (pos.y - lastPoint[1]) ** 2);
                     if (dist > 5) {
                         currentRoutePoints.push([pos.x, pos.y]);
+                        hasUnsavedChanges = true;
                     }
                 }
             }
@@ -1032,6 +1047,7 @@
             document.getElementById('playName').value = '';
             document.getElementById('playNotes').value = '';
             clearRoutes();
+            hasUnsavedChanges = false;
         }
 
         function loadPlays() {
@@ -1170,6 +1186,17 @@
                 state.plays = state.plays.filter(p => p.id !== playId);
                 localStorage.setItem('ff_plays', JSON.stringify(state.plays));
                 loadPlays();
+            }
+        }
+
+        // Navigation with unsaved changes check
+        function goBack() {
+            if (hasUnsavedChanges) {
+                if (confirm('You have unsaved changes. Are you sure you want to leave?')) {
+                    window.location.href = './app.html';
+                }
+            } else {
+                window.location.href = './app.html';
             }
         }
 

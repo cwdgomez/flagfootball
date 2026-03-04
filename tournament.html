@@ -13,7 +13,7 @@
             --gold2: #CC9900;
             --red: #AA0000;
             --red2: #770000;
-            --dark: #060606;
+            --dark: #080808;
             --dark2: #0D0D0D;
             --dark3: #161616;
             --dark4: #1f1f1f;
@@ -806,7 +806,7 @@
 <body>
     <!-- Navigation -->
     <nav>
-        <div class="logo">CGMAX · FFTP</div>
+        <div class="logo">CGMax · FFTP</div>
         <a href="./app.html" class="back-link">← Back</a>
     </nav>
 
@@ -844,7 +844,7 @@
                     <h3>Format</h3>
                     <div class="format-options">
                         <button class="option-btn selected" data-format="single">Single Elimination</button>
-                        <button class="option-btn" data-format="double">Double Elimination</button>
+                        <button class="option-btn" data-format="double" disabled>Double Elimination (Coming Soon)</button>
                         <button class="option-btn" data-format="roundrobin">Round Robin</button>
                     </div>
                 </div>
@@ -1343,6 +1343,13 @@
 
             matchup.score1 = score1;
             matchup.score2 = score2;
+
+            // Handle tie-breaking
+            if (score1 === score2) {
+                alert('The scores are tied! Please adjust one score to determine a winner.');
+                return;
+            }
+
             matchup.winner = score1 > score2 ? matchup.team1 : matchup.team2;
 
             // Advance winner to next round
