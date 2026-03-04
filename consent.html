@@ -69,7 +69,7 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;
   letter-spacing:1px;color:var(--dim);cursor:pointer;text-transform:uppercase;}
 
 /* SUBMIT */
-.btn-submit{width:100%;background:linear-gradient(135deg,var(--p),#CC1100);border:none;border-radius:12px;
+.btn-submit{width:100%;background:linear-gradient(135deg,var(--p),#AA0000);border:none;border-radius:12px;
   padding:16px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;
   color:white;cursor:pointer;transition:all .2s;margin-top:8px;position:relative;overflow:hidden;}
 .btn-submit:active{transform:scale(.98);}
@@ -172,35 +172,35 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;
     <div class="date-display" id="form-date"></div>
 
     <div class="field">
-      <label>Player's Full Name *</label>
+      <label for="f-player">Player's Full Name *</label>
       <input type="text" id="f-player" placeholder="First and last name" required>
     </div>
     <div class="field-row">
       <div class="field">
-        <label>Player's Age *</label>
+        <label for="f-age">Player's Age *</label>
         <input type="number" id="f-age" placeholder="Age" min="4" max="18" required>
       </div>
       <div class="field">
-        <label>Jersey Number</label>
+        <label for="f-jersey">Jersey Number</label>
         <input type="number" id="f-jersey" placeholder="#" min="0" max="99">
       </div>
     </div>
     <div class="field">
-      <label>Team Name *</label>
+      <label for="f-team">Team Name *</label>
       <input type="text" id="f-team" placeholder="e.g. River Hawks" required>
     </div>
     <div class="field">
-      <label>Season *</label>
+      <label for="f-season">Season *</label>
       <input type="text" id="f-season" placeholder="e.g. Spring 2026" required>
     </div>
 
     <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06);">
       <div class="field">
-        <label>Parent / Legal Guardian Full Name *</label>
+        <label for="f-guardian">Parent / Legal Guardian Full Name *</label>
         <input type="text" id="f-guardian" placeholder="First and last name" required>
       </div>
       <div class="field">
-        <label>Relationship to Player *</label>
+        <label for="f-relation">Relationship to Player *</label>
         <select id="f-relation" required>
           <option value="">Select...</option>
           <option value="Mother">Mother</option>
@@ -211,11 +211,11 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;
         </select>
       </div>
       <div class="field">
-        <label>Email Address *</label>
+        <label for="f-email">Email Address *</label>
         <input type="email" id="f-email" placeholder="you@example.com" required>
       </div>
       <div class="field">
-        <label>Phone Number</label>
+        <label for="f-phone">Phone Number</label>
         <input type="tel" id="f-phone" placeholder="(555) 123-4567">
       </div>
     </div>
@@ -264,7 +264,7 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;
   <div class="form-footer">
     <a href="./index.html">CGMax FFTP</a> · <a href="./privacy.html">Privacy Policy</a> · <a href="./terms.html">Terms</a>
     <div style="margin-top:6px;font-size:10px;color:var(--dimmer);letter-spacing:1px;">
-      © 2025 ITCC LLC · All Rights Reserved
+      © 2026 ITCC LLC · All Rights Reserved
     </div>
   </div>
 </div>
