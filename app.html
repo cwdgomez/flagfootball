@@ -1015,6 +1015,15 @@ body.light-mode .toast-msg{color:#1a1714;}
     <div id="absent-list"></div>
 
     <button type="button" class="btn-kickoff" id="kickoff-btn" onclick="startGame()">⚡ KICK OFF</button>
+
+    <!-- PRO ACTIVATION STRIP -->
+    <div id="setup-pro-strip" style="margin-top:14px;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.35);">⭐ PRO FEATURES INACTIVE</div>
+      <button type="button" id="setup-pro-btn" onclick="openProModal('setup',null)"
+        style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#111;border:none;border-radius:8px;padding:6px 14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:1px;cursor:pointer;">
+        UNLOCK PRO
+      </button>
+    </div>
   </div>
 </div>
 
@@ -2827,8 +2836,6 @@ function copyShareText(){
   </div>
 </div>
 
-</body>
-</html>
 <script>
 /* ════════════════════════════════════════════════════
    SERVICE WORKER REGISTRATION
@@ -4001,6 +4008,14 @@ window.onload=function(){
       var pb=document.getElementById('pro-hdr-btn');
       if(pb){pb.textContent='✅ PRO';pb.classList.add('unlocked');pb.onclick=null;pb.title='Pro is active';}
       document.querySelectorAll('.pro-badge').forEach(function(b){b.style.display='none';});
+      // Hide setup screen pro strip when already unlocked
+      var strip=document.getElementById('setup-pro-strip');
+      if(strip){
+        strip.querySelector('div').textContent='✅ PRO ACTIVE';
+        strip.querySelector('div').style.color='#22C55E';
+        var sbtn=document.getElementById('setup-pro-btn');
+        if(sbtn)sbtn.style.display='none';
+      }
     }
   }catch(e){}
 };
@@ -4063,6 +4078,16 @@ function proUnlockWithCode(code){
       try{document.querySelectorAll('.pro-badge').forEach(function(b){b.style.display='none';});}catch(e){}
       // Hide/dim the PRO header button once unlocked
       try{var pb=document.getElementById('pro-hdr-btn');if(pb){pb.textContent='✅ PRO';pb.classList.add('unlocked');pb.onclick=null;pb.title='Pro is active';}}catch(e){}
+      // Update setup screen pro strip
+      try{
+        var strip=document.getElementById('setup-pro-strip');
+        if(strip){
+          strip.querySelector('div').textContent='✅ PRO ACTIVE';
+          strip.querySelector('div').style.color='#22C55E';
+          var sbtn=document.getElementById('setup-pro-btn');
+          if(sbtn)sbtn.style.display='none';
+        }
+      }catch(e){}
       if(typeof _proCallback==='function'){_proCallback();_proCallback=null;}
     } else {
       showToast('❌ Invalid or expired license key');
@@ -4297,4 +4322,16 @@ function processVoiceCommand2(text,confidence){
     vibe([30,10,30]);
     setTimeout(function(){if(res)res.textContent='';},3000);
   } else if(matchedPlayer&&!matchedKey){
-    if(res){res.className='voice-result error';res.textContent='⚠️ '+firstName(match
+    if(res){res.className='voice-result error';res.textContent='⚠️ '+firstName(matchedPlayer)+' — which stat? Say "touchdown", "flag pull", "catch"...';}
+    playVoiceFail();
+  } else if(!matchedPlayer&&matchedKey){
+    if(res){res.className='voice-result error';res.textContent='⚠️ Which player? Say a player name first.';}
+    playVoiceFail();
+  } else {
+    if(res){res.className='voice-result error';res.textContent='❓ Try: "Jaxon touchdown" or "offense is Jaxon Reed Cade"';}
+    playVoiceFail();
+  }
+}
+</script>
+</body>
+</html>
