@@ -104,14 +104,18 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
       <li>Roster management with privacy-preserving name formatting</li>
       <li>Multiple team management with per-team roster and season history</li>
       <li>Attendance tracking — mark players present or absent before each game</li>
-      <li>Live Sync — optional real-time co-coaching via Firebase Realtime Database</li>
-      <li>Live Parent Scoreboard — optional shareable read-only live game link for parents, powered by Firebase</li>
+      <li>Live Sync — optional real-time co-coaching via ITCC LLC's secure backend (Vercel + Supabase)</li>
+      <li>Live Parent Scoreboard — optional shareable read-only live game link for parents, powered by ITCC LLC's Supabase backend</li>
+      <li>Tournament Mode — bracket management for single elimination, double elimination, and round robin formats</li>
+      <li>Play Designer — canvas-based playbook tool for drawing and saving plays</li>
+      <li>Penalty Tracker — live in-game flag count for both teams, saved with the game summary</li>
+      <li>Player Development Trends — season-long per-player stat charts across all saved games</li>
     </ul>
     <p>The App operates primarily via client-side local storage on your device. ITCC LLC does not store your coaching data, rosters, or game statistics on its servers.</p>
 
-    <p><strong>Service Tiers — Lite and Pro:</strong> CGMax FFTP is offered in two tiers. The <strong>Lite tier</strong> is available at no cost to coaches who possess a valid app access code and includes core game-day features: live scoring, player stats, smart rotations, MVP rankings, roster management (single team), and full offline functionality. The <strong>Pro tier</strong> unlocks advanced features including voice-activated stat logging with audio feedback, season history and leaderboard, Live Parent Scoreboard, multiple team management, game export, and share card generation. Pro access is granted through a separate Pro unlock code provided by ITCC LLC upon upgrade and stored locally on your device. ITCC LLC reserves the right to modify the features included in each tier at any time.</p>
+    <p><strong>Service Tiers — Lite and Pro:</strong> CGMax FFTP is offered in two tiers. The <strong>Lite tier</strong> is available at no cost to coaches who possess a valid app access code and includes core game-day features: live scoring, player stats, smart rotations, MVP rankings, roster management (single team), attendance tracking, penalty tracker, and full offline functionality. The <strong>Pro tier</strong> unlocks advanced features including voice-activated stat logging with audio feedback, season history and leaderboard, Live Parent Scoreboard, multiple team management, Tournament Mode, Play Designer, Player Development Trends, game export, share card generation, and print summaries. Pro access is granted through a license key (format: CGMAX-XXXX-XXXX-XXXX) emailed after payment and validated by ITCC LLC's backend. ITCC LLC reserves the right to modify the features included in each tier at any time.</p>
 
-    <p><strong>Live Sync and Parent View (optional, Pro):</strong> These features use Firebase Realtime Database (Google) to transmit live game data to other devices. Use of these features is entirely optional, requires the coach to supply a personal Firebase project configuration, and is subject to Google's Terms of Service and Privacy Policy. By using these optional features, you acknowledge that live game data (scores, stats, player names in first name + last initial format) will be transmitted to your Firebase project and may be accessible by any person who possesses the parent view link you share.</p>
+    <p><strong>Live Sync and Parent View (optional, Pro):</strong> These features use ITCC LLC's secure backend infrastructure (Vercel serverless functions + Supabase database) to transmit live game data. Use of these features is entirely optional — the coach activates the session in-app. No external configuration is required. By using these optional features, you acknowledge that live game data (scores, stats, player names in first name + last initial format, team name, opponent name) will be temporarily transmitted to and stored in ITCC LLC's Supabase database, automatically expiring after 12 hours. This data is accessible by any person who possesses the parent view link you share.</p>
   </div>
   <div class="doc-divider"></div>
 

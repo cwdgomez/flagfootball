@@ -230,6 +230,9 @@ footer{
       <li>Your selected team colors and app preferences</li>
       <li>Multiple team profiles (team names and roster associations for coaches managing more than one team)</li>
       <li>Per-game attendance records (which players were present or absent for each game)</li>
+      <li>Penalty flag counts per game (stored in the game summary, not transmitted)</li>
+      <li>Tournament records (bracket format, team names, scores, and champion — stored locally in <code>ff_tournaments</code>)</li>
+      <li>Saved plays from the Play Designer (canvas drawings stored as serialized data in <code>ff_plays</code>, up to 20 plays)</li>
       <li><strong>In-game auto-save state</strong> (localStorage key: <code>ff_live_game_v1</code>): To prevent data loss when you switch apps or your screen turns off during a live game, the App automatically saves a snapshot of the active game state to localStorage. This snapshot is deleted when the game ends normally (saved to Season History) or when you start a new game. It is retained for up to 24 hours and is used solely to offer a "resume game" prompt on next app open.</li>
       <li><strong>Pro tier status</strong> (localStorage keys: <code>ff_pro_v1</code>, <code>ff_license_key</code>): If you have activated a valid Pro license key, the App stores a flag locally indicating your Pro tier is active, along with your license key for re-validation purposes. License key validation is performed by transmitting your key to ITCC LLC's secure backend (hosted on Vercel) where it is checked against your subscription record in our license database (hosted on Supabase). See Section 5 for details on these third-party processors.</li>
     </ul>
