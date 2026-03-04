@@ -1029,7 +1029,7 @@ body.light-mode .toast-msg{color:#1a1714;}
     <!-- COACH TOOLS SECTION -->
     <div style="margin-top:18px;border-top:1px solid rgba(255,255,255,.07);padding-top:16px;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:10px;">⚡ Coach Tools</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;">
         <button type="button" onclick="proGate('tournament',function(){window.open('./tournament.html','_blank')})"
           style="background:rgba(170,0,0,.12);border:1px solid rgba(170,0,0,.35);border-radius:12px;padding:14px 8px;cursor:pointer;text-align:center;transition:all .2s;">
           <div style="font-size:24px;margin-bottom:4px;">🏆</div>
@@ -1047,6 +1047,12 @@ body.light-mode .toast-msg{color:#1a1714;}
           <div style="font-size:24px;margin-bottom:4px;">📡</div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.8);">Live Score</div>
           <span class="pro-badge" style="margin-top:4px;">PRO</span>
+        </button>
+        <button type="button" onclick="openConsentForm()"
+          style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:14px 8px;cursor:pointer;text-align:center;transition:all .2s;">
+          <div style="font-size:24px;margin-bottom:4px;">📋</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.8);">Photo Consent</div>
+          <div style="font-size:8px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;color:rgba(168,85,247,.6);margin-top:3px;">FREE</div>
         </button>
       </div>
     </div>
@@ -3973,6 +3979,15 @@ function copyParentLink(){
     try{document.execCommand('copy');showToast('✅ Parent link copied!');}catch(e){showToast('📋 Copy the link above');}
     document.body.removeChild(ta);
   }
+}
+
+// Open consent form — passes team name and season for pre-fill
+function openConsentForm(){
+  var team=encodeURIComponent(G.team||'');
+  var now=new Date();
+  var seasons=['Spring','Spring','Spring','Spring','Summer','Summer','Summer','Fall','Fall','Fall','Winter','Winter'];
+  var season=encodeURIComponent(seasons[now.getMonth()]+' '+now.getFullYear());
+  window.open('./consent.html?team='+team+'&season='+season,'_blank');
 }
 </script>
 <script>
