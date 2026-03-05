@@ -906,6 +906,31 @@ body.light-mode .toast-msg{color:#1a1714;}
 /* Season print/CSV buttons */
 .sact-print{background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.35);color:var(--purple);}
 .sact-csv{background:rgba(20,184,166,.12);border-color:rgba(20,184,166,.35);color:var(--teal);}
+
+/* Edit Roster pulsating glow for new users */
+@keyframes rosterPulse{
+  0%{box-shadow:0 0 4px rgba(251,191,36,.2), 0 0 8px rgba(251,191,36,.1);border-color:rgba(251,191,36,.45);}
+  50%{box-shadow:0 0 12px rgba(251,191,36,.5), 0 0 24px rgba(251,191,36,.2);border-color:rgba(251,191,36,.8);}
+  100%{box-shadow:0 0 4px rgba(251,191,36,.2), 0 0 8px rgba(251,191,36,.1);border-color:rgba(251,191,36,.45);}
+}
+.roster-open-btn.pulse{
+  animation:rosterPulse 2s ease-in-out infinite;
+  color:#f59e0b !important;
+  border-color:rgba(251,191,36,.5);
+}
+
+/* Offline / Online connectivity banner */
+.offline-banner{position:fixed;top:0;left:0;right:0;z-index:9999;padding:6px 14px;
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;
+  text-align:center;text-transform:uppercase;transform:translateY(-100%);
+  transition:transform .35s cubic-bezier(.22,1,.36,1);display:flex;align-items:center;justify-content:center;gap:8px;}
+.offline-banner.show{transform:translateY(0);}
+.offline-banner.offline{background:#b91c1c;color:#fff;}
+.offline-banner.online{background:#16a34a;color:#fff;}
+.offline-banner .offline-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.offline-banner.offline .offline-dot{background:#fca5a5;animation:offDotBlink 1.5s infinite;}
+.offline-banner.online .offline-dot{background:#bbf7d0;}
+@keyframes offDotBlink{0%,100%{opacity:1;}50%{opacity:.3;}}
 </style>
 </head>
 <body>
@@ -1125,7 +1150,7 @@ body.light-mode .toast-msg{color:#1a1714;}
           style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:14px 8px;cursor:pointer;text-align:center;transition:all .2s;">
           <div style="font-size:24px;margin-bottom:4px;">📋</div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.8);">Photo Consent</div>
-          <div style="font-size:8px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;color:rgba(168,85,247,.6);margin-top:3px;">FREE</div>
+          <span class="pro-badge" style="margin-top:4px;">PRO</span>
         </button>
       </div>
     </div>
@@ -1302,6 +1327,7 @@ body.light-mode .toast-msg{color:#1a1714;}
       <button type="button" class="sact-btn sact-import" onclick="document.getElementById('import-file').click()">⬆ Import</button>
       <button type="button" class="sact-btn" style="background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.35);color:#818cf8" onclick="proGate('cloudBackup',cloudBackup)">☁️ Backup<span class="pro-badge">PRO</span></button>
       <button type="button" class="sact-btn" style="background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.25);color:#818cf8" onclick="proGate('cloudRestore',cloudRestore)">☁️ Restore<span class="pro-badge">PRO</span></button>
+      <button type="button" class="sact-btn" style="background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.35);color:#f59e0b" onclick="proGate('seasonReport',generateSeasonReport)">📋 Summary<span class="pro-badge">PRO</span></button>
       <button type="button" class="sact-btn sact-clear" onclick="clearSeason()">🗑 Clear All</button>
     </div>
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="importSeason(event)">
@@ -1496,6 +1522,12 @@ body.light-mode .toast-msg{color:#1a1714;}
   </div>
 </div>
 
+<!-- OFFLINE BANNER -->
+<div class="offline-banner" id="offline-banner">
+  <span class="offline-dot"></span>
+  <span id="offline-banner-msg">You're offline</span>
+</div>
+
 <!-- TOAST -->
 <div class="undo-toast" id="toast">
   <div class="toast-msg" id="toast-msg">Logged</div>
@@ -1544,17 +1576,17 @@ var TC={primary:'#CC0000',secondary:'#FFD700'};
 
 /* ── PLAYERS — dynamic, editable, localStorage-backed ── */
 var DEFAULT_ROSTER=[
-  {name:'Jaxon B.',   num:13},
-  {name:'Braden A.',  num:9},
-  {name:'Cade A.',    num:84},
-  {name:'Caelb S.',   num:1},
-  {name:'Grayson G.', num:85},
-  {name:'Greyson P.', num:18},
-  {name:'Jax J.',     num:12},
-  {name:'Milo V.',    num:2},
-  {name:'Nico L.',    num:21},
-  {name:'Phoenix O.', num:88},
-  {name:'Reed J.',    num:99}
+  {name:'Player 1',  num:1},
+  {name:'Player 2',  num:2},
+  {name:'Player 3',  num:3},
+  {name:'Player 4',  num:4},
+  {name:'Player 5',  num:5},
+  {name:'Player 6',  num:6},
+  {name:'Player 7',  num:7},
+  {name:'Player 8',  num:8},
+  {name:'Player 9',  num:9},
+  {name:'Player 10', num:10},
+  {name:'Player 11', num:11}
 ];
 var LS_ROSTER='ff_roster_v1';
 
@@ -2901,10 +2933,12 @@ function renderRosterScreen(){
       ?'<img class="rpr-photo" src="'+photoSrc+'" onclick=\'triggerPhotoUpload('+idx+')\'>'
       :'<div class="rpr-photo-placeholder" onclick=\'triggerPhotoUpload('+idx+')\'>📷</div>';
 
+    var isPro=!!localStorage.getItem('ff_pro');
+    var photoLbl=isPro?'photo':'<span style="color:#f59e0b;font-size:8px">PRO</span>';
     var photoCol='<div class="rpr-photo-col">'
       +photoHtml
       +'<input type="file" accept="image/*" capture="environment" class="rpr-photo-input" id="rpr-photo-'+idx+'" onchange=\'handlePhotoUpload('+idx+',this)\'>'
-      +'<div class="rpr-photo-lbl">photo</div>'
+      +'<div class="rpr-photo-lbl">'+photoLbl+'</div>'
       +'</div>';
 
     var numCol='<div class="rpr-num">'
@@ -2976,7 +3010,7 @@ function saveRoster(){
   setTimeout(function(){closeRoster();},700);
 }
 function resetToDefault(){
-  if(!confirm('Reset to default 11-player roster?'))return;
+  if(!confirm('Reset roster to Player 1–11 defaults?'))return;
   LIVE_ROSTER=DEFAULT_ROSTER.map(function(p){return {name:p.name,num:p.num};});
   saveRosterData(LIVE_ROSTER);
   renderRosterScreen();
@@ -3063,8 +3097,8 @@ function copyShareText(){
       <div class="pro-feature-item">📤 Export Game Reports</div>
       <div class="pro-feature-item">🖨️ Print Game Summary</div>
     </div>
-    <button type="button" class="pro-cta-btn" onclick="proUpgradeAnnual()" style="margin-bottom:6px;">⭐ Go Pro — $79.99 / year</button>
-    <button type="button" onclick="proUpgradeMonthly()" style="width:100%;background:none;border:1px solid rgba(251,191,36,.35);border-radius:12px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:#f59e0b;cursor:pointer;margin-bottom:14px;">or $9.99 / month</button>
+    <button type="button" class="pro-cta-btn" onclick="proUpgradeMonthly()" style="margin-bottom:6px;">⭐ Go Pro — $9.99 / month</button>
+    <button type="button" onclick="proUpgradeAnnual()" style="width:100%;background:none;border:1px solid rgba(251,191,36,.35);border-radius:12px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:#f59e0b;cursor:pointer;margin-bottom:14px;">or $79.99 / year (save 33%)</button>
     <div style="display:flex;gap:8px;margin-bottom:10px;">
       <input type="text" id="pro-code-input" placeholder="License key: CGMAX-XXXX-XXXX-XXXX"
         style="flex:1;background:var(--dark3);border:1px solid var(--dark5);border-radius:9px;padding:9px 12px;color:var(--txt);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;outline:none;text-transform:uppercase;"
@@ -3483,7 +3517,7 @@ rotToggle=function(name,side){
 ════════════════════════════════════════════════════════════ */
 var OB_STEPS=[
   {icon:'🏈',title:'Welcome, Coach!',body:'Flag Football Tracker gives you <strong>live stats, smart rotations, and MVP rankings</strong> — all on your phone, right on the sideline. No app store. Works offline.'},
-  {icon:'✏️',title:'Build Your Roster',body:'Tap <strong>Edit Roster</strong> on the setup screen to add your players, jersey numbers, and even player photos. Your roster saves automatically for every future game.'},
+  {icon:'✏️',title:'Build Your Roster',body:'Tap <strong>Edit Roster</strong> on the setup screen to add your players and jersey numbers. Your roster saves automatically for every future game. <strong>Pro</strong> users can add player photos too!'},
   {icon:'⚡',title:"You're Ready!",body:'Pick your team colors, enter your opponent, and tap <strong>Kick Off</strong>. During the game use the 🎙️ Voice button to log stats hands-free, or tap ⏱ to start the quarter timer.'}
 ];
 var obStep=0;
@@ -3634,8 +3668,10 @@ var LS_PHOTOS='ff_photos_v1';
 function loadPhotos(){try{return JSON.parse(localStorage.getItem(LS_PHOTOS))||{};}catch(e){return{};}}
 function savePhotos(p){try{localStorage.setItem(LS_PHOTOS,JSON.stringify(p));}catch(e){}}
 function triggerPhotoUpload(idx){
-  var inp=document.getElementById('rpr-photo-'+idx);
-  if(inp)inp.click();
+  proGate('photos',function(){
+    var inp=document.getElementById('rpr-photo-'+idx);
+    if(inp)inp.click();
+  });
 }
 function handlePhotoUpload(idx,input){
   var file=input.files[0];if(!file)return;
@@ -4737,6 +4773,220 @@ function processVoiceCommand2(text,confidence){
     if(res){res.className='voice-result error';res.textContent='❓ Try: "Jaxon touchdown" or "offense is Jaxon Reed Cade"';}
     playVoiceFail();
   }
+}
+
+/* ════════════════════════════════════════════════════
+   EDIT ROSTER PULSE (new-user hint)
+════════════════════════════════════════════════════ */
+(function initRosterPulse(){
+  function isDefaultRoster(){
+    try{
+      var saved=JSON.parse(localStorage.getItem(LS_ROSTER));
+      if(!saved||!Array.isArray(saved))return true;
+      for(var i=0;i<saved.length;i++){
+        if(saved[i].name&&saved[i].name.indexOf('Player ')!==0)return false;
+      }
+      return true;
+    }catch(e){return true;}
+  }
+  function updatePulse(){
+    var btn=document.querySelector('.roster-open-btn');
+    if(!btn)return;
+    if(isDefaultRoster()){btn.classList.add('pulse');}
+    else{btn.classList.remove('pulse');}
+  }
+  updatePulse();
+  // Re-check after roster saves
+  var origSave=window.saveRosterData;
+  if(origSave){
+    window.saveRosterData=function(){
+      origSave.apply(this,arguments);
+      setTimeout(updatePulse,100);
+    };
+  }
+})();
+
+/* ════════════════════════════════════════════════════
+   OFFLINE / ONLINE CONNECTIVITY BANNER
+════════════════════════════════════════════════════ */
+(function initOfflineBanner(){
+  var banner=document.getElementById('offline-banner');
+  var msg=document.getElementById('offline-banner-msg');
+  if(!banner||!msg)return;
+  var hideTimer=null;
+
+  function showBanner(isOffline){
+    clearTimeout(hideTimer);
+    banner.className='offline-banner '+(isOffline?'offline':'online');
+    msg.textContent=isOffline?"You're offline — data saves locally":'Back online!';
+    banner.classList.add('show');
+    if(!isOffline){
+      hideTimer=setTimeout(function(){banner.classList.remove('show');},3500);
+    }
+  }
+
+  // Only show on transitions, not on initial load (unless offline)
+  var wasOffline=!navigator.onLine;
+  if(wasOffline) showBanner(true);
+
+  window.addEventListener('offline',function(){
+    wasOffline=true;
+    showBanner(true);
+  });
+  window.addEventListener('online',function(){
+    if(wasOffline){
+      wasOffline=false;
+      showBanner(false);
+    }
+  });
+})();
+
+/* ════════════════════════════════════════════════════
+   SEASON SUMMARY / END-OF-SEASON REPORT
+════════════════════════════════════════════════════ */
+function generateSeasonReport(){
+  var games=loadSeason();
+  if(!games.length){showToast('⚠️ No season data for report');return;}
+
+  var wins=0,losses=0,ties=0,totalUs=0,totalThem=0;
+  games.forEach(function(g){
+    totalUs+=g.us; totalThem+=g.them;
+    if(g.us>g.them)wins++;
+    else if(g.us<g.them)losses++;
+    else ties++;
+  });
+
+  // Player cumulative stats
+  var pStats={};
+  games.forEach(function(g){
+    Object.keys(g.playerStats||{}).forEach(function(name){
+      var s=g.playerStats[name];
+      if(!pStats[name])pStats[name]={tds:0,ints:0,flags:0,blocks:0,catches:0,score:0,games:0,offSnaps:0,defSnaps:0,mvps:0};
+      pStats[name].tds+=(s.tds||0)+(s.qbTDs||0);
+      pStats[name].ints+=s.ints||0;
+      pStats[name].flags+=s.flags||0;
+      pStats[name].blocks+=s.blocks||0;
+      pStats[name].catches+=s.catches||0;
+      pStats[name].score+=s.score||0;
+      pStats[name].games++;
+      pStats[name].offSnaps+=s.offSnaps||0;
+      pStats[name].defSnaps+=s.defSnaps||0;
+    });
+    if(g.mvp){
+      if(!pStats[g.mvp])pStats[g.mvp]={tds:0,ints:0,flags:0,blocks:0,catches:0,score:0,games:0,offSnaps:0,defSnaps:0,mvps:0};
+      pStats[g.mvp].mvps++;
+    }
+  });
+
+  var players=Object.keys(pStats).sort(function(a,b){return pStats[b].score-pStats[a].score;});
+
+  // Find superlatives
+  function topIn(key){
+    var best=null,bestVal=0;
+    players.forEach(function(n){if(pStats[n][key]>bestVal){bestVal=pStats[n][key];best=n;}});
+    return best?{name:dispName(best),val:bestVal}:{name:'—',val:0};
+  }
+  var topScorer=topIn('score');
+  var topTDs=topIn('tds');
+  var topFlags=topIn('flags');
+  var topDef=topIn('blocks');
+  var topMVP=topIn('mvps');
+  var topInts=topIn('ints');
+
+  // Streak calculation
+  var streak=0,streakType='',curStreak=0,curType='';
+  games.forEach(function(g){
+    var res=g.us>g.them?'W':g.us<g.them?'L':'T';
+    if(res===curType){curStreak++;}
+    else{curType=res;curStreak=1;}
+    if(curStreak>streak||(curStreak===streak&&curType==='W')){streak=curStreak;streakType=curType;}
+  });
+
+  var avgUs=(totalUs/games.length).toFixed(1);
+  var avgThem=(totalThem/games.length).toFixed(1);
+
+  // Build report modal
+  var html='<div style="position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.93);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px" id="season-report-modal" onclick="if(event.target===this)this.remove()">'
+    +'<div style="background:var(--dark2);border:1px solid var(--dark5);border-radius:16px;max-width:420px;width:100%;max-height:85vh;overflow-y:auto;padding:24px 20px;-webkit-overflow-scrolling:touch">'
+    +'<div style="text-align:center;margin-bottom:18px">'
+    +'<div style="font-size:28px;margin-bottom:6px">📋</div>'
+    +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:22px;font-weight:800;letter-spacing:2px;color:var(--txt)">SEASON SUMMARY</div>'
+    +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;color:var(--dimmer);letter-spacing:1px">'+(G.team||'My Team')+' · '+games.length+' Game'+(games.length>1?'s':'')+'</div>'
+    +'</div>';
+
+  // Record bar
+  var total=wins+losses+ties;
+  html+='<div style="display:flex;gap:10px;justify-content:center;margin-bottom:16px;flex-wrap:wrap">'
+    +'<div style="text-align:center;flex:1;min-width:60px"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:28px;font-weight:800;color:#22c55e">'+wins+'</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--dimmer);letter-spacing:1px">WINS</div></div>'
+    +'<div style="text-align:center;flex:1;min-width:60px"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:28px;font-weight:800;color:#f43f5e">'+losses+'</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--dimmer);letter-spacing:1px">LOSSES</div></div>'
+    +'<div style="text-align:center;flex:1;min-width:60px"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:28px;font-weight:800;color:var(--dimmer)">'+ties+'</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--dimmer);letter-spacing:1px">TIES</div></div>'
+    +'</div>';
+
+  // Win percentage bar
+  var winPct=total?Math.round(wins/total*100):0;
+  html+='<div style="background:var(--dark3);border-radius:8px;height:8px;margin-bottom:18px;overflow:hidden">'
+    +'<div style="height:100%;width:'+winPct+'%;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:8px;transition:width .5s"></div></div>';
+
+  // Key stats row
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">'
+    +'<div style="background:var(--dark3);border-radius:10px;padding:12px;text-align:center"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--dimmer);letter-spacing:1px;margin-bottom:4px">AVG SCORED</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:20px;font-weight:800;color:#22c55e">'+avgUs+'</div></div>'
+    +'<div style="background:var(--dark3);border-radius:10px;padding:12px;text-align:center"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--dimmer);letter-spacing:1px;margin-bottom:4px">AVG ALLOWED</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:20px;font-weight:800;color:#f43f5e">'+avgThem+'</div></div>'
+    +'<div style="background:var(--dark3);border-radius:10px;padding:12px;text-align:center"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--dimmer);letter-spacing:1px;margin-bottom:4px">WIN RATE</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:20px;font-weight:800;color:var(--s)">'+winPct+'%</div></div>'
+    +'<div style="background:var(--dark3);border-radius:10px;padding:12px;text-align:center"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--dimmer);letter-spacing:1px;margin-bottom:4px">BEST STREAK</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:20px;font-weight:800;color:'+(streakType==='W'?'#22c55e':streakType==='L'?'#f43f5e':'var(--dimmer)')+'">'+streak+(streakType?' '+streakType:'')+'</div></div>'
+    +'</div>';
+
+  // Superlatives
+  html+='<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;color:var(--dimmer);margin-bottom:8px;text-transform:uppercase">⭐ Season Awards</div>'
+    +'<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">';
+  var awards=[
+    {emoji:'🏆',label:'Top Scorer',name:topScorer.name,val:topScorer.val+' pts'},
+    {emoji:'🏈',label:'Most TDs',name:topTDs.name,val:topTDs.val},
+    {emoji:'🚩',label:'Most Flag Pulls',name:topFlags.name,val:topFlags.val},
+    {emoji:'🛡️',label:'Most Deflections',name:topDef.name,val:topDef.val},
+    {emoji:'🎯',label:'Most INTs',name:topInts.name,val:topInts.val},
+    {emoji:'⭐',label:'Most MVPs',name:topMVP.name,val:topMVP.val}
+  ];
+  awards.forEach(function(a){
+    if(a.val===0||a.val==='0 pts')return;
+    html+='<div style="display:flex;align-items:center;gap:10px;background:var(--dark3);border-radius:10px;padding:10px 12px">'
+      +'<span style="font-size:18px">'+a.emoji+'</span>'
+      +'<div style="flex:1"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;color:var(--dimmer);letter-spacing:1px">'+a.label+'</div>'
+      +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:15px;font-weight:700;color:var(--txt)">'+a.name+'</div></div>'
+      +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:16px;font-weight:800;color:var(--s)">'+a.val+'</div></div>';
+  });
+  html+='</div>';
+
+  // Top 5 players table
+  html+='<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;color:var(--dimmer);margin-bottom:8px;text-transform:uppercase">📊 Top 5 Players</div>'
+    +'<div style="overflow-x:auto;margin-bottom:16px"><table style="width:100%;border-collapse:collapse;font-family:\'Barlow Condensed\',sans-serif;font-size:12px">'
+    +'<thead><tr style="border-bottom:1px solid var(--dark5)">'
+    +'<th style="text-align:left;padding:6px 4px;color:var(--dimmer);font-weight:700;letter-spacing:1px">#</th>'
+    +'<th style="text-align:left;padding:6px 4px;color:var(--dimmer);font-weight:700;letter-spacing:1px">Player</th>'
+    +'<th style="text-align:center;padding:6px 4px;color:var(--dimmer);font-weight:700;letter-spacing:1px">GP</th>'
+    +'<th style="text-align:center;padding:6px 4px;color:var(--dimmer);font-weight:700;letter-spacing:1px">TDs</th>'
+    +'<th style="text-align:center;padding:6px 4px;color:var(--dimmer);font-weight:700;letter-spacing:1px">PTS</th>'
+    +'</tr></thead><tbody>';
+  var top5=players.slice(0,5);
+  var medals=['🥇','🥈','🥉'];
+  top5.forEach(function(n,i){
+    var p=pStats[n];
+    html+='<tr style="border-bottom:1px solid rgba(255,255,255,.04)">'
+      +'<td style="padding:8px 4px;color:var(--txt)">'+(medals[i]||(i+1))+'</td>'
+      +'<td style="padding:8px 4px;color:var(--txt);font-weight:700">'+dispName(n)+'</td>'
+      +'<td style="text-align:center;padding:8px 4px;color:var(--dimmer)">'+p.games+'</td>'
+      +'<td style="text-align:center;padding:8px 4px;color:'+(p.tds?'#22c55e':'var(--dimmer)')+'">'+p.tds+'</td>'
+      +'<td style="text-align:center;padding:8px 4px;color:var(--s);font-weight:800">'+p.score+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+
+  // Close button
+  html+='<button type="button" onclick="document.getElementById(\'season-report-modal\').remove()" style="width:100%;background:var(--dark4);border:1px solid var(--dark5);border-radius:12px;padding:12px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:var(--dimmer);cursor:pointer;text-transform:uppercase">Close</button>'
+    +'</div></div>';
+
+  // Inject into page
+  var div=document.createElement('div');
+  div.innerHTML=html;
+  document.body.appendChild(div.firstChild);
 }
 </script>
 </body>
