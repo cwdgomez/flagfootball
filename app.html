@@ -214,8 +214,8 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .hdr-left{display:flex;align-items:center;gap:9px;flex:1;overflow:hidden;}
 .hdr-center{flex:0 0 auto;display:flex;justify-content:center;align-items:center;padding:0 8px;}
 .hdr-right{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:6px;}
-.hdr-helmet{width:32px;height:28px;flex-shrink:0;overflow:hidden;}
-.hdr-helmet svg{width:100%;height:100%;overflow:hidden;}
+.hdr-helmet{width:40px;height:40px;flex-shrink:0;overflow:visible;display:flex;align-items:center;justify-content:center;}
+.hdr-helmet svg{width:40px;height:40px;overflow:visible;}
 .header-team{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:2px;color:var(--s);line-height:1;}
 .header-game{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;color:var(--dim);text-transform:uppercase;}
 .nq-btn{border-radius:9px;padding:7px 11px;color:var(--s);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:transform .1s;white-space:nowrap;border:1px solid;}
@@ -261,7 +261,7 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .qtab.active{color:var(--s);border-bottom-color:var(--s);}
 
 /* NAV TABS */
-.nav-tabs{display:flex;background:var(--dark2);border-bottom:1px solid var(--dark5);}
+.nav-tabs{display:flex;background:var(--dark2);border-top:1px solid var(--dark5);border-bottom:1px solid var(--dark5);margin-top:2px;}
 .nav-tab{flex:1;padding:9px 2px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--dimmer);cursor:pointer;border-bottom:3px solid transparent;transition:color .2s,border-color .2s;text-transform:uppercase;}
 .nav-tab.active{color:var(--s);border-bottom-color:var(--s);}
 
@@ -405,9 +405,35 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .pt-val{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;width:20px;text-align:right;}
 .pt-val.o{color:var(--green);}.pt-val.d{color:var(--blue);}
 .pt-pct{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;width:30px;text-align:right;color:var(--dimmer);}
-.end-game-btn{width:100%;border:none;border-radius:14px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;cursor:pointer;margin-top:6px;margin-bottom:6px;}
-.end-game-btn:active{opacity:.85;}
-.reset-btn{background:transparent;border:1px solid var(--rose);border-radius:10px;padding:11px 20px;color:var(--rose);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;width:100%;margin-top:6px;}
+.end-game-btn{
+  width:100%;border:none;border-radius:16px;padding:17px 20px;
+  font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:4px;cursor:pointer;
+  margin-top:8px;margin-bottom:8px;
+  background:linear-gradient(135deg,#FFD700,#FFF5B0 50%,#CC9900);
+  color:#0a0a0a;
+  box-shadow:0 6px 28px rgba(255,215,0,.3),inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .1s,box-shadow .1s;
+}
+.end-game-btn:active{transform:scale(.98);box-shadow:0 3px 14px rgba(255,215,0,.2);}
+.reset-btn{
+  background:transparent;border:1px solid rgba(244,63,94,.35);border-radius:12px;
+  padding:12px 20px;color:rgba(244,63,94,.65);
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;width:100%;margin-top:4px;
+  transition:border-color .2s,color .2s;
+}
+.reset-btn:active{border-color:var(--rose);color:var(--rose);}
+.share-recap-btn{
+  width:100%;border:none;border-radius:16px;padding:14px 20px;
+  font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;
+  margin-bottom:8px;
+  background:linear-gradient(135deg,rgba(20,184,166,.25),rgba(20,184,166,.12));
+  border:1px solid rgba(20,184,166,.4);
+  color:var(--teal);
+  box-shadow:0 2px 12px rgba(20,184,166,.15);
+  transition:box-shadow .2s;
+}
+.share-recap-btn:active{box-shadow:0 0 6px rgba(20,184,166,.2);}
 
 /* SEASON SCREEN */
 #screen-season{align-items:center;justify-content:flex-start;padding:20px 14px 80px;overflow-y:auto;}
@@ -800,9 +826,9 @@ body.light-mode .toast-msg{color:#1a1714;}
 .pr-footer{margin-top:20px;font-size:10px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:8px;}
 
 /* ── MULTIPLAYER ── */
-.sync-bar{background:rgba(20,184,166,.1);border:1px solid rgba(20,184,166,.3);border-radius:10px;
-  padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;
-  margin-bottom:8px;font-family:'Barlow Condensed',sans-serif;}
+.sync-bar{background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.25);border-radius:10px;
+  padding:7px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  margin-bottom:4px;font-family:'Barlow Condensed',sans-serif;}
 .sync-bar.hidden{display:none;}
 .sync-status-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0;}
 .sync-status-dot.offline{background:var(--dimmer);}
@@ -1228,15 +1254,13 @@ body.light-mode .toast-msg{color:#1a1714;}
       </div>
     </div>
   </div>
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 12px 0;">
-    <div style="display:flex;gap:6px;">
-      <button type="button" onclick="proGate('tournament',function(){window.open('./tournament.html','_blank')})"
-        style="background:rgba(170,0,0,.1);border:1px solid rgba(170,0,0,.25);border-radius:6px;padding:3px 8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.5);">🏆 Tournament<span class="pro-badge" style="margin-left:3px;">PRO</span></button>
-      <button type="button" onclick="proGate('playdesigner',function(){window.open('./playdesigner.html','_blank')})"
-        style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:6px;padding:3px 8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.5);">🎨 Plays<span class="pro-badge" style="margin-left:3px;">PRO</span></button>
-    </div>
-    <button type="button" class="voice-btn" id="voice-btn" onclick="proGate('voice',openVoice)">
-      <span class="voice-icon">🎙️</span><span>Voice Log<span class="pro-badge">PRO</span></span>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:6px 12px 2px;">
+    <button type="button" onclick="proGate('tournament',function(){window.open('./tournament.html','_blank')})"
+      style="background:rgba(170,0,0,.1);border:1px solid rgba(170,0,0,.28);border-radius:8px;padding:6px 4px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.55);text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;">🏆 Tournament<span class="pro-badge" style="margin-left:3px;">PRO</span></button>
+    <button type="button" onclick="proGate('playdesigner',function(){window.open('./playdesigner.html','_blank')})"
+      style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:6px 4px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.55);text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;">🎨 Plays<span class="pro-badge" style="margin-left:3px;">PRO</span></button>
+    <button type="button" class="voice-btn" id="voice-btn" onclick="proGate('voice',openVoice)" style="border-radius:8px;padding:6px 4px;font-size:11px;justify-content:center;margin:0;width:100%;height:auto;">
+      <span class="voice-icon" style="font-size:13px;">🎙️</span><span style="font-size:11px;letter-spacing:.5px;">Voice Log<span class="pro-badge">PRO</span></span>
     </button>
   </div>
   <div class="nav-tabs">
@@ -1261,7 +1285,7 @@ body.light-mode .toast-msg{color:#1a1714;}
     <div class="wl-bar" id="sl-record"></div>
     <div class="season-sec">All-Season Leaderboard</div>
     <div class="slb"><table class="slbt">
-      <thead><tr><th>#</th><th>Player</th><th>TDs</th><th>INT</th><th>Flags</th><th>Blk</th><th>Pts</th></tr></thead>
+      <thead><tr><th>#</th><th>Player</th><th>TDs</th><th>INT</th><th>Flags</th><th>Def</th><th>Pts</th></tr></thead>
       <tbody id="sl-table"></tbody>
     </table></div>
     <div class="season-sec">🏆 MVP Awards</div>
@@ -1794,7 +1818,7 @@ function updateHelmetSVG(p,p2,s){
 function miniShieldSVG(p,p2,s){
   // Compact sports badge icon for game header — matches the FFTP logo aesthetic
   var pD=darken(p,70); var sD=darken(s,60); var sL=lighten(s,50)||s;
-  return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:36px;height:36px;overflow:visible;filter:drop-shadow(0 2px 5px rgba(0,0,0,.75))">'
+  return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:40px;height:40px;overflow:visible;filter:drop-shadow(0 2px 6px rgba(0,0,0,.85))">'
     +'<defs>'
       +'<linearGradient id="miG" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="'+lighten(p,20)+'"/><stop offset="100%" stop-color="'+pD+'"/></linearGradient>'
       +'<linearGradient id="miS" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="'+sL+'"/><stop offset="100%" stop-color="'+sD+'"/></linearGradient>'
@@ -2160,7 +2184,7 @@ function renderStats(){
            +'<div class="sp i">'+st.ints+'I</div>'
            +(cv?'<div class="sp cv">'+cv+'cv</div>':'')
            +(st.fumbles?'<div class="sp fu">'+st.fumbles+'F</div>':'')
-           +(st.blocks?'<div class="sp bl">'+st.blocks+'B</div>':'');
+           +(st.blocks?'<div class="sp bl">'+st.blocks+'D</div>':'');
     }
 
     var numBg=isQB?s:p;
@@ -2187,7 +2211,7 @@ function renderStats(){
         +'<div class="stb scv" onclick="logStat(\''+esc(name)+'\',\'conv1\',event)"><div class="bi">1️⃣</div><div class="bl2">1pt Conv</div><div class="bc">'+st.conv1+'</div></div>'
         +'<div class="stb scv" onclick="logStat(\''+esc(name)+'\',\'conv2\',event)"><div class="bi">2️⃣</div><div class="bl2">2pt Conv</div><div class="bc">'+st.conv2+'</div></div>'
         +'<div class="stb sfu" onclick="logStat(\''+esc(name)+'\',\'fumbles\',event)"><div class="bi">💨</div><div class="bl2">Fumble</div><div class="bc">'+st.fumbles+'</div></div>'
-        +'<div class="stb sbl" onclick="logStat(\''+esc(name)+'\',\'blocks\',event)"><div class="bi">🛡️</div><div class="bl2">Block</div><div class="bc">'+st.blocks+'</div></div>';
+        +'<div class="stb sbl" onclick="logStat(\''+esc(name)+'\',\'blocks\',event)"><div class="bi">🛡️</div><div class="bl2">Deflect</div><div class="bc">'+st.blocks+'</div></div>';
     }
 
     var card=document.createElement('div');
@@ -2222,7 +2246,7 @@ function logStat(name,key,ev){
   if(ev&&ev.stopPropagation)ev.stopPropagation();
   G.stats[name][G.cq][key]++;
   G.last={type:'stat',name:name,key:key,q:G.cq};
-  var lbl={catches:'Catch',tds:'TD',flags:'Flag Pull',ints:'INT',conv1:'1pt Conv',conv2:'2pt Conv',qbTDs:'TD Pass',qbInts:'INT Thrown',qbConvs:'Conv Pass',fumbles:'Fumble',blocks:'Block'};
+  var lbl={catches:'Catch',tds:'TD',flags:'Flag Pull',ints:'INT',conv1:'1pt Conv',conv2:'2pt Conv',qbTDs:'TD Pass',qbInts:'INT Thrown',qbConvs:'Conv Pass',fumbles:'Fumble',blocks:'Deflection'};
   showToast(firstName(name)+' · '+(lbl[key]||key));
   if(ev&&ev.currentTarget){ev.currentTarget.classList.add('pop');setTimeout(function(){try{ev.currentTarget.classList.remove('pop');}catch(e){}},240);}
   renderStats();
@@ -2540,7 +2564,7 @@ function renderSummary(){
     +'</tbody></table></div>'
     +'<div class="sum-lbl">📋 Player Stats</div>'
     +'<div class="stw"><table class="stt">'
-      +'<thead><tr><th>Player</th><th>Flag</th><th>Catch</th><th>TD</th><th>INT</th><th>Conv</th><th>Fum</th><th>Blk</th></tr></thead>'
+      +'<thead><tr><th>Player</th><th>Flag</th><th>Catch</th><th>TD</th><th>INT</th><th>Conv</th><th>Fum</th><th>Def</th></tr></thead>'
       +'<tbody>'+prows+'</tbody>'
     +'</table></div>'
     +'<div class="sum-lbl">⏱ Play Time</div>'
@@ -2549,9 +2573,9 @@ function renderSummary(){
       +'<span style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;color:var(--blue)">■ DEFENSE</span>'
     +'</div>'
     +'<div class="pt-section">'+ptRows+'</div>'
-    +'<button type="button" style="width:100%;background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.35);border-radius:14px;padding:12px;font-family:Bebas Neue,sans-serif;font-size:20px;letter-spacing:3px;color:var(--teal);cursor:pointer;margin-bottom:6px" onclick="proGate(\'share\',openShareCard)">📤 Share Game Recap <span class=\'pro-badge\'>PRO</span></button>'
-    +'<button type="button" class="end-game-btn" style="'+egStyle+'" onclick="endAndSave()">💾 End Game &amp; Save to Season</button>'
-    +'<button type="button" class="reset-btn" onclick="doReset()">⚠ New Game (don\'t save)</button>';
+    +'<button type="button" class="share-recap-btn" onclick="proGate(\'share\',openShareCard)">📤 Share Game Recap <span class=\'pro-badge\'>PRO</span></button>'
+    +'<button type="button" class="end-game-btn" onclick="endAndSave()">💾 End Game &amp; Save to Season</button>'
+    +'<button type="button" class="reset-btn" onclick="doReset()">⚠️ New Game (don\'t save)</button>';
 }
 
 /* ── HALFTIME ── */
@@ -3001,7 +3025,7 @@ function openShareCard(){
   document.getElementById('sc-stats-row').innerHTML=
     '<div class="sc-stat"><div class="sc-stat-num">'+totalTDs+'</div><div class="sc-stat-lbl">TDs</div></div>'
     +'<div class="sc-stat"><div class="sc-stat-num">'+totalFlags+'</div><div class="sc-stat-lbl">Flags</div></div>'
-    +'<div class="sc-stat"><div class="sc-stat-num">'+totalBlocks+'</div><div class="sc-stat-lbl">Blocks</div></div>'
+    +'<div class="sc-stat"><div class="sc-stat-num">'+totalBlocks+'</div><div class="sc-stat-lbl">Deflections</div></div>'
     +'<div class="sc-stat"><div class="sc-stat-num">'+mvps.length+'</div><div class="sc-stat-lbl">Active</div></div>';
   var card=document.getElementById('share-card');
   if(card){card.style.setProperty('--p',TC.primary);card.style.setProperty('--p2',darken(TC.primary,50));}
@@ -3714,7 +3738,8 @@ var VOICE_KEYWORDS=[
   // Fumbles
   ['fumbled',       'fumbles'],['lost the ball',  'fumbles'],['fumble',        'fumbles'],
   ['dropped',       'fumbles'],
-  // Blocks
+  // Deflections (formerly Blocks)
+  ['deflected',     'blocks'], ['deflection',     'blocks'], ['deflect',       'blocks'],
   ['blocked',       'blocks'], ['block',          'blocks'],
   // Conversions
   ['two point',     'conv2'],  ['2 point',        'conv2'],  ['two-point',     'conv2'],
@@ -3904,7 +3929,7 @@ function processVoiceCommand(text){
     }
     logStat(matchedPlayer,matchedKey,null);
     var label={tds:'TD ⭐',catches:'Catch 🏈',flags:'Flag Pull 🏃',ints:'INT 🎯',
-      fumbles:'Fumble 💨',blocks:'Block 🛡️',conv1:'1pt Conv',conv2:'2pt Conv',
+      fumbles:'Fumble 💨',blocks:'Deflection 🛡️',conv1:'1pt Conv',conv2:'2pt Conv',
       qbTDs:'TD Pass 🏈',qbInts:'INT Thrown ❌',qbConvs:'Conv Pass'};
     if(res){res.className='voice-result success';res.textContent='✅ '+dispName(matchedPlayer)+' — '+(label[matchedKey]||matchedKey);}
     vibe([30,10,30]);
@@ -3983,7 +4008,7 @@ function printReport(){
     +'<div class="pr-section">Player Stats</div>'
     +'<table class="pr-table"><thead><tr>'
       +'<th>#</th><th>Player</th><th>TDs</th><th>Catches</th>'
-      +'<th>Flags</th><th>INTs</th><th>Blocks</th><th>Snaps</th><th>Score</th>'
+      +'<th>Flags</th><th>INTs</th><th>Deflections</th><th>Snaps</th><th>Score</th>'
     +'</tr></thead><tbody>'+statRows+'</tbody></table>'
     +'<div class="pr-footer">Generated by CGMax FFTP · cgmaxfftp.com</div>'
     +'</div>';
@@ -3999,7 +4024,7 @@ function printReport(){
 function exportCSV(){
   var games=loadSeason();
   if(!games.length){showToast('No games to export yet');return;}
-  var rows=[['Date','Opponent','Result','Our Score','Their Score','Player','TDs','Catches','Flags','INTs','Blocks','Fumbles','Conv','Snaps (Off)','Snaps (Def)','MVP Score']];
+  var rows=[['Date','Opponent','Result','Our Score','Their Score','Player','TDs','Catches','Flags','INTs','Deflections','Fumbles','Conv','Snaps (Off)','Snaps (Def)','MVP Score']];
   games.forEach(function(g){
     var result=g.us>g.them?'W':g.us<g.them?'L':'T';
     Object.keys(g.playerStats||{}).forEach(function(name){
@@ -4697,7 +4722,7 @@ function processVoiceCommand2(text,confidence){
     }
     logStat(matchedPlayer,matchedKey,null);
     var lbl={tds:'TD ⭐',catches:'Catch 🏈',flags:'Flag Pull 🏃',ints:'INT 🎯',
-      fumbles:'Fumble 💨',blocks:'Block 🛡️',conv1:'1pt Conv',conv2:'2pt Conv',
+      fumbles:'Fumble 💨',blocks:'Deflection 🛡️',conv1:'1pt Conv',conv2:'2pt Conv',
       qbTDs:'TD Pass 🏈',qbInts:'INT Thrown ❌',qbConvs:'QB Conv'};
     if(res){res.className='voice-result success';res.textContent='✅ '+dispName(matchedPlayer)+' — '+(lbl[matchedKey]||matchedKey);}
     vibe([30,10,30]);
