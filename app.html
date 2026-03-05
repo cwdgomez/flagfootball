@@ -575,9 +575,6 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .roster-open-btn:hover{border-color:var(--s);color:var(--s);}
 .roster-player-count{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--s);vertical-align:middle;margin-left:4px;}
 
-/* rotation alert */
-.rot-alert{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-80px);z-index:600;background:var(--odim);border:1px solid rgba(249,115,22,.5);border-radius:12px;padding:11px 20px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--orange);letter-spacing:1px;box-shadow:0 8px 30px rgba(0,0,0,.7);transition:transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap;}
-.rot-alert.show{transform:translateX(-50%) translateY(0);}
 
 /* share card modal */
 .share-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:700;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;}
@@ -1384,7 +1381,6 @@ body.light-mode .toast-msg{color:#1a1714;}
 </div>
 
 <!-- ROTATION ALERT -->
-<div class="rot-alert" id="rot-alert"></div>
 
 
 <!-- PLAYER TREND SCREEN -->
@@ -3026,15 +3022,6 @@ function shareRosterURL(){
   }catch(e){showToast('Could not generate URL');}
 }
 
-/* ══ ROTATION ALERTS ══ */
-var rotAlertTimer=null;
-function checkRotationAlerts(){/* alerts disabled */}
-function showRotAlert(msg){
-  var el=document.getElementById('rot-alert');if(!el)return;
-  el.textContent=msg;el.classList.add('show');
-  if(rotAlertTimer)clearTimeout(rotAlertTimer);
-  rotAlertTimer=setTimeout(function(){el.classList.remove('show');},4500);
-}
 
 /* ══ SHARE CARD ══ */
 function openShareCard(){
