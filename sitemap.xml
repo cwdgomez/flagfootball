@@ -37,6 +37,12 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://cgmaxfftp.com/statcoach.html</loc>
+    <lastmod>2026-03-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://cgmaxfftp.com/consent.html</loc>
     <lastmod>2026-03-06</lastmod>
     <changefreq>yearly</changefreq>

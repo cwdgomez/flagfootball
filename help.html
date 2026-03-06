@@ -224,7 +224,9 @@ hr.div{border:none;border-top:1px solid var(--dark3);margin:8px 0 4px;}
   <a href="#tournament">Tournament</a>
   <a href="#playdesigner">Plays</a>
   <a href="#livesync">Live Sync</a>
+  <a href="#statcoach">Stat Coach</a>
   <a href="#photos">Photos</a>
+  <a href="#signin">Sign In</a>
   <a href="#cloud">Cloud</a>
   <a href="#summary">Summary</a>
   <a href="#pro">Pro</a>
@@ -793,6 +795,87 @@ hr.div{border:none;border-top:1px solid var(--dark3);margin:8px 0 4px;}
     <div class="hl-text">The parent view is <strong>read-only</strong>. Parents can see the score, quarter, and top stats — but they can't tap anything or change any data. Live data auto-expires after 12 hours.</div>
   </div>
 
+  <!-- ══════════════════════════ STAT COACH ══════════════════════════ -->
+  <div id="statcoach" class="sec-hdr">
+    <div class="sec-hdr-icon">🤝</div>
+    <div>
+      <div class="sec-hdr-title">Stat Coach — Co-Coaching<span class="pro-tag">PRO</span></div>
+      <div class="sec-hdr-sub">Log stats from a second device in real time</div>
+    </div>
+  </div>
+
+  <div class="hl-box purple">
+    <div class="hl-icon">🤝</div>
+    <div class="hl-text"><strong>Stat Coach</strong> lets you hand off stat logging to an assistant coach on their own phone. They see your full roster, tap stat buttons, and the stats appear instantly on your primary device — no shared screen, no delay.</div>
+  </div>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Go Live First</div>
+        <div class="step-desc">Tap the <strong>📡 sync button</strong> in the game screen header and tap <strong>GO LIVE NOW</strong>. The Live Parent Scoreboard must be active to use Stat Coach — both features share the same session.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Copy the Stat Coach Link</div>
+        <div class="step-desc">In the sync modal, a purple <strong>🤝 STAT COACH LINK</strong> section appears below the parent link. Tap <strong>Copy Stat Coach Link</strong> and text it to your assistant coach.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Assistant Opens on Their Phone</div>
+        <div class="step-desc">Your assistant taps the link on their phone. <strong>statcoach.html</strong> opens, shows your full roster with their on-field status (Offense / Defense / Bench), and connects to the live session automatically.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Tap Stats — They Appear Instantly</div>
+        <div class="step-desc">When the assistant taps a stat button (Catch, TD, Flag Pull, etc.), it broadcasts to your device and shows a <strong>🤝 toast notification</strong> confirming the stat was logged. Stats are saved exactly as if you tapped them yourself.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-row">
+      <div class="info-icon">👤</div>
+      <div class="info-body">
+        <div class="info-title">Regular Player Buttons</div>
+        <div class="info-desc">Catch · TD · Flag Pull · INT · Fumble · Deflection</div>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-icon">🏈</div>
+      <div class="info-body">
+        <div class="info-title">QB Player Buttons</div>
+        <div class="info-desc">TD Pass · INT Thrown · Conv Pass · Catch · Fumble · Deflection — QB is auto-detected from your roster settings.</div>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-icon">🔄</div>
+      <div class="info-body">
+        <div class="info-title">Roster Updates Automatically</div>
+        <div class="info-desc">Any time you change a rotation, score a TD, or advance a quarter on the primary device, the Stat Coach screen updates automatically — your assistant always sees the current state.</div>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-icon">⚡</div>
+      <div class="info-body">
+        <div class="info-title">No Account Needed for the Assistant</div>
+        <div class="info-desc">The assistant coach doesn't need a Pro license or account — just the link. Only the primary coach (the one who went live) needs Pro.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hl-box gold">
+    <div class="hl-icon">💡</div>
+    <div class="hl-text"><strong>Tip:</strong> Send the Stat Coach link before the game starts. Your assistant can connect and do a test tap during warm-ups to confirm the connection is working before kickoff.</div>
+  </div>
+
   <!-- ══════════════════════════ PLAYER PHOTOS ══════════════════════════ -->
   <div id="photos" class="sec-hdr">
     <div class="sec-hdr-icon">📷</div>
@@ -829,6 +912,68 @@ hr.div{border:none;border-top:1px solid var(--dark3);margin:8px 0 4px;}
   <div class="hl-box purple">
     <div class="hl-icon">🔐</div>
     <div class="hl-text"><strong>Compliance note:</strong> Player photos are stored only on your device. We recommend using the <strong>📋 Photo Consent</strong> form (under Coach Tools) to collect guardian permission before photographing any minor athlete.</div>
+  </div>
+
+  <!-- ══════════════════════════ SIGN IN & CLOUD SYNC ══════════════════════════ -->
+  <div id="signin" class="sec-hdr">
+    <div class="sec-hdr-icon">🔐</div>
+    <div>
+      <div class="sec-hdr-title">Sign In &amp; Cloud Sync<span class="pro-tag">PRO</span></div>
+      <div class="sec-hdr-sub">Your data on every device, automatically</div>
+    </div>
+  </div>
+
+  <div class="hl-box green">
+    <div class="hl-icon">☁️</div>
+    <div class="hl-text"><strong>Signing in is optional</strong> — you can use your Pro license key and all local features without ever creating an account. But signing in gives you automatic cross-device sync so your roster and season data follows you everywhere.</div>
+  </div>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Find the Sign-In Button</div>
+        <div class="step-desc">On the app setup screen, look for the <strong>👤 Signed In</strong> strip or a sign-in option in the header. You can sign in with <strong>Google</strong>, <strong>Apple</strong>, or a <strong>magic link email</strong> sent to your inbox.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Choose Your Sign-In Method</div>
+        <div class="step-desc"><strong>Google</strong> — tap and sign in via Google's secure OAuth popup. <strong>Apple</strong> — uses Apple ID with Face ID / Touch ID. <strong>Email link</strong> — enter your email and tap the magic link sent to you; no password needed.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Your Data Syncs Automatically</div>
+        <div class="step-desc">Once signed in, your roster, season history, team colors, and settings sync silently in the background whenever you save a game or make changes. Open the app on a second phone and sign in — everything is already there.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Sign Out</div>
+        <div class="step-desc">On the setup screen, the <strong>👤 Signed In</strong> strip shows your email and a <strong>Sign Out</strong> button. Tapping Sign Out switches back to local-only mode — your existing local data is unaffected.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-row">
+      <div class="info-icon">🔒</div>
+      <div class="info-body">
+        <div class="info-title">Your Data is Private</div>
+        <div class="info-desc">Cloud sync is protected by Row Level Security — only you can access your own data. ITCC LLC never reads, shares, or sells your coaching data.</div>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-icon">📱</div>
+      <div class="info-body">
+        <div class="info-title">Works on Multiple Devices</div>
+        <div class="info-desc">Sign in on your iPad at home and your phone at the field — both stay in sync automatically. Your season data is always up to date.</div>
+      </div>
+    </div>
   </div>
 
   <!-- ══════════════════════════ CLOUD BACKUP ══════════════════════════ -->

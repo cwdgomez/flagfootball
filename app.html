@@ -963,6 +963,11 @@ body.light-mode .toast-msg{color:#1a1714;}
 .auth-status{text-align:center;margin-top:10px;font-size:13px;color:var(--dim);min-height:18px;}
 .auth-status.ok{color:var(--green);}
 .auth-status.err{color:#ef4444;}
+.auth-mkt-row{display:flex;align-items:flex-start;gap:10px;margin-top:14px;padding:12px 14px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;}
+.auth-mkt-row input[type=checkbox]{width:16px;height:16px;min-width:16px;margin-top:2px;
+  accent-color:var(--s2);cursor:pointer;}
+.auth-mkt-row label{font-family:'Barlow',sans-serif;font-size:12px;color:var(--dim);line-height:1.55;cursor:pointer;}
 .auth-setup-prompt{background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.12);border-radius:12px;
   padding:14px 16px;margin-bottom:16px;text-align:center;}
 .auth-setup-prompt p{font-size:13px;color:var(--dim);line-height:1.6;margin-bottom:10px;}
@@ -1562,6 +1567,12 @@ body.light-mode .toast-msg{color:#1a1714;}
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,.35);text-align:center;letter-spacing:1px;margin-bottom:8px;">Parents open the link on their phone — no app needed · Updates every 15 sec</div>
         <button type="button" onclick="stopLiveSync();closeSyncModal();" style="width:100%;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);border-radius:9px;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:#ef4444;cursor:pointer;">⏹ Stop Live Score</button>
       </div>
+      <!-- CO-COACH LINK SECTION -->
+      <div id="cocoach-link-section" style="display:none;margin-top:10px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:12px 14px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(168,85,247,.9);margin-bottom:8px;">🤝 STAT COACH LINK</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);margin-bottom:10px;line-height:1.5;">Share this link with your stat coach. They'll see the roster and record player stats in real time.</div>
+        <button type="button" onclick="copyCocoachLink()" style="width:100%;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;border-radius:10px;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;color:#fff;cursor:pointer;">🤝 Copy Stat Coach Link</button>
+      </div>
     </div>
     <div class="sync-panel" id="sync-panel-join">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;">Enter a 6-character game code to view live:</div>
@@ -1613,6 +1624,10 @@ body.light-mode .toast-msg{color:#1a1714;}
     <button type="button" class="auth-btn auth-btn-magic" id="auth-magic-btn" onclick="authSignInMagicLink()">
       ✉️ Send Magic Link
     </button>
+    <div class="auth-mkt-row">
+      <input type="checkbox" id="auth-mkt-opt" onchange="AUTH_MKT_OPT_IN=this.checked">
+      <label for="auth-mkt-opt">I'd like to receive occasional tips and offers from CGMax FFTP. You can unsubscribe any time.</label>
+    </div>
     <div class="auth-status" id="auth-status"></div>
   </div>
 </div>
@@ -1696,7 +1711,16 @@ function loadRosterData(){
   try{
     var params=new URLSearchParams(window.location.search);
     var encoded=params.get('roster');
-    if(encoded){var decoded=JSON.parse(atob(encoded));if(Array.isArray(decoded)&&decoded.length>0)return decoded.map(migratePlayer);}
+    if(encoded){
+      var decoded=JSON.parse(atob(encoded));
+      if(Array.isArray(decoded)&&decoded.length>0){
+        // Sanitize names from URL param to prevent XSS — strip any HTML tags, limit length
+        return decoded.map(migratePlayer).map(function(p){
+          p.name=String(p.name||'').replace(/<[^>]*>/g,'').replace(/['"&]/g,'').slice(0,40);
+          return p;
+        });
+      }
+    }
   }catch(e){}
   try{var saved=JSON.parse(localStorage.getItem(LS_ROSTER));if(Array.isArray(saved)&&saved.length>0)return saved.map(migratePlayer);}catch(e){}
   return DEFAULT_ROSTER.map(function(p){return {name:p.name,num:p.num};});
@@ -2002,7 +2026,7 @@ function buildQBList(){
     var d=document.createElement('div');
     d.className='qb-opt'+(p===G.qb?' sel':'');
     var num=jerseyNum(p);
-    d.innerHTML='<span class="qb-opt-name">'+dispName(p)+' <span style="opacity:.5;font-size:12px">#'+num+'</span></span><span class="qb-badge">QB</span>';
+    d.innerHTML='<span class="qb-opt-name">'+esc(dispName(p))+' <span style="opacity:.5;font-size:12px">#'+num+'</span></span><span class="qb-badge">QB</span>';
     if(p===G.qb){d.style.borderColor=TC.secondary;d.style.background=rgba(TC.secondary,.10);}
     (function(player,div){
       div.onclick=function(){
@@ -2030,7 +2054,7 @@ function buildAbsentList(){
     row.className='absent-row';
     if(abs)row.style.opacity='0.5';
     var num=jerseyNum(name);
-    row.innerHTML='<span class="absent-name">'+dispName(name)+' <span style="font-size:12px;opacity:.5">#'+num+'</span></span>'
+    row.innerHTML='<span class="absent-name">'+esc(dispName(name))+' <span style="font-size:12px;opacity:.5">#'+num+'</span></span>'
       +'<button type="button" class="absent-toggle'+(abs?' active':'')+'" onclick="toggleAbsent(\''+esc(name)+'\')">'+( abs?'🚫 Absent':'Present')+'</button>';
     el.appendChild(row);
   });
@@ -2378,6 +2402,7 @@ function logStat(name,key,ev){
   if(ev&&ev.currentTarget){ev.currentTarget.classList.add('pop');setTimeout(function(){try{ev.currentTarget.classList.remove('pop');}catch(e){}},240);}
   renderStats();
   if(G.tab==='summary')renderSummary();
+  broadcastGameStateToCoach();
 }
 
 /* ── ROTATIONS ── */
@@ -2501,6 +2526,7 @@ function rotToggle(name,side){
   }
   renderRots();
   if(G.tab==='summary')renderSummary();
+  broadcastGameStateToCoach();
 }
 
 function toggleR(name){G.expR=G.expR===name?null:name;renderRots();}
@@ -2512,6 +2538,7 @@ function addScore(team,pts){
   var lbl=pts===6?'Touchdown':pts===1?'1-pt Conv':'2-pt Conv';
   showToast((team==='us'?G.team:G.opp)+' · '+lbl);
   renderScore();
+  broadcastGameStateToCoach();
   if(team==='us')triggerScoreAnim();
   if(pts===6&&team==='us'){
     if(isPro()){playTDFanfare();}
@@ -2555,6 +2582,7 @@ function advanceQ(){
   if(G.cq<G.quarters){
     var wasHalf=(G.cq===Math.floor(G.quarters/2));
     G.cq++;renderAll();
+    broadcastGameStateToCoach();
     if(wasHalf)showHalftime();
   } else {
     // Already on final quarter — offer to end game and save
@@ -3025,7 +3053,7 @@ function renderRosterScreen(){
     var photoSrc=photos[pkey]||'';
 
     var photoHtml=photoSrc
-      ?'<img class="rpr-photo" src="'+photoSrc+'" onclick=\'triggerPhotoUpload('+idx+')\'>'
+      ?'<img class="rpr-photo" src="'+escHtml(photoSrc)+'" onclick=\'triggerPhotoUpload('+idx+')\'>'
       :'<div class="rpr-photo-placeholder" onclick=\'triggerPhotoUpload('+idx+')\'>📷</div>';
 
     var isPro=!!localStorage.getItem('ff_pro');
@@ -3473,7 +3501,7 @@ function renderTrendDetail(name){
   var s=TC.secondary, p=TC.primary;
 
   if(!games.length){
-    detail.innerHTML='<div class="tgl-nodata">No season games saved yet for '+dispName(name)+'.</div>';
+    detail.innerHTML='<div class="tgl-nodata">No season games saved yet for '+esc(dispName(name))+'.</div>';
     return;
   }
 
@@ -4137,7 +4165,7 @@ function printReport(){
 
   var frame=document.getElementById('print-frame');
   if(frame){frame.innerHTML=html;window.print();}
-  else{var w=window.open('','_blank');if(w){w.document.write('<html><head><link rel="stylesheet" href="'+window.location.href+'"></head><body>'+html+'</body></html>');w.print();}}
+  else{var w=window.open('','_blank');if(w){w.document.write('<html><head><link rel="stylesheet" href="https://cgmaxfftp.com/app.html"></head><body>'+html+'</body></html>');w.print();}}
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -4215,13 +4243,17 @@ function hostSession(){
   var licenseKey=localStorage.getItem(LS_LICENSE)||'';
   if(!licenseKey){showToast('❌ Pro license required — enter your key first');return;}
   syncActive=true;
-  closeSyncModal();
   showSyncBar('Live · Code: '+syncSession,'online',syncSession);
   updateParentLinkUI();
+  // Show co-coach link section
+  var ccSection=document.getElementById('cocoach-link-section');
+  if(ccSection)ccSection.style.display='block';
   showToast('📡 Live scoreboard ON! Parents can open the link now.');
   syncPush();
   if(syncInterval)clearInterval(syncInterval);
   syncInterval=setInterval(function(){if(syncActive)syncPush();},15000);
+  // Start co-coach realtime channel
+  startCocoachChannel();
 }
 
 function stopLiveSync(){
@@ -4236,6 +4268,10 @@ function stopLiveSync(){
       body:JSON.stringify({game_code:syncSession,license_key:licenseKey,action:'end'})
     }).catch(function(){});
   }
+  // Clean up co-coach channel
+  if(cocoachChannel){try{sbClient.removeChannel(cocoachChannel);}catch(e){}cocoachChannel=null;}
+  var ccSection=document.getElementById('cocoach-link-section');
+  if(ccSection)ccSection.style.display='none';
   resetSyncBar();
   var section=document.getElementById('parent-link-section');
   if(section)section.style.display='none';
@@ -4334,6 +4370,87 @@ function copyParentLink(){
     ta.value=link;ta.style.position='fixed';ta.style.opacity='0';
     document.body.appendChild(ta);ta.focus();ta.select();
     try{document.execCommand('copy');showToast('✅ Parent link copied!');}catch(e){showToast('📋 Copy the link above');}
+    document.body.removeChild(ta);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   CO-COACH REALTIME BROADCAST
+   ─ Primary coach shares a link → stat coach opens statcoach.html
+   ─ Stat coach sends stat events → primary applies them live
+   ─ Primary broadcasts game state → stat coach sees roster & field
+════════════════════════════════════════════════════════════ */
+var cocoachChannel=null;
+
+function startCocoachChannel(){
+  if(!sbClient||!syncSession)return;
+  if(cocoachChannel){try{sbClient.removeChannel(cocoachChannel);}catch(e){}cocoachChannel=null;}
+  cocoachChannel=sbClient.channel('cocoach:'+syncSession,{config:{broadcast:{ack:false}}});
+  cocoachChannel
+    .on('broadcast',{event:'stat_event'},function(msg){
+      var p=msg.payload;
+      if(!p||!p.name||!p.key)return;
+      if(!G.stats[p.name])return;
+      var q=p.q||G.cq;
+      if(!G.stats[p.name][q])G.stats[p.name][q]=blankStat();
+      G.stats[p.name][q][p.key]++;
+      G.last={type:'stat',name:p.name,key:p.key,q:q};
+      var lbl={catches:'Catch',tds:'TD',flags:'Flag Pull',ints:'INT',conv1:'1pt Conv',conv2:'2pt Conv',qbTDs:'TD Pass',qbInts:'INT Thrown',qbConvs:'Conv Pass',fumbles:'Fumble',blocks:'Deflection'};
+      showToast('🤝 '+firstName(p.name)+' · '+(lbl[p.key]||p.key));
+      renderStats();
+      if(G.tab==='summary')renderSummary();
+      scheduleAutoSave();
+    })
+    .on('broadcast',{event:'stat_coach_joined'},function(){
+      // Stat coach just connected — send them current state immediately
+      broadcastGameStateToCoach();
+      showToast('🤝 Stat coach connected!');
+    })
+    .subscribe();
+  broadcastGameStateToCoach();
+}
+
+function broadcastGameStateToCoach(){
+  if(!cocoachChannel||!syncActive)return;
+  var rotsCurrent={};
+  ALL_PLAYERS.forEach(function(n){
+    if(G.rots[n]&&G.rots[n][G.cq])rotsCurrent[n]=G.rots[n][G.cq].onField;
+  });
+  cocoachChannel.send({
+    type:'broadcast',
+    event:'game_state',
+    payload:{
+      roster:ALL_PLAYERS,
+      absent:G.absent,
+      qb:G.qb,
+      cq:G.cq,
+      quarters:G.quarters,
+      team:G.team,
+      opp:G.opp,
+      scores:G.scores,
+      rots:rotsCurrent,
+      tc:{primary:TC.primary,secondary:TC.secondary}
+    }
+  });
+}
+
+function generateCocoachLink(){
+  if(!syncSession)return null;
+  var base=window.location.href.replace(/[^/]*$|app\.html[^/]*/,'');
+  return base+'statcoach.html?code='+encodeURIComponent(syncSession);
+}
+
+function copyCocoachLink(){
+  var link=generateCocoachLink();
+  if(!link||!syncActive){showToast('❌ Tap "Go Live" first');return;}
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(link).then(function(){showToast('🤝 Stat coach link copied!');}).catch(fallback);
+  }else{fallback();}
+  function fallback(){
+    var ta=document.createElement('textarea');
+    ta.value=link;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.focus();ta.select();
+    try{document.execCommand('copy');showToast('🤝 Stat coach link copied!');}catch(e){showToast('📋 Copy the stat coach link');}
     document.body.removeChild(ta);
   }
 }
@@ -5087,6 +5204,7 @@ var SYNC_API_BASE='https://cgmax-fftp-backend.vercel.app/api';
 var sbClient=null;
 var CURRENT_USER=null;
 var AUTH_SESSION=null;
+var AUTH_MKT_OPT_IN=false; // tracks marketing checkbox state in auth modal
 
 /* ── INIT ── */
 function initSupabaseAuth(){
@@ -5106,6 +5224,12 @@ function initSupabaseAuth(){
       if(event==='SIGNED_IN'&&session){
         closeAuthModal();
         showToast('✅ Signed in as '+(CURRENT_USER.email||'').split('@')[0]);
+        // Upsert coach profile (captures marketing opt-in from signup modal)
+        upsertCoachProfile(AUTH_MKT_OPT_IN);
+        // Reset checkbox for next open
+        AUTH_MKT_OPT_IN=false;
+        var mktCb=document.getElementById('auth-mkt-opt');
+        if(mktCb)mktCb.checked=false;
         // Check for linked license + sync data from cloud
         setTimeout(function(){
           checkAndLinkLicense();
@@ -5231,18 +5355,52 @@ function openAccountMenu(){
   var email=CURRENT_USER.email||'Unknown';
   var queueLen=SYNC_ENGINE.queue.length;
   var syncStatus=queueLen>0?queueLen+' changes pending':'All synced';
-  var action=confirm(
+  var choice=prompt(
     '👤 Account: '+email+'\n'
     +'☁️ Sync: '+syncStatus+'\n\n'
-    +'Press OK to sign out, or Cancel to go back.'
+    +'Type an option:\n'
+    +'  signout — Sign out\n'
+    +'  unsubscribe — Stop marketing emails\n'
+    +'  cancel — Go back'
   );
-  if(action)authSignOut();
+  if(!choice)return;
+  var cmd=(choice||'').trim().toLowerCase();
+  if(cmd==='signout')authSignOut();
+  else if(cmd==='unsubscribe')updateMarketingOptIn(false);
 }
 
 /* ── GET AUTH TOKEN (for API calls) ── */
 function getAuthToken(){
   if(AUTH_SESSION&&AUTH_SESSION.access_token)return AUTH_SESSION.access_token;
   return null;
+}
+
+/* ── COACH PROFILE (marketing opt-in) ── */
+function upsertCoachProfile(marketingOptIn){
+  if(!sbClient||!CURRENT_USER)return;
+  var profile={
+    id:CURRENT_USER.id,
+    email:CURRENT_USER.email||'',
+    marketing_opt_in:!!marketingOptIn,
+    updated_at:new Date().toISOString()
+  };
+  sbClient.from('coach_profiles').upsert(profile,{onConflict:'id'})
+    .then(function(result){
+      if(result.error)console.error('Profile upsert error:',result.error);
+    })
+    .catch(function(e){console.error('Profile upsert exception:',e);});
+}
+
+function updateMarketingOptIn(value){
+  if(!sbClient||!CURRENT_USER)return;
+  sbClient.from('coach_profiles')
+    .update({marketing_opt_in:!!value,updated_at:new Date().toISOString()})
+    .eq('id',CURRENT_USER.id)
+    .then(function(result){
+      if(result.error){console.error('Marketing pref update error:',result.error);}
+      else{showToast(value?'📧 Email preferences saved':'✅ Unsubscribed from marketing emails');}
+    })
+    .catch(function(e){console.error('Marketing pref exception:',e);});
 }
 
 /* ── LICENSE LINKING ── */
@@ -5496,7 +5654,8 @@ saveRosterData=function(roster){
 var _origSaveSeason=saveSeason;
 saveSeason=function(games){
   _origSaveSeason(games);
-  if(CURRENT_USER&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
+  // season sync is Pro-only
+  if(CURRENT_USER&&isPro()&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
     SYNC_ENGINE.queueChange(ACTIVE_TEAM_ID,'season',games);
   }
 };
