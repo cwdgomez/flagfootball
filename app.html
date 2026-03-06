@@ -12,6 +12,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --p:#CC0000;--p2:#880000;--s:#FFD700;--s2:#B8860B;
@@ -928,6 +929,56 @@ body.light-mode .toast-msg{color:#1a1714;}
 .offline-banner.offline .offline-dot{background:#fca5a5;animation:offDotBlink 1.5s infinite;}
 .offline-banner.online .offline-dot{background:#bbf7d0;}
 @keyframes offDotBlink{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* ── AUTH SYSTEM ── */
+.auth-hdr-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;
+  padding:4px 10px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:1px;color:var(--dim);cursor:pointer;white-space:nowrap;max-width:120px;overflow:hidden;
+  text-overflow:ellipsis;transition:all .2s;}
+.auth-hdr-btn:hover{border-color:var(--s2);}
+.auth-hdr-btn.signed-in{border-color:rgba(34,197,94,.3);color:var(--green);}
+.auth-modal-overlay{position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.92);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:none;
+  align-items:center;justify-content:center;padding:20px;}
+.auth-modal-overlay.active{display:flex;}
+.auth-modal-box{background:var(--dark2);border:1px solid var(--dark4);border-radius:18px;
+  width:100%;max-width:380px;padding:28px 24px;position:relative;}
+.auth-modal-close{position:absolute;top:12px;right:14px;background:none;border:none;
+  font-size:20px;color:var(--dim);cursor:pointer;}
+.auth-modal-hdr{text-align:center;margin-bottom:20px;}
+.auth-modal-hdr h2{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:var(--txt);margin-bottom:6px;}
+.auth-modal-hdr p{font-size:13px;color:var(--dim);line-height:1.6;}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;font-size:11px;letter-spacing:1px;color:var(--dimmer);}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--dark4);}
+.auth-email-field{width:100%;background:var(--dark3);border:1px solid rgba(255,255,255,.1);border-radius:10px;
+  padding:12px 14px;color:var(--txt);font-family:'Barlow',sans-serif;font-size:15px;outline:none;margin-bottom:10px;}
+.auth-email-field:focus{border-color:var(--s2);}
+.auth-btn{width:100%;border:none;border-radius:10px;padding:13px 16px;font-family:'Barlow Condensed',sans-serif;
+  font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .15s;display:flex;
+  align-items:center;justify-content:center;gap:8px;}
+.auth-btn-magic{background:linear-gradient(135deg,var(--p),#AA0000);color:white;}
+.auth-btn-google{background:#fff;color:#333;border:1px solid #ddd;margin-bottom:8px;}
+.auth-btn-apple{background:#000;color:#fff;border:1px solid #333;}
+.auth-btn:disabled{opacity:.5;cursor:not-allowed;}
+.auth-status{text-align:center;margin-top:10px;font-size:13px;color:var(--dim);min-height:18px;}
+.auth-status.ok{color:var(--green);}
+.auth-status.err{color:#ef4444;}
+.auth-setup-prompt{background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.12);border-radius:12px;
+  padding:14px 16px;margin-bottom:16px;text-align:center;}
+.auth-setup-prompt p{font-size:13px;color:var(--dim);line-height:1.6;margin-bottom:10px;}
+.auth-setup-prompt button{background:var(--dark3);border:1px solid rgba(255,255,255,.1);border-radius:8px;
+  padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:1px;color:var(--s);cursor:pointer;}
+.sync-indicator{position:fixed;bottom:env(safe-area-inset-bottom,16px);right:16px;z-index:800;
+  background:var(--dark2);border:1px solid var(--dark4);border-radius:8px;padding:8px 14px;
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--dim);
+  display:flex;align-items:center;gap:6px;transition:all .3s;transform:translateY(80px);pointer-events:none;}
+.sync-indicator.show{transform:translateY(0);pointer-events:auto;}
+.sync-indicator.synced{border-color:rgba(34,197,94,.25);color:var(--green);}
+.sync-indicator.syncing{border-color:rgba(245,158,11,.25);color:var(--orange);}
+@keyframes syncSpin{to{transform:rotate(360deg);}}
+.sync-spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.1);
+  border-top-color:var(--orange);border-radius:50%;animation:syncSpin .6s linear infinite;}
 </style>
 </head>
 <body>
@@ -1119,6 +1170,12 @@ body.light-mode .toast-msg{color:#1a1714;}
     <div class="setup-section-lbl">🚫 Mark Absent Players</div>
     <div id="absent-list"></div>
 
+    <!-- AUTH SETUP PROMPT -->
+    <div class="auth-setup-prompt" id="auth-setup-prompt">
+      <p>☁️ Sign in to sync your data across devices</p>
+      <button type="button" onclick="openAuthModal()">Sign In / Create Account</button>
+    </div>
+
     <button type="button" class="btn-kickoff" id="kickoff-btn" onclick="startGame()">⚡ KICK OFF</button>
 
     <!-- COACH TOOLS SECTION -->
@@ -1201,6 +1258,7 @@ body.light-mode .toast-msg{color:#1a1714;}
         <span class="qtimer-display" id="qtimer-display">—:——</span>
         <span class="qtimer-play" id="qtimer-play">▶</span>
       </div>
+      <button type="button" class="auth-hdr-btn" id="auth-hdr-btn" onclick="authHeaderClick()" title="Sign in / Account">👤</button>
       <button type="button" class="pro-hdr-btn" id="pro-hdr-btn" onclick="openProModal('header',null)" title="Activate Pro">⭐ PRO</button>
       <button type="button" class="mode-toggle" id="mode-toggle" onclick="toggleLightMode()" title="Toggle light/dark mode">☀️</button>
     </div>
@@ -1522,6 +1580,36 @@ body.light-mode .toast-msg{color:#1a1714;}
 <div class="offline-banner" id="offline-banner">
   <span class="offline-dot"></span>
   <span id="offline-banner-msg">You're offline</span>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="auth-modal-overlay" id="auth-modal">
+  <div class="auth-modal-box">
+    <button type="button" class="auth-modal-close" onclick="closeAuthModal()">&times;</button>
+    <div class="auth-modal-hdr">
+      <h2>SIGN IN</h2>
+      <p>Sync your team data across devices.<br>Cloud backup. Multi-device coaching.</p>
+    </div>
+    <button type="button" class="auth-btn auth-btn-google" id="auth-google-btn" onclick="authSignInGoogle()">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+    <button type="button" class="auth-btn auth-btn-apple" id="auth-apple-btn" onclick="authSignInApple()">
+       Continue with Apple
+    </button>
+    <div class="auth-divider">or use email</div>
+    <input type="email" class="auth-email-field" id="auth-email" placeholder="coach@example.com">
+    <button type="button" class="auth-btn auth-btn-magic" id="auth-magic-btn" onclick="authSignInMagicLink()">
+      ✉️ Send Magic Link
+    </button>
+    <div class="auth-status" id="auth-status"></div>
+  </div>
+</div>
+
+<!-- SYNC INDICATOR -->
+<div class="sync-indicator" id="sync-indicator">
+  <span id="sync-icon">✅</span>
+  <span id="sync-text">Synced</span>
 </div>
 
 <!-- TOAST -->
@@ -4975,6 +5063,463 @@ function generateSeasonReport(){
   div.innerHTML=html;
   document.body.appendChild(div.firstChild);
 }
+
+/* ════════════════════════════════════════════════════════════
+   SUPABASE AUTH + CLOUD SYNC ENGINE
+════════════════════════════════════════════════════════════ */
+
+/* ── CONFIG (anon key is safe to expose — RLS enforces security) ── */
+var SUPABASE_URL='https://wbgzemukhyfndqvsqasc.supabase.co';
+var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3plbXVraHlmbmRxdnNxYXNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTkxNDMsImV4cCI6MjA4ODEzNTE0M30.7--HyU0wH4yPTgFsi90yecSPrNng59QVL8Rv0VARETk';
+var SYNC_API_BASE='https://cgmax-fftp-backend.vercel.app/api';
+
+var sbClient=null;
+var CURRENT_USER=null;
+var AUTH_SESSION=null;
+
+/* ── INIT ── */
+function initSupabaseAuth(){
+  try{
+    if(typeof window.supabase==='undefined'||!window.supabase.createClient){
+      console.warn('Supabase JS SDK not loaded — auth disabled');
+      return;
+    }
+    sbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+    // Listen for auth state changes (sign-in, sign-out, token refresh)
+    sbClient.auth.onAuthStateChange(function(event,session){
+      AUTH_SESSION=session;
+      CURRENT_USER=session?session.user:null;
+      updateAuthUI();
+
+      if(event==='SIGNED_IN'&&session){
+        closeAuthModal();
+        showToast('✅ Signed in as '+(CURRENT_USER.email||'').split('@')[0]);
+        // Check for linked license + sync data from cloud
+        setTimeout(function(){
+          checkAndLinkLicense();
+          SYNC_ENGINE.downloadAll();
+        },500);
+      }
+      if(event==='SIGNED_OUT'){
+        showToast('👤 Signed out');
+      }
+    });
+
+    // Restore existing session
+    sbClient.auth.getSession().then(function(result){
+      if(result.data&&result.data.session){
+        AUTH_SESSION=result.data.session;
+        CURRENT_USER=result.data.session.user;
+        updateAuthUI();
+      }
+    });
+  }catch(e){
+    console.error('Supabase init error:',e);
+  }
+}
+
+/* ── AUTH UI ── */
+function updateAuthUI(){
+  var hdrBtn=document.getElementById('auth-hdr-btn');
+  var setupPrompt=document.getElementById('auth-setup-prompt');
+  if(!hdrBtn)return;
+
+  if(CURRENT_USER){
+    var shortEmail=(CURRENT_USER.email||'').split('@')[0];
+    hdrBtn.textContent='👤 '+shortEmail;
+    hdrBtn.classList.add('signed-in');
+    if(setupPrompt)setupPrompt.style.display='none';
+  }else{
+    hdrBtn.textContent='👤';
+    hdrBtn.classList.remove('signed-in');
+    if(setupPrompt)setupPrompt.style.display='';
+  }
+}
+
+function authHeaderClick(){
+  if(CURRENT_USER){
+    openAccountMenu();
+  }else{
+    openAuthModal();
+  }
+}
+
+function openAuthModal(){
+  var m=document.getElementById('auth-modal');
+  if(m){m.classList.add('active');document.getElementById('auth-email').value='';
+    document.getElementById('auth-status').textContent='';document.getElementById('auth-status').className='auth-status';}
+}
+function closeAuthModal(){
+  var m=document.getElementById('auth-modal');
+  if(m)m.classList.remove('active');
+}
+
+/* ── SIGN IN METHODS ── */
+function authSignInMagicLink(){
+  var email=document.getElementById('auth-email').value.trim();
+  var status=document.getElementById('auth-status');
+  var btn=document.getElementById('auth-magic-btn');
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    status.className='auth-status err';status.textContent='Enter a valid email address.';return;
+  }
+  btn.disabled=true;btn.textContent='Sending…';
+  var redirectUrl=window.location.origin+'/auth-callback.html';
+
+  sbClient.auth.signInWithOtp({
+    email:email,
+    options:{shouldCreateUser:true,emailRedirectTo:redirectUrl}
+  }).then(function(result){
+    btn.disabled=false;btn.textContent='✉️ Send Magic Link';
+    if(result.error){
+      status.className='auth-status err';status.textContent=result.error.message;
+    }else{
+      status.className='auth-status ok';status.textContent='✅ Check your email for the magic link!';
+    }
+  }).catch(function(e){
+    btn.disabled=false;btn.textContent='✉️ Send Magic Link';
+    status.className='auth-status err';status.textContent='Network error — try again.';
+  });
+}
+
+function authSignInGoogle(){
+  if(!sbClient)return;
+  var redirectUrl=window.location.origin+'/auth-callback.html';
+  sbClient.auth.signInWithOAuth({
+    provider:'google',
+    options:{redirectTo:redirectUrl}
+  });
+}
+
+function authSignInApple(){
+  if(!sbClient)return;
+  var redirectUrl=window.location.origin+'/auth-callback.html';
+  sbClient.auth.signInWithOAuth({
+    provider:'apple',
+    options:{redirectTo:redirectUrl}
+  });
+}
+
+function authSignOut(){
+  if(!sbClient)return;
+  sbClient.auth.signOut().then(function(){
+    CURRENT_USER=null;AUTH_SESSION=null;
+    updateAuthUI();
+    SYNC_ENGINE.queue=[];
+  });
+}
+
+/* ── ACCOUNT MENU (simple confirm-based for now) ── */
+function openAccountMenu(){
+  if(!CURRENT_USER)return;
+  var email=CURRENT_USER.email||'Unknown';
+  var queueLen=SYNC_ENGINE.queue.length;
+  var syncStatus=queueLen>0?queueLen+' changes pending':'All synced';
+  var action=confirm(
+    '👤 Account: '+email+'\n'
+    +'☁️ Sync: '+syncStatus+'\n\n'
+    +'Press OK to sign out, or Cancel to go back.'
+  );
+  if(action)authSignOut();
+}
+
+/* ── GET AUTH TOKEN (for API calls) ── */
+function getAuthToken(){
+  if(AUTH_SESSION&&AUTH_SESSION.access_token)return AUTH_SESSION.access_token;
+  return null;
+}
+
+/* ── LICENSE LINKING ── */
+function checkAndLinkLicense(){
+  var token=getAuthToken();
+  if(!token)return;
+
+  fetch(SYNC_API_BASE+'/check-license-link',{
+    method:'GET',
+    headers:{'Authorization':'Bearer '+token}
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.has_active_license){
+      try{
+        localStorage.setItem(LS_PRO,'unlocked');
+        localStorage.setItem(LS_LICENSE,data.license_key);
+      }catch(e){}
+      updateProUI();
+      if(data.auto_linked)showToast('🔗 Pro license auto-linked to your account!');
+    }else{
+      // If user has a local license key, try to link it
+      var localKey=localStorage.getItem(LS_LICENSE);
+      if(localKey&&localStorage.getItem(LS_PRO)==='unlocked'){
+        linkLocalLicenseToAccount(localKey);
+      }
+    }
+  })
+  .catch(function(e){console.error('License link check error:',e);});
+}
+
+function linkLocalLicenseToAccount(key){
+  var token=getAuthToken();
+  if(!token||!key)return;
+
+  fetch(SYNC_API_BASE+'/link-license-to-user',{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+    body:JSON.stringify({license_key:key})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.success)showToast('🔗 License linked to your account!');
+  })
+  .catch(function(e){console.error('License link error:',e);});
+}
+
+/* ════════════════════════════════════════════════════════════
+   CLOUD SYNC ENGINE (offline-first, last-write-wins)
+════════════════════════════════════════════════════════════ */
+var SYNC_ENGINE={
+  queue:[],
+  syncInProgress:false,
+  _timeout:null,
+  _retryCount:{},
+  MAX_RETRIES:5,
+
+  /* Queue a data change for sync */
+  queueChange:function(teamId,dataType,data){
+    if(!CURRENT_USER)return;
+    // Deduplicate: remove pending item for same team+type
+    this.queue=this.queue.filter(function(item){
+      return !(item.teamId===teamId&&item.dataType===dataType);
+    });
+    var versionKey='ff_sync_ver:'+teamId+':'+dataType;
+    var localVersion=parseInt(localStorage.getItem(versionKey)||'0',10);
+    this.queue.push({teamId:teamId,dataType:dataType,data:data,localVersion:localVersion,ts:Date.now()});
+    this.scheduleSync();
+  },
+
+  /* Schedule sync with debounce */
+  scheduleSync:function(){
+    var self=this;
+    clearTimeout(this._timeout);
+    this._timeout=setTimeout(function(){self.syncPending();},2000);
+  },
+
+  /* Process all queued items */
+  syncPending:function(){
+    if(this.syncInProgress||!CURRENT_USER||this.queue.length===0)return;
+    var self=this;
+    this.syncInProgress=true;
+    showSyncIndicator('syncing');
+
+    var item=this.queue[0];
+    var token=getAuthToken();
+    if(!token){this.syncInProgress=false;return;}
+
+    fetch(SYNC_API_BASE+'/sync-coach-data',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({
+        team_id:item.teamId,
+        data_type:item.dataType,
+        data:item.data,
+        local_version:item.localVersion
+      })
+    })
+    .then(function(r){return r.json();})
+    .then(function(result){
+      if(result.success){
+        // Update local version tracker
+        var versionKey='ff_sync_ver:'+item.teamId+':'+item.dataType;
+        localStorage.setItem(versionKey,String(result.server_version));
+        // Remove from queue
+        self.queue.shift();
+        delete self._retryCount[item.teamId+':'+item.dataType];
+
+        if(result.conflict&&result.server_data){
+          // Server won — apply server data locally
+          applyCloudData(item.teamId,item.dataType,result.server_data);
+          showToast('☁️ Cloud data was newer — updated locally');
+        }
+      }else{
+        // Non-success, leave in queue for retry
+        self.bumpRetry(item);
+      }
+      self.syncInProgress=false;
+      if(self.queue.length>0)self.scheduleSync();
+      else showSyncIndicator('synced');
+    })
+    .catch(function(err){
+      console.error('Sync error:',err);
+      self.bumpRetry(item);
+      self.syncInProgress=false;
+      showSyncIndicator('error');
+    });
+  },
+
+  /* Retry tracking with exponential backoff */
+  bumpRetry:function(item){
+    var key=item.teamId+':'+item.dataType;
+    this._retryCount[key]=(this._retryCount[key]||0)+1;
+    if(this._retryCount[key]>this.MAX_RETRIES){
+      // Drop after max retries
+      this.queue.shift();
+      delete this._retryCount[key];
+      console.warn('Sync dropped after max retries:',key);
+    }else{
+      // Exponential backoff: 4s, 8s, 16s, 32s, 64s
+      var delay=Math.pow(2,this._retryCount[key]+1)*1000;
+      var self=this;
+      setTimeout(function(){self.syncPending();},delay);
+    }
+  },
+
+  /* Download ALL data from cloud (new device / sign-in) */
+  downloadAll:function(){
+    var token=getAuthToken();
+    if(!token)return;
+
+    fetch(SYNC_API_BASE+'/download-coach-data?all=true',{
+      method:'GET',
+      headers:{'Authorization':'Bearer '+token}
+    })
+    .then(function(r){return r.json();})
+    .then(function(result){
+      if(!result.success||!result.items||result.items.length===0)return;
+      showSyncIndicator('syncing');
+      var applied=0;
+      result.items.forEach(function(item){
+        var versionKey='ff_sync_ver:'+item.team_id+':'+item.data_type;
+        var localVer=parseInt(localStorage.getItem(versionKey)||'0',10);
+        // Only apply if cloud version is newer
+        if(item.version>localVer){
+          applyCloudData(item.team_id,item.data_type,item.data);
+          localStorage.setItem(versionKey,String(item.version));
+          applied++;
+        }
+      });
+      if(applied>0){
+        showToast('☁️ Restored '+applied+' items from cloud');
+        // Reload UI state
+        try{
+          LIVE_ROSTER=loadRosterData();
+          rebuildFromRoster();
+          renderGameUI();
+        }catch(e){}
+      }
+      showSyncIndicator('synced');
+    })
+    .catch(function(e){
+      console.error('Download all error:',e);
+      showSyncIndicator('error');
+    });
+  }
+};
+
+/* ── Apply cloud data to localStorage ── */
+function applyCloudData(teamId,dataType,data){
+  try{
+    switch(dataType){
+      case 'roster':
+        localStorage.setItem('ff_roster_'+teamId,JSON.stringify(data));
+        // Also update v1 key if this is the active team
+        if(teamId===ACTIVE_TEAM_ID)localStorage.setItem(LS_ROSTER,JSON.stringify(data));
+        break;
+      case 'season':
+        localStorage.setItem('ff_season_'+teamId,JSON.stringify(data));
+        if(teamId===ACTIVE_TEAM_ID)localStorage.setItem(LS_KEY,JSON.stringify(data));
+        break;
+      case 'notes':
+        localStorage.setItem('ff_notes_'+teamId,JSON.stringify(data));
+        break;
+      case 'colors':
+        localStorage.setItem('ff_colors_'+teamId,JSON.stringify(data));
+        break;
+      case 'photos':
+        localStorage.setItem('ff_photos_v1',JSON.stringify(data));
+        break;
+      case 'teams':
+        localStorage.setItem(LS_TEAMS,JSON.stringify(data));
+        break;
+      case 'settings':
+        // Apply individual settings
+        if(data.light_mode!==undefined)localStorage.setItem('ff_light_mode',data.light_mode);
+        if(data.onboarded!==undefined)localStorage.setItem('ff_onboarded',data.onboarded);
+        break;
+    }
+  }catch(e){console.error('applyCloudData error:',e);}
+}
+
+/* ── Sync status indicator ── */
+function showSyncIndicator(state){
+  var el=document.getElementById('sync-indicator');
+  if(!el)return;
+  var icon=document.getElementById('sync-icon');
+  var text=document.getElementById('sync-text');
+  el.className='sync-indicator show '+state;
+  if(state==='syncing'){
+    icon.innerHTML='<span class="sync-spinner"></span>';
+    text.textContent='Syncing…';
+  }else if(state==='synced'){
+    icon.innerHTML='✅';text.textContent='Synced';
+    setTimeout(function(){el.classList.remove('show');},2500);
+  }else if(state==='error'){
+    icon.innerHTML='⚠️';text.textContent='Sync error';
+    setTimeout(function(){el.classList.remove('show');},4000);
+  }
+}
+
+/* ── Hook into existing save functions ── */
+var _origSaveRosterData=saveRosterData;
+saveRosterData=function(roster){
+  _origSaveRosterData(roster);
+  if(CURRENT_USER&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
+    SYNC_ENGINE.queueChange(ACTIVE_TEAM_ID,'roster',roster);
+  }
+};
+
+var _origSaveSeason=saveSeason;
+saveSeason=function(games){
+  _origSaveSeason(games);
+  if(CURRENT_USER&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
+    SYNC_ENGINE.queueChange(ACTIVE_TEAM_ID,'season',games);
+  }
+};
+
+var _origSaveTeamColors=saveTeamColors;
+saveTeamColors=function(){
+  _origSaveTeamColors();
+  if(CURRENT_USER&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
+    SYNC_ENGINE.queueChange(ACTIVE_TEAM_ID,'colors',{primary:TC.primary,secondary:TC.secondary});
+  }
+};
+
+var _origSaveTeams=saveTeams;
+saveTeams=function(teams){
+  _origSaveTeams(teams);
+  if(CURRENT_USER){
+    SYNC_ENGINE.queueChange('_global','teams',teams);
+  }
+};
+
+/* ── Hook into saveNote ── */
+var _origSaveNote=saveNote;
+saveNote=function(name,val){
+  _origSaveNote(name,val);
+  if(CURRENT_USER&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
+    try{
+      var allNotes=JSON.parse(localStorage.getItem('ff_notes')||'{}');
+      SYNC_ENGINE.queueChange(ACTIVE_TEAM_ID,'notes',allNotes);
+    }catch(e){}
+  }
+};
+
+/* ── Init auth on app load ── */
+var _authOrigOnload=window.onload;
+window.onload=function(){
+  if(_authOrigOnload)_authOrigOnload();
+  initSupabaseAuth();
+};
+
 </script>
 </body>
 </html>

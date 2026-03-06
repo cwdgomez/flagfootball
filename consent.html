@@ -103,6 +103,27 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;
 /* DATE DISPLAY */
 .date-display{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--dim);
   letter-spacing:1px;text-align:right;margin-bottom:4px;}
+
+/* PHOTO UPLOAD */
+.photo-upload-area{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:8px;}
+.photo-drop{width:160px;height:160px;border:2px dashed rgba(255,255,255,.15);border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  cursor:pointer;transition:border-color .2s,background .2s;position:relative;overflow:hidden;
+  background:rgba(255,255,255,.02);}
+.photo-drop:hover,.photo-drop.dragover{border-color:var(--s2);background:rgba(255,215,0,.04);}
+.photo-drop-icon{font-size:32px;opacity:.4;transition:opacity .2s;}
+.photo-drop-text{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;
+  color:var(--dim);text-transform:uppercase;text-align:center;line-height:1.4;}
+.photo-drop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:12px;}
+.photo-drop.has-photo .photo-drop-icon,.photo-drop.has-photo .photo-drop-text{display:none;}
+.photo-remove{display:none;margin-top:2px;background:none;border:1px solid rgba(255,255,255,.1);
+  border-radius:6px;padding:4px 12px;font-family:'Barlow Condensed',sans-serif;font-size:11px;
+  letter-spacing:1px;color:var(--dim);cursor:pointer;text-transform:uppercase;}
+.photo-remove.show{display:inline-block;}
+.photo-hint{font-size:11px;color:var(--dimmer);text-align:center;line-height:1.5;max-width:280px;}
+.photo-optional{display:inline-block;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);
+  border-radius:4px;padding:1px 6px;font-family:'Barlow Condensed',sans-serif;font-size:10px;
+  letter-spacing:1px;color:var(--s2);text-transform:uppercase;margin-left:4px;vertical-align:middle;}
 </style>
 </head>
 <body>
@@ -129,17 +150,18 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;
     <ul>
       <li>Displaying the player's profile image within the CGMax FFTP coaching app on the coach's personal device</li>
       <li>Appearing on digitally generated game scorecards and stat summaries viewable only by the coaching staff</li>
+      <li>If uploaded through this form, securely transmitting the photo to the coaching staff via email</li>
     </ul>
     <div class="legal-box">
-      <p><strong>Photos will NOT be:</strong> uploaded to any server, shared on social media, used for advertising or marketing, sold to third parties, or made publicly accessible in any way. All images are stored locally on the coach's device using browser storage and are never transmitted over the internet.</p>
+      <p><strong>Photos will NOT be:</strong> shared on social media, used for advertising or marketing, sold to third parties, or made publicly accessible in any way. Images stored locally on the coach's device use browser storage. If you upload a photo through this form, it is sent via encrypted email to the coaching staff and may be stored in a secure database accessible only to the team's licensed coach.</p>
     </div>
   </div>
 
   <!-- SECTION 3: DATA STORAGE & SECURITY -->
   <div class="sec">
     <div class="sec-title">3. Data Storage &amp; Security</div>
-    <p>Player photos are stored exclusively in the web browser's local storage on the coach's personal device. Photos are automatically resized to a small thumbnail (120×120 pixels) before storage. No cloud servers, databases, or third-party services have access to these images.</p>
-    <p>The coach is responsible for maintaining the physical security of their device. Photos can be deleted at any time by removing the player from the roster within the app or by clearing the browser's local storage.</p>
+    <p>Player photos added directly through the app are stored in the web browser's local storage on the coach's personal device. Photos uploaded through this consent form are resized to a maximum of 800 pixels, transmitted via encrypted email, and may be stored in a secure, access-controlled database (Supabase with Row Level Security) accessible only to the team's licensed Pro coach.</p>
+    <p>The coach is responsible for maintaining the physical security of their device. Photos can be deleted at any time by removing the player from the roster within the app, by clearing the browser's local storage, or by requesting deletion from the coaching staff.</p>
   </div>
 
   <!-- SECTION 4: COPPA COMPLIANCE -->
@@ -221,9 +243,26 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;
     </div>
   </div>
 
-  <!-- SECTION 7: ACKNOWLEDGMENT & SIGNATURE -->
+  <!-- SECTION 7: PLAYER PHOTO (OPTIONAL) -->
   <div class="sec">
-    <div class="sec-title">7. Acknowledgment &amp; Signature</div>
+    <div class="sec-title">7. Player Photo <span class="photo-optional">Optional</span></div>
+    <p>Upload a recent photo of your child (e.g. their league photo from last season). This photo will be used as their player profile image within the coaching app only.</p>
+    <p style="font-size:12px;color:var(--dimmer);margin-top:4px;">Photos are resized to 800px max and stored securely. You may skip this step — the coach can also take a photo during practice.</p>
+
+    <div class="photo-upload-area">
+      <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none;">
+      <div class="photo-drop" id="photo-drop" onclick="document.getElementById('photo-input').click()">
+        <div class="photo-drop-icon">📷</div>
+        <div class="photo-drop-text">Tap to take<br>or choose photo</div>
+      </div>
+      <button type="button" class="photo-remove" id="photo-remove" onclick="removePhoto()">Remove Photo</button>
+      <div class="photo-hint">Accepted: JPG, PNG, HEIC · Max 10 MB · Will be resized automatically</div>
+    </div>
+  </div>
+
+  <!-- SECTION 8: ACKNOWLEDGMENT & SIGNATURE -->
+  <div class="sec">
+    <div class="sec-title">8. Acknowledgment &amp; Signature</div>
 
     <div class="check-row">
       <input type="checkbox" id="c-read" required>
@@ -334,6 +373,75 @@ function clearSignature(){
   placeholder.style.opacity='1';
 }
 
+/* ── PHOTO UPLOAD & RESIZE ── */
+var photoBase64=null;
+var photoInput=document.getElementById('photo-input');
+var photoDrop=document.getElementById('photo-drop');
+var photoRemoveBtn=document.getElementById('photo-remove');
+
+photoInput.addEventListener('change',function(e){
+  if(e.target.files&&e.target.files[0]) handlePhotoFile(e.target.files[0]);
+});
+
+// Drag & drop
+photoDrop.addEventListener('dragover',function(e){e.preventDefault();photoDrop.classList.add('dragover');});
+photoDrop.addEventListener('dragleave',function(){photoDrop.classList.remove('dragover');});
+photoDrop.addEventListener('drop',function(e){
+  e.preventDefault();photoDrop.classList.remove('dragover');
+  if(e.dataTransfer.files&&e.dataTransfer.files[0]) handlePhotoFile(e.dataTransfer.files[0]);
+});
+
+function handlePhotoFile(file){
+  if(!file.type.match(/^image\//)){
+    alert('Please select an image file (JPG, PNG, HEIC).');return;
+  }
+  if(file.size>10*1024*1024){
+    alert('Photo must be under 10 MB.');return;
+  }
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    resizeImage(ev.target.result,800,function(resized){
+      photoBase64=resized;
+      showPhotoPreview(resized);
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function resizeImage(dataUrl,maxPx,cb){
+  var img=new Image();
+  img.onload=function(){
+    var w=img.width,h=img.height;
+    if(w>maxPx||h>maxPx){
+      if(w>h){h=Math.round(h*(maxPx/w));w=maxPx;}
+      else{w=Math.round(w*(maxPx/h));h=maxPx;}
+    }
+    var c=document.createElement('canvas');c.width=w;c.height=h;
+    var cx=c.getContext('2d');cx.drawImage(img,0,0,w,h);
+    cb(c.toDataURL('image/jpeg',0.85));
+  };
+  img.src=dataUrl;
+}
+
+function showPhotoPreview(src){
+  // Remove any existing preview img
+  var existing=photoDrop.querySelector('img');
+  if(existing)existing.remove();
+  var img=document.createElement('img');img.src=src;img.alt='Player photo preview';
+  photoDrop.appendChild(img);
+  photoDrop.classList.add('has-photo');
+  photoRemoveBtn.classList.add('show');
+}
+
+function removePhoto(){
+  photoBase64=null;
+  var img=photoDrop.querySelector('img');
+  if(img)img.remove();
+  photoDrop.classList.remove('has-photo');
+  photoRemoveBtn.classList.remove('show');
+  photoInput.value='';
+}
+
 /* ── PRE-FILL TEAM NAME FROM URL ── */
 (function(){
   try{
@@ -403,7 +511,8 @@ function submitConsent(){
       email:email,
       phone:phone,
       signature:sigData,
-      date:formDate
+      date:formDate,
+      photo:photoBase64||null
     })
   })
   .then(function(r){return r.json();})
@@ -439,6 +548,7 @@ function resetForm(){
     document.getElementById(id).checked=false;
   });
   clearSignature();
+  removePhoto();
   document.getElementById('form-status').textContent='';
   document.getElementById('btn-submit').disabled=false;
   document.getElementById('btn-submit').textContent='Submit Consent Form';

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#080808">
+<title>Signing in… · CGMax FFTP</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:#080808;color:#f2f2f2;font-family:'Helvetica Neue',Arial,sans-serif;}
+.wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px;text-align:center;}
+.logo{font-size:28px;font-weight:900;letter-spacing:6px;color:#FFD700;margin-bottom:16px;}
+.logo span{color:#AA0000;}
+.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.1);border-top-color:#FFD700;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:20px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.msg{font-size:15px;color:#888;letter-spacing:1px;}
+.err{color:#ef4444;display:none;margin-top:12px;font-size:13px;line-height:1.6;}
+.btn-retry{display:none;margin-top:16px;background:#AA0000;border:none;border-radius:8px;padding:12px 24px;color:#FFD700;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">CG<span>MAX</span> FFTP</div>
+  <div class="spinner" id="spinner"></div>
+  <div class="msg" id="msg">Completing sign-in…</div>
+  <div class="err" id="err"></div>
+  <a class="btn-retry" id="btn-retry" href="./app.html">← Back to App</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  // ── CONFIG ── (same as app.html)
+  var SUPABASE_URL = 'https://wbgzemukhyfndqvsqasc.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3plbXVraHlmbmRxdnNxYXNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTkxNDMsImV4cCI6MjA4ODEzNTE0M30.7--HyU0wH4yPTgFsi90yecSPrNng59QVL8Rv0VARETk';
+
+  var msg = document.getElementById('msg');
+  var err = document.getElementById('err');
+  var spinner = document.getElementById('spinner');
+  var btnRetry = document.getElementById('btn-retry');
+
+  function showError(text) {
+    spinner.style.display = 'none';
+    msg.style.display = 'none';
+    err.style.display = 'block';
+    err.textContent = text;
+    btnRetry.style.display = 'inline-block';
+  }
+
+  function redirect() {
+    // Redirect to app.html (preserves session in localStorage)
+    window.location.replace('./app.html');
+  }
+
+  try {
+    // Supabase JS v2 handles the hash fragment automatically on page load
+    // when the client is initialized. The auth token exchange happens via
+    // supabase.auth.getSession() after the URL fragment is parsed.
+    var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Listen for auth state change — SIGNED_IN fires after token exchange
+    sb.auth.onAuthStateChange(function(event, session) {
+      if (event === 'SIGNED_IN' && session) {
+        msg.textContent = 'Signed in! Redirecting…';
+        setTimeout(redirect, 600);
+      }
+    });
+
+    // Also check immediately (magic link may have already resolved)
+    sb.auth.getSession().then(function(result) {
+      if (result.data && result.data.session) {
+        msg.textContent = 'Signed in! Redirecting…';
+        setTimeout(redirect, 600);
+      } else {
+        // If no session after 5 seconds, show error
+        setTimeout(function() {
+          if (msg.textContent === 'Completing sign-in…') {
+            showError('Sign-in could not be completed. The link may have expired.');
+          }
+        }, 5000);
+      }
+    }).catch(function(e) {
+      showError('Auth error: ' + (e.message || 'Unknown error'));
+    });
+
+  } catch (e) {
+    showError('Failed to initialize: ' + (e.message || 'Unknown error'));
+  }
+})();
+</script>
+</body>
+</html>
