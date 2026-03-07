@@ -983,6 +983,18 @@ body.light-mode .toast-msg{color:#1a1714;}
 @keyframes syncSpin{to{transform:rotate(360deg);}}
 .sync-spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.1);
   border-top-color:var(--orange);border-radius:50%;animation:syncSpin .6s linear infinite;}
+/* ── POST-GAME RECAP CARD ── */
+#recap-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9990;display:none;align-items:center;justify-content:center;padding:20px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
+#recap-modal.open{display:flex;flex-direction:column;gap:14px;}
+.recap-inner{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:360px;}
+.recap-canvas-wrap{border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.7);width:100%;max-width:360px;}
+#recap-canvas{display:block;width:100%;height:auto;}
+.recap-actions{display:flex;gap:10px;width:100%;max-width:360px;}
+.recap-share-btn{flex:1;background:linear-gradient(135deg,#AA0000,#660000);border:1px solid rgba(255,215,0,.3);border-radius:12px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#FFD700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.recap-share-btn:active{opacity:.8;}
+.recap-dl-btn{background:var(--dark3);border:1px solid var(--dark5);border-radius:12px;padding:14px 16px;font-family:'Barlow Condensed',sans-serif;font-size:20px;color:var(--dim);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.recap-dl-btn:active{opacity:.8;}
+.recap-skip{background:transparent;border:none;padding:8px 20px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;color:var(--dimmer);cursor:pointer;text-transform:uppercase;}
 </style>
 </head>
 <body>
@@ -1056,7 +1068,7 @@ body.light-mode .toast-msg{color:#1a1714;}
   </div>
   <div class="gate-contact">
     Need access or want to purchase?<br>
-    Contact: <a href="/cdn-cgi/l/email-protection#c9aaaea4a8b1afafbdb989a0bdaaaae7a5a5aa" style="color:rgba(255,215,0,.6);text-decoration:none;"><span class="__cf_email__" data-cfemail="d2b1b5bfb3aab4b4a6a292bba6b1b1fcbebeb1">[email&#160;protected]</span></a><br>
+    Contact: <a href="mailto:cgmaxfftp@itcc.llc" style="color:rgba(255,215,0,.6);text-decoration:none;">cgmaxfftp@itcc.llc</a><br>
     <span style="opacity:.5;font-size:10px;letter-spacing:1px;margin-top:4px;display:block;">
       © ITCC LLC · All Rights Reserved · Youth Sports Technology
     </span>
@@ -1649,6 +1661,18 @@ body.light-mode .toast-msg{color:#1a1714;}
 <div class="undo-toast" id="toast">
   <div class="toast-msg" id="toast-msg">Logged</div>
   <button type="button" class="toast-undo" id="toast-undo-btn" onclick="undoLast()">UNDO</button>
+</div>
+
+<!-- POST-GAME RECAP CARD MODAL -->
+<div id="recap-modal" role="dialog" aria-modal="true" aria-label="Post-Game Recap Card">
+  <div class="recap-inner">
+    <div class="recap-canvas-wrap"><canvas id="recap-canvas" width="720" height="960"></canvas></div>
+    <div class="recap-actions">
+      <button type="button" class="recap-share-btn" id="recap-share-btn">&#128228; Share Recap</button>
+      <button type="button" class="recap-dl-btn" id="recap-dl-btn" title="Save image">&#11015;</button>
+    </div>
+    <button type="button" class="recap-skip" id="recap-skip-btn">Skip for now</button>
+  </div>
 </div>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
@@ -2621,7 +2645,13 @@ function finalizeGame(){
   clearSavedGameState();
   showToast('🏁 Game saved to Season!');
   vibe([30,15,30,15,50]);
-  setTimeout(function(){openSeason();},900);
+  // Show recap card for Pro users, then open Season
+  if(isPro()){
+    var gamesAfter=loadSeason();
+    setTimeout(function(){openRecapCard(us,them,mvps,gamesAfter);},600);
+  } else {
+    setTimeout(function(){openSeason();},900);
+  }
 }
 
 /* ── MVP ── */
@@ -2861,7 +2891,241 @@ function endAndSave(){
   var game={id:Date.now(),date:G.date||new Date().toISOString().split('T')[0],team:G.team,opp:G.opp,us:us,them:them,quarters:G.quarters,qb:G.qb,mvp:mvps[0]?mvps[0].name:'',playerStats:playerStats,absent:G.absent.slice()};
   var games=loadSeason();games.unshift(game);saveSeason(games);
   showToast('✅ Game saved!');
-  setTimeout(function(){openSeason();},800);
+  // Show recap card for Pro users, then open Season
+  if(isPro()){
+    setTimeout(function(){openRecapCard(us,them,mvps,games);},600);
+  } else {
+    setTimeout(function(){openSeason();},800);
+  }
+}
+
+/* ── POST-GAME RECAP CARD ── */
+function openRecapCard(us,them,mvps,games){
+  var modal=document.getElementById('recap-modal');
+  if(!modal)return;
+  buildRecapCanvas(us,them,mvps,games);
+  modal.classList.add('open');
+  // Share button
+  document.getElementById('recap-share-btn').onclick=function(){
+    var canvas=document.getElementById('recap-canvas');
+    canvas.toBlob(function(blob){
+      var result=us>them?'WIN':us<them?'LOSS':'TIE';
+      var fileName=G.team.replace(/\s+/g,'_')+'_vs_'+G.opp.replace(/\s+/g,'_')+'_recap.png';
+      var file=new File([blob],fileName,{type:'image/png'});
+      var shareText=result==='WIN'?'We won! '+us+'\u2013'+them+' vs '+G.opp+' \ud83c\udfc6':
+                    result==='LOSS'?'Final score: '+us+'\u2013'+them+' vs '+G.opp:
+                    'It\'s a tie! '+us+'\u2013'+them+' vs '+G.opp;
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+        navigator.share({title:G.team+' Recap',text:shareText,files:[file]}).catch(function(){});
+      } else {
+        // Fallback: download
+        var a=document.createElement('a');
+        a.href=URL.createObjectURL(blob);
+        a.download=fileName;
+        a.click();
+        setTimeout(function(){URL.revokeObjectURL(a.href);},5000);
+      }
+    },'image/png');
+  };
+  // Download button
+  document.getElementById('recap-dl-btn').onclick=function(){
+    var canvas=document.getElementById('recap-canvas');
+    var a=document.createElement('a');
+    a.href=canvas.toDataURL('image/png');
+    a.download=G.team.replace(/\s+/g,'_')+'_recap.png';
+    a.click();
+  };
+  // Skip button
+  document.getElementById('recap-skip-btn').onclick=function(){closeRecapCard();};
+  // Tap backdrop to close
+  modal.addEventListener('click',function handler(e){
+    if(e.target===modal){closeRecapCard();modal.removeEventListener('click',handler);}
+  });
+}
+function closeRecapCard(){
+  var modal=document.getElementById('recap-modal');
+  if(modal)modal.classList.remove('open');
+  setTimeout(function(){openSeason();},300);
+}
+function rcRectPath(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+}
+function buildRecapCanvas(us,them,mvps,games){
+  var canvas=document.getElementById('recap-canvas');
+  var ctx=canvas.getContext('2d');
+  var W=720,H=960;
+  canvas.width=W;canvas.height=H;
+
+  var primary=TC.primary||'#AA0000';
+  var secondary=TC.secondary||'#FFD700';
+  var result=us>them?'WIN':us<them?'LOSS':'TIE';
+
+  // ── Background ──
+  var bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,darken(primary,0.85));
+  bg.addColorStop(1,'#0a0a0a');
+  ctx.fillStyle=bg;
+  ctx.fillRect(0,0,W,H);
+
+  // Subtle grid texture
+  ctx.strokeStyle='rgba(255,255,255,0.04)';
+  ctx.lineWidth=1;
+  for(var gx=0;gx<W;gx+=40){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
+  for(var gy=0;gy<H;gy+=40){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();}
+
+  // ── Top accent bar ──
+  ctx.fillStyle=secondary;
+  ctx.fillRect(0,0,W,6);
+
+  // ── Team name ──
+  ctx.textAlign='center';
+  ctx.fillStyle=secondary;
+  ctx.font='bold 52px "Bebas Neue",sans-serif';
+  ctx.letterSpacing='4px';
+  ctx.fillText(G.team.toUpperCase(),W/2,80);
+
+  // ── VS line ──
+  ctx.fillStyle='rgba(255,255,255,0.4)';
+  ctx.font='500 26px "Barlow Condensed",sans-serif';
+  ctx.fillText('VS  '+G.opp.toUpperCase(),W/2,116);
+
+  // ── Date ──
+  var dateStr=G.date?new Date(G.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+  ctx.fillStyle='rgba(255,255,255,0.35)';
+  ctx.font='500 20px "Barlow Condensed",sans-serif';
+  ctx.fillText(dateStr,W/2,144);
+
+  // ── Score card ──
+  var scY=170,scH=160;
+  rcRectPath(ctx,60,scY,W-120,scH,20);
+  ctx.fillStyle='rgba(255,255,255,0.06)';
+  ctx.fill();
+  rcRectPath(ctx,60,scY,W-120,scH,20);
+  ctx.strokeStyle='rgba(255,255,255,0.12)';
+  ctx.lineWidth=1.5;
+  ctx.stroke();
+
+  // Score numbers
+  ctx.textAlign='center';
+  ctx.fillStyle=result==='WIN'?secondary:result==='LOSS'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.8)';
+  ctx.font='bold 100px "Bebas Neue",sans-serif';
+  ctx.fillText(us,200,scY+scH-30);
+
+  ctx.fillStyle='rgba(255,255,255,0.2)';
+  ctx.font='bold 50px "Bebas Neue",sans-serif';
+  ctx.fillText('\u2013',W/2,scY+scH-45);
+
+  ctx.fillStyle='rgba(255,255,255,0.4)';
+  ctx.font='bold 100px "Bebas Neue",sans-serif';
+  ctx.fillText(them,W-200,scY+scH-30);
+
+  // Score labels
+  ctx.fillStyle='rgba(255,255,255,0.3)';
+  ctx.font='600 18px "Barlow Condensed",sans-serif';
+  ctx.fillText(G.team.toUpperCase(),200,scY+24);
+  ctx.fillText(G.opp.toUpperCase(),W-200,scY+24);
+
+  // ── Result badge ──
+  var badgeColors={WIN:[secondary,'#5a3a00'],LOSS:['rgba(255,255,255,0.7)','rgba(0,0,0,0.4)'],TIE:['rgba(180,180,180,0.9)','rgba(0,0,0,0.3)']};
+  var bc=badgeColors[result];
+  rcRectPath(ctx,W/2-70,scY+scH/2-24,140,48,12);
+  ctx.fillStyle=bc[1];ctx.fill();
+  rcRectPath(ctx,W/2-70,scY+scH/2-24,140,48,12);
+  ctx.strokeStyle=bc[0];ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle=bc[0];
+  ctx.font='bold 32px "Bebas Neue",sans-serif';
+  ctx.fillText(result,W/2,scY+scH/2+11);
+
+  // ── MVP Section ──
+  var mvpY=scY+scH+28;
+  ctx.textAlign='center';
+  ctx.fillStyle=rgba(secondary,0.7);
+  ctx.font='bold 22px "Bebas Neue",sans-serif';
+  ctx.fillText('\u2605  TOP PERFORMERS  \u2605',W/2,mvpY+2);
+
+  var topMvps=mvps.slice(0,3);
+  var cardW=topMvps.length===1?320:topMvps.length===2?290:200;
+  var cardH=180;
+  var totalW=topMvps.length*cardW+(topMvps.length-1)*14;
+  var startX=(W-totalW)/2;
+  var cardY=mvpY+18;
+
+  topMvps.forEach(function(mvp,i){
+    var cx=startX+i*(cardW+14);
+    var isFirst=i===0;
+
+    // Card bg
+    rcRectPath(ctx,cx,cardY,cardW,cardH,14);
+    var cg=ctx.createLinearGradient(cx,cardY,cx,cardY+cardH);
+    cg.addColorStop(0,isFirst?rgba(secondary,0.18):'rgba(255,255,255,0.08)');
+    cg.addColorStop(1,'rgba(0,0,0,0.2)');
+    ctx.fillStyle=cg;ctx.fill();
+    rcRectPath(ctx,cx,cardY,cardW,cardH,14);
+    ctx.strokeStyle=isFirst?rgba(secondary,0.5):'rgba(255,255,255,0.15)';
+    ctx.lineWidth=isFirst?2:1;ctx.stroke();
+
+    // Rank badge
+    var rankColors=['#FFD700','#C0C0C0','#CD7F32'];
+    ctx.fillStyle=rankColors[i]||'rgba(255,255,255,0.4)';
+    ctx.font='bold '+(isFirst?'22':'18')+'px "Bebas Neue",sans-serif';
+    ctx.textAlign='left';
+    ctx.fillText('#'+(i+1),cx+12,cardY+24);
+
+    // Name
+    ctx.fillStyle=isFirst?secondary:'rgba(255,255,255,0.85)';
+    ctx.font='bold '+(isFirst?'26':'22')+'px "Bebas Neue",sans-serif';
+    ctx.textAlign='center';
+    var displayName=firstName(mvp.name);
+    ctx.fillText(displayName.toUpperCase(),cx+cardW/2,cardY+52);
+
+    // Score
+    ctx.fillStyle=isFirst?secondary:'rgba(255,255,255,0.5)';
+    ctx.font='bold '+(isFirst?'48':'38')+'px "Bebas Neue",sans-serif';
+    ctx.fillText(mvp.score,cx+cardW/2,cardY+100);
+
+    ctx.fillStyle='rgba(255,255,255,0.3)';
+    ctx.font='600 14px "Barlow Condensed",sans-serif';
+    ctx.fillText('RATING',cx+cardW/2,cardY+118);
+
+    // Why (stats)
+    if(mvp.why){
+      ctx.fillStyle='rgba(255,255,255,0.55)';
+      ctx.font='500 '+(cardW<220?12:13)+'px "Barlow Condensed",sans-serif';
+      ctx.textAlign='center';
+      var why=mvp.why.length>28?mvp.why.substring(0,26)+'\u2026':mvp.why;
+      ctx.fillText(why,cx+cardW/2,cardY+cardH-16);
+    }
+  });
+
+  // ── Season Record ──
+  var recY=cardY+cardH+28;
+  var wins=0,losses=0,ties=0;
+  (games||[]).forEach(function(g){
+    if(g.us>g.them)wins++;else if(g.us<g.them)losses++;else ties++;
+  });
+  var recStr=wins+'W\u2013'+losses+'L'+(ties?' '+ties+'T':'');
+
+  ctx.textAlign='center';
+  ctx.fillStyle='rgba(255,255,255,0.25)';
+  ctx.font='600 18px "Barlow Condensed",sans-serif';
+  ctx.fillText('SEASON RECORD',W/2,recY);
+  ctx.fillStyle=rgba(secondary,0.9);
+  ctx.font='bold 44px "Bebas Neue",sans-serif';
+  ctx.fillText(recStr,W/2,recY+42);
+
+  // ── Branding footer ──
+  var footY=H-50;
+  ctx.fillStyle='rgba(255,255,255,0.15)';
+  ctx.fillRect(60,footY-10,W-120,1);
+  ctx.fillStyle='rgba(255,255,255,0.3)';
+  ctx.font='600 16px "Barlow Condensed",sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('CGMax FFTP \u2022 Flag Football Tracker Pro',W/2,footY+16);
 }
 
 function renderSeasonScreen(){
@@ -4482,13 +4746,21 @@ function deactivateStatCoach(){
   showToast('🤝 Stat Coach deactivated');
 }
 
-// Open consent form — passes team name and season for pre-fill
-function openConsentForm(){
+// Open consent form — passes team name, season, and coach uid for pre-fill + ownership
+async function openConsentForm(){
   var team=encodeURIComponent(G.team||'');
   var now=new Date();
   var seasons=['Spring','Spring','Spring','Spring','Summer','Summer','Summer','Fall','Fall','Fall','Winter','Winter'];
   var season=encodeURIComponent(seasons[now.getMonth()]+' '+now.getFullYear());
-  window.open('./consent.html?team='+team+'&season='+season,'_blank');
+  var uid='';
+  try{
+    if(sbClient){
+      var gu=await sbClient.auth.getUser();
+      if(gu.data&&gu.data.user)uid=gu.data.user.id;
+    }
+  }catch(e){}
+  var url='./consent.html?team='+team+'&season='+season+(uid?'&uid='+encodeURIComponent(uid):'');
+  window.open(url,'_blank');
 }
 </script>
 <script>
