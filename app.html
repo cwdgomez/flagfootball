@@ -3205,6 +3205,18 @@ function copyShareText(){
     <div class="pro-upgrade-star">⭐</div>
     <div class="pro-upgrade-title">CGMax FFTP Pro</div>
     <div class="pro-upgrade-sub">Unlock the full coaching experience</div>
+    <!-- LICENSE KEY ENTRY — shown first so existing customers can unlock immediately -->
+    <div style="background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:12px;padding:14px;margin-bottom:14px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;color:rgba(255,215,0,.6);text-transform:uppercase;margin-bottom:8px;">Already have a license key?</div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="pro-code-input" placeholder="CGMAX-XXXX-XXXX-XXXX"
+          style="flex:1;background:var(--dark3);border:1px solid rgba(255,215,0,.25);border-radius:9px;padding:10px 12px;color:var(--txt);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;outline:none;text-transform:uppercase;"
+          oninput="this.value=this.value.toUpperCase()">
+        <button type="button" onclick="proUnlockWithCode(document.getElementById('pro-code-input').value)"
+          style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#111;border:none;border-radius:9px;padding:10px 16px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:1px;cursor:pointer;white-space:nowrap;">✓ Activate</button>
+      </div>
+    </div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.2);text-align:center;text-transform:uppercase;margin-bottom:12px;">— or purchase below —</div>
     <div class="pro-feature-list">
       <div class="pro-feature-item">🎙️ Voice Command Logging</div>
       <div class="pro-feature-item">📚 Season Stats &amp; Leaderboard</div>
@@ -3215,13 +3227,6 @@ function copyShareText(){
     </div>
     <button type="button" class="pro-cta-btn" onclick="proUpgradeMonthly()" style="margin-bottom:6px;">⭐ Go Pro — $9.99 / month</button>
     <button type="button" onclick="proUpgradeAnnual()" style="width:100%;background:none;border:1px solid rgba(251,191,36,.35);border-radius:12px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:#f59e0b;cursor:pointer;margin-bottom:14px;">or $79.99 / year (save 33%)</button>
-    <div style="display:flex;gap:8px;margin-bottom:10px;">
-      <input type="text" id="pro-code-input" placeholder="License key: CGMAX-XXXX-XXXX-XXXX"
-        style="flex:1;background:var(--dark3);border:1px solid var(--dark5);border-radius:9px;padding:9px 12px;color:var(--txt);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;outline:none;text-transform:uppercase;"
-        oninput="this.value=this.value.toUpperCase()">
-      <button type="button" onclick="proUnlockWithCode(document.getElementById('pro-code-input').value)"
-        style="background:var(--dark4);border:1px solid var(--dark5);border-radius:9px;padding:9px 14px;color:var(--s);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Unlock</button>
-    </div>
     <button type="button" class="pro-dismiss-btn" onclick="closeProModal()">Maybe Later</button>
   </div>
 </div>
@@ -4622,6 +4627,15 @@ window.onload=function(){
   sendConsentToBackend();
   // Initialize Supabase Auth (sign-in, session restore, cloud sync)
   initSupabaseAuth();
+  // Auto-open Pro modal if arriving via ?activate=1 (e.g. from index page "Already have a key?" link)
+  if(new URLSearchParams(window.location.search).get('activate')==='1'){
+    setTimeout(function(){
+      openProModal('url',null);
+      // Focus the license key input so the user can type immediately
+      var inp=document.getElementById('pro-code-input');
+      if(inp)inp.focus();
+    },600);
+  }
 };
 
 /* ════════════════════════════════════════════════════════════
