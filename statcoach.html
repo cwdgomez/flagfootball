@@ -205,8 +205,15 @@ body{display:flex;flex-direction:column;}
 
     channel = sb.channel('cocoach:' + code, { config: { broadcast: { ack: false } } });
 
+    var retryTimer = null;
+    function requestState() {
+      if (!channel || gameState) return;
+      channel.send({ type: 'broadcast', event: 'stat_coach_joined', payload: { code: code } });
+    }
+
     channel
       .on('broadcast', { event: 'game_state' }, function(msg) {
+        if (retryTimer) { clearInterval(retryTimer); retryTimer = null; }
         handleGameState(msg.payload);
       })
       .on('broadcast', { event: 'coach_ping' }, function() {
@@ -217,9 +224,11 @@ body{display:flex;flex-direction:column;}
         if (status === 'SUBSCRIBED') {
           setConnected(true);
           showScreen('game');
-          // Ask primary to send state immediately
-          channel.send({ type: 'broadcast', event: 'stat_coach_joined', payload: { code: code } });
+          // Ask primary to send state immediately, then retry every 3s until received
+          requestState();
+          retryTimer = setInterval(requestState, 3000);
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          if (retryTimer) { clearInterval(retryTimer); retryTimer = null; }
           setConnected(false);
           showErr('Connection failed. Check the code and try again.');
           showScreen('join');
@@ -332,7 +341,10 @@ body{display:flex;flex-direction:column;}
           var btnId = 'stb-' + safeid(name) + '-' + s.key;
           recBtnHtml += '<button type="button" class="stb" id="'+btnId+'" onclick="sendStatBtn(''+escq(name)+'',''+s.key+'')">'            +'<div class="stb-icon">'+s.icon+'</div>'            +'<div class="stb-label">'+s.label+'</div>'            +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'            +'</button>';
         });
-        bodyHtml = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,215,0,.6);text-transform:uppercase;margin-bottom:6px;">⚡ QB Stats</div>'          +'<div class="stat-btns" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px;">'+qbBtnHtml+'</div>'          +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:6px;">Receiving / Defense</div>'          +'<div class="stat-btns">'+recBtnHtml+'</div>';
+        bodyHtml = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,215,0,.6);text-transform:uppercase;margin-bottom:6px;">⚡ QB Stats</div>'
+          +'<div class="stat-btns" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px;">'+qbBtnHtml+'</div>'
+          +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:6px;">Receiving / Defense</div>'
+          +'<div class="stat-btns">'+recBtnHtml+'</div>';
       } else {
         var btnHtml = '';
         STAT_KEYS.forEach(function(s) {

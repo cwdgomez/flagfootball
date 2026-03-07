@@ -885,22 +885,14 @@ body.light-mode .toast-msg{color:#1a1714;}
 .sync-box-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--teal);margin-bottom:4px;}
 .sync-box-sub{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
   letter-spacing:2px;color:var(--dimmer);text-transform:uppercase;margin-bottom:18px;}
-.sync-tabs{display:flex;gap:0;border:1px solid var(--dark5);border-radius:10px;overflow:hidden;margin-bottom:16px;}
-.sync-tab{flex:1;padding:9px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
-  letter-spacing:1px;text-align:center;cursor:pointer;background:var(--dark3);color:var(--dimmer);
-  border:none;transition:background .2s,color .2s;text-transform:uppercase;}
-.sync-tab.active{background:rgba(20,184,166,.15);color:var(--teal);}
-.sync-panel{display:none;}.sync-panel.active{display:block;}
+
 .sync-code-display{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:8px;
   text-align:center;color:var(--teal);background:rgba(20,184,166,.08);border-radius:12px;
   padding:16px;margin-bottom:12px;border:2px dashed rgba(20,184,166,.3);}
 .sync-copy-btn{width:100%;border:1px solid rgba(20,184,166,.3);border-radius:10px;padding:10px;
   font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;
   color:var(--teal);background:rgba(20,184,166,.08);cursor:pointer;text-transform:uppercase;margin-bottom:8px;}
-.sync-join-input{width:100%;background:var(--dark3);border:1.5px solid var(--dark5);border-radius:10px;
-  padding:12px;color:var(--txt);font-family:'Bebas Neue',sans-serif;font-size:28px;
-  letter-spacing:6px;text-align:center;outline:none;margin-bottom:12px;text-transform:uppercase;}
-.sync-join-input:focus{border-color:var(--teal);}
+
 .sync-join-btn{width:100%;border:none;border-radius:10px;padding:12px;font-family:'Bebas Neue',sans-serif;
   font-size:20px;letter-spacing:3px;cursor:pointer;margin-bottom:8px;}
 .sync-dismiss{width:100%;border:1px solid var(--dark5);border-radius:10px;padding:10px;
@@ -1583,34 +1575,20 @@ body.light-mode .toast-msg{color:#1a1714;}
   <div class="sync-box">
     <div class="sync-box-title">📡 Live Parent Score</div>
     <div class="sync-box-sub">Parents see live scores on their phone · No app needed</div>
-    <div class="sync-tabs">
-      <button type="button" class="sync-tab active" id="sync-tab-host" onclick="syncSwitchTab('host')">Go Live</button>
-      <button type="button" class="sync-tab" id="sync-tab-join" onclick="syncSwitchTab('join')">View a Game</button>
-    </div>
-    <div class="sync-panel active" id="sync-panel-host">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;">Your game code — share with parents:</div>
-      <div class="sync-code-display" id="sync-host-code">——</div>
-      <button type="button" class="sync-copy-btn" onclick="copySessionCode()">📋 Copy Code</button>
-      <div class="sync-fb-note">Tap Go Live → text parents the link. Scores update automatically every 15 seconds. Works on any phone, no app required.</div>
-      <button type="button" class="sync-join-btn" onclick="hostSession()" style="background:linear-gradient(135deg,var(--teal),#0f766e);color:#fff;">📡 Go Live Now</button>
-      <div id="parent-link-section" style="display:none;margin-top:14px;background:linear-gradient(135deg,rgba(20,184,166,.12),rgba(20,184,166,.06));border:2px solid rgba(20,184,166,.5);border-radius:14px;padding:14px 14px 10px;">
-        <!-- LIVE indicator -->
-        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
-          <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:pulse 1.2s ease-in-out infinite;"></span>
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;color:#14b8a6;">LIVE — Share This Link With Parents</span>
-        </div>
-        <!-- Big link display -->
-        <div id="parent-link-display" style="background:rgba(0,0,0,.4);border:1px solid rgba(20,184,166,.3);border-radius:8px;padding:9px 10px;font-family:monospace;font-size:11px;color:#5eead4;word-break:break-all;margin-bottom:10px;line-height:1.5;">—</div>
-        <!-- Copy button — big and obvious -->
-        <button type="button" onclick="copyParentLink()" style="width:100%;background:linear-gradient(135deg,#14b8a6,#0f766e);border:none;border-radius:10px;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:3px;color:#fff;cursor:pointer;margin-bottom:7px;box-shadow:0 4px 16px rgba(20,184,166,.35);">📋 COPY LINK — TEXT TO PARENTS</button>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,.35);text-align:center;letter-spacing:1px;margin-bottom:8px;">Parents open the link on their phone — no app needed · Updates every 15 sec</div>
-        <button type="button" onclick="stopLiveSync();closeSyncModal();" style="width:100%;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);border-radius:9px;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:#ef4444;cursor:pointer;">⏹ Stop Live Score</button>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;">Your game code — share with parents:</div>
+    <div class="sync-code-display" id="sync-host-code">——</div>
+    <button type="button" class="sync-copy-btn" onclick="copySessionCode()">📋 Copy Code</button>
+    <div class="sync-fb-note">Tap Go Live → text parents the link. Scores update automatically every 15 seconds. Works on any phone, no app required.</div>
+    <button type="button" class="sync-join-btn" onclick="hostSession()" style="background:linear-gradient(135deg,var(--teal),#0f766e);color:#fff;">📡 Go Live Now</button>
+    <div id="parent-link-section" style="display:none;margin-top:14px;background:linear-gradient(135deg,rgba(20,184,166,.12),rgba(20,184,166,.06));border:2px solid rgba(20,184,166,.5);border-radius:14px;padding:14px 14px 10px;">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
+        <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:pulse 1.2s ease-in-out infinite;"></span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;color:#14b8a6;">LIVE — Share This Link With Parents</span>
       </div>
-    </div>
-    <div class="sync-panel" id="sync-panel-join">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;">Enter a 6-character game code to view live:</div>
-      <input type="text" class="sync-join-input" id="sync-join-code-input" maxlength="6" placeholder="A3F9K2" oninput="this.value=this.value.toUpperCase()">
-      <button type="button" class="sync-join-btn" onclick="joinSession()" style="background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;">📱 Open Live View</button>
+      <div id="parent-link-display" style="background:rgba(0,0,0,.4);border:1px solid rgba(20,184,166,.3);border-radius:8px;padding:9px 10px;font-family:monospace;font-size:11px;color:#5eead4;word-break:break-all;margin-bottom:10px;line-height:1.5;">—</div>
+      <button type="button" onclick="copyParentLink()" style="width:100%;background:linear-gradient(135deg,#14b8a6,#0f766e);border:none;border-radius:10px;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:3px;color:#fff;cursor:pointer;margin-bottom:7px;box-shadow:0 4px 16px rgba(20,184,166,.35);">📋 COPY LINK — TEXT TO PARENTS</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,.35);text-align:center;letter-spacing:1px;margin-bottom:8px;">Parents open the link on their phone — no app needed · Updates every 15 sec</div>
+      <button type="button" onclick="stopLiveSync();closeSyncModal();" style="width:100%;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);border-radius:9px;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:#ef4444;cursor:pointer;">⏹ Stop Live Score</button>
     </div>
     <button type="button" class="sync-dismiss" onclick="closeSyncModal()">Dismiss</button>
   </div>
@@ -4266,12 +4244,6 @@ function openSyncModal(){
   });
 }
 function closeSyncModal(){document.getElementById('sync-modal').classList.remove('show');}
-function syncSwitchTab(tab){
-  ['host','join'].forEach(function(t){
-    document.getElementById('sync-tab-'+t).classList.toggle('active',t===tab);
-    document.getElementById('sync-panel-'+t).classList.toggle('active',t===tab);
-  });
-}
 function copySessionCode(){
   var code=document.getElementById('sync-host-code').textContent;
   if(navigator.clipboard)navigator.clipboard.writeText(code).then(function(){showToast('📋 Code copied: '+code);});
@@ -4323,15 +4295,6 @@ function stopLiveSync(){
   resetSyncBar();
   var section=document.getElementById('parent-link-section');
   if(section)section.style.display='none';
-}
-
-function joinSession(){
-  var code=document.getElementById('sync-join-code-input').value.trim().toUpperCase();
-  if(code.length!==6){showToast('❌ Enter the 6-character game code');return;}
-  closeSyncModal();
-  var base=window.location.href.replace(/[^/]*$|app\.html[^/]*/,'');
-  window.open(base+'parent.html?code='+encodeURIComponent(code),'_blank');
-  showToast('📱 Opening parent view for code: '+code);
 }
 
 function syncPush(){
@@ -4454,8 +4417,9 @@ function startCocoachChannel(){
       broadcastGameStateToCoach();
       showToast('🤝 Stat coach connected!');
     })
-    .subscribe();
-  broadcastGameStateToCoach();
+    .subscribe(function(status){
+      if(status==='SUBSCRIBED') broadcastGameStateToCoach();
+    });
 }
 
 function broadcastGameStateToCoach(){
