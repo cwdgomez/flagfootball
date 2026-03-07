@@ -4459,7 +4459,7 @@ function startCocoachChannel(){
 }
 
 function broadcastGameStateToCoach(){
-  if(!cocoachChannel||!syncActive)return;
+  if(!cocoachChannel)return;
   var rotsCurrent={};
   ALL_PLAYERS.forEach(function(n){
     if(G.rots[n]&&G.rots[n][G.cq])rotsCurrent[n]=G.rots[n][G.cq].onField;
