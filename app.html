@@ -1057,7 +1057,7 @@ body.light-mode .toast-msg{color:#1a1714;}
   </div>
   <div class="gate-contact">
     Need access or want to purchase?<br>
-    Contact: <a href="mailto:cgmaxfftp@itcc.llc" style="color:rgba(255,215,0,.6);text-decoration:none;">cgmaxfftp@itcc.llc</a><br>
+    Contact: <a href="/cdn-cgi/l/email-protection#c9aaaea4a8b1afafbdb989a0bdaaaae7a5a5aa" style="color:rgba(255,215,0,.6);text-decoration:none;"><span class="__cf_email__" data-cfemail="d2b1b5bfb3aab4b4a6a292bba6b1b1fcbebeb1">[email&#160;protected]</span></a><br>
     <span style="opacity:.5;font-size:10px;letter-spacing:1px;margin-top:4px;display:block;">
       © ITCC LLC · All Rights Reserved · Youth Sports Technology
     </span>
@@ -1350,7 +1350,7 @@ body.light-mode .toast-msg{color:#1a1714;}
       </div>
     </div>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:6px 12px 2px;">
+  <div id="quick-action-strip" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:6px 12px 2px;">
     <button type="button" onclick="proGate('tournament',function(){window.open('./tournament.html','_blank')})"
       style="background:rgba(170,0,0,.1);border:1px solid rgba(170,0,0,.28);border-radius:8px;padding:6px 4px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.55);text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;">🏆 Tournament<span class="pro-badge" style="margin-left:3px;">PRO</span></button>
     <button type="button" onclick="proGate('playdesigner',function(){window.open('./playdesigner.html','_blank')})"
@@ -1358,6 +1358,8 @@ body.light-mode .toast-msg{color:#1a1714;}
     <button type="button" class="voice-btn" id="voice-btn" onclick="proGate('voice',openVoice)" style="border-radius:8px;padding:6px 4px;font-size:11px;justify-content:center;margin:0;width:100%;height:auto;">
       <span class="voice-icon" style="font-size:13px;">🎙️</span><span style="font-size:11px;letter-spacing:.5px;">Voice Log<span class="pro-badge">PRO</span></span>
     </button>
+    <button type="button" id="statcoach-btn" onclick="copyCocoachLink()"
+      style="display:none;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.4);border-radius:8px;padding:6px 4px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:rgba(168,85,247,.9);text-align:center;align-items:center;justify-content:center;gap:4px;">🤝 Stat Coach</button>
   </div>
   <div class="nav-tabs">
     <div class="nav-tab active" onclick="switchTab('stats')">📊 Stats</div>
@@ -1644,7 +1646,7 @@ body.light-mode .toast-msg{color:#1a1714;}
   <button type="button" class="toast-undo" id="toast-undo-btn" onclick="undoLast()">UNDO</button>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ── COLOR HELPERS ── */
 function hexToRgb(hex){
   if(!hex) return {r:0,g:0,b:0};
@@ -4245,9 +4247,14 @@ function hostSession(){
   syncActive=true;
   showSyncBar('Live · Code: '+syncSession,'online',syncSession);
   updateParentLinkUI();
-  // Show co-coach link section
+  // Show co-coach link section (inside sync modal)
   var ccSection=document.getElementById('cocoach-link-section');
   if(ccSection)ccSection.style.display='block';
+  // Show stat coach quick-action button + expand grid to 4 cols
+  var scBtn=document.getElementById('statcoach-btn');
+  if(scBtn){scBtn.style.display='flex';}
+  var strip=document.getElementById('quick-action-strip');
+  if(strip){strip.style.gridTemplateColumns='1fr 1fr 1fr 1fr';}
   showToast('📡 Live scoreboard ON! Parents can open the link now.');
   syncPush();
   if(syncInterval)clearInterval(syncInterval);
@@ -4272,6 +4279,11 @@ function stopLiveSync(){
   if(cocoachChannel){try{sbClient.removeChannel(cocoachChannel);}catch(e){}cocoachChannel=null;}
   var ccSection=document.getElementById('cocoach-link-section');
   if(ccSection)ccSection.style.display='none';
+  // Hide stat coach quick-action button + collapse grid back to 3 cols
+  var scBtn=document.getElementById('statcoach-btn');
+  if(scBtn){scBtn.style.display='none';}
+  var strip=document.getElementById('quick-action-strip');
+  if(strip){strip.style.gridTemplateColumns='1fr 1fr 1fr';}
   resetSyncBar();
   var section=document.getElementById('parent-link-section');
   if(section)section.style.display='none';
@@ -5683,18 +5695,4 @@ saveNote=function(name,val){
   if(CURRENT_USER&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
     try{
       var allNotes=JSON.parse(localStorage.getItem('ff_notes')||'{}');
-      SYNC_ENGINE.queueChange(ACTIVE_TEAM_ID,'notes',allNotes);
-    }catch(e){}
-  }
-};
-
-/* ── Init auth on app load ── */
-var _authOrigOnload=window.onload;
-window.onload=function(){
-  if(_authOrigOnload)_authOrigOnload();
-  initSupabaseAuth();
-};
-
-</script>
-</body>
-</html>
+      SYNC_ENGINE.queueChange(ACTIVE_TEAM
