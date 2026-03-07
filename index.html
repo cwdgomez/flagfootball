@@ -371,6 +371,47 @@ nav{
 .lm-pill-td{background:rgba(34,197,94,.14);color:#22C55E;border:1px solid rgba(34,197,94,.3);}
 .lm-pill-f{background:rgba(59,130,246,.14);color:#3B82F6;border:1px solid rgba(59,130,246,.3);}
 
+/* ── STAT COACH / CO-COACHING BAND ── */
+.coach-band{
+  position:relative;z-index:10;
+  background:linear-gradient(135deg,rgba(59,130,246,.1) 0%,rgba(0,0,0,0) 50%,rgba(255,215,0,.05) 100%);
+  border-top:1px solid rgba(59,130,246,.2);border-bottom:1px solid rgba(59,130,246,.2);
+  padding:70px 20px;overflow:hidden;
+}
+@media(max-width:480px){.coach-band{padding:52px 16px;}}
+.coach-band-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;}
+@media(max-width:700px){.coach-band-inner{grid-template-columns:1fr;gap:32px;}}
+.coach-band-glow{position:absolute;top:50%;right:25%;transform:translate(50%,-50%);
+  width:500px;height:500px;background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(59,130,246,.1),transparent);
+  pointer-events:none;}
+.coach-band-text .sec-eyebrow{margin-bottom:8px;}
+.coach-band-text h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5.5vw,54px);letter-spacing:2px;line-height:1;margin-bottom:14px;}
+.coach-band-text p{font-family:'Barlow',sans-serif;font-size:15px;line-height:1.7;color:rgba(255,255,255,.55);margin-bottom:20px;}
+.coach-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:24px;}
+.coach-step{display:flex;align-items:flex-start;gap:12px;}
+.coach-step-num{width:26px;height:26px;border-radius:50%;background:rgba(59,130,246,.9);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.coach-step-txt{font-family:'Barlow',sans-serif;font-size:14px;color:rgba(255,255,255,.6);line-height:1.5;}
+.coach-step-txt strong{color:rgba(255,255,255,.85);}
+/* Coach mockup */
+.coach-mockup{display:flex;gap:16px;align-items:flex-start;}
+@media(max-width:700px){.coach-mockup{flex-direction:column;align-items:center;gap:20px;}}
+.cm-device{background:rgba(6,6,6,.9);border:1px solid rgba(59,130,246,.25);border-radius:16px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.7);flex:1;max-width:230px;}
+.cm-device.primary{border-color:rgba(255,215,0,.25);}
+.cm-device-hdr{padding:7px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid rgba(59,130,246,.3);}
+.cm-device.primary .cm-device-hdr{border-bottom-color:rgba(255,215,0,.3);}
+.cm-device-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(59,130,246,.7);text-transform:uppercase;}
+.cm-device.primary .cm-device-label{color:rgba(255,215,0,.7);}
+.cm-device-dot{width:6px;height:6px;border-radius:50%;background:#3B82F6;animation:livePulse 1.4s ease-in-out infinite;}
+.cm-device.primary .cm-device-dot{background:var(--gold);}
+.cm-device-body{padding:12px 10px;font-family:'Barlow',sans-serif;font-size:11px;color:rgba(255,255,255,.5);line-height:1.6;}
+.cm-stat-line{display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid #111;}
+.cm-stat-line:last-child{border-bottom:none;}
+.cm-stat-name{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:#aaa;}
+.cm-stat-badge{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:rgba(34,197,94,.14);color:#22C55E;border:1px solid rgba(34,197,94,.3);}
+.cm-stat-badge.flag{background:rgba(59,130,246,.14);color:#3B82F6;border-color:rgba(59,130,246,.3);}
+.cm-sync-arrow{font-size:28px;color:rgba(59,130,246,.4);align-self:center;flex-shrink:0;}
+@media(max-width:700px){.cm-sync-arrow{transform:rotate(90deg);}}
+
 /* ── NEW FEATURES BAND ── */
 .new-band{position:relative;z-index:10;
   background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(20,184,166,.06));
@@ -787,6 +828,64 @@ footer{
   </div>
 </section>
 
+<!-- STAT COACH / CO-COACHING FEATURE -->
+<section class="coach-band" id="stat-coach">
+  <div class="coach-band-glow"></div>
+  <div class="coach-band-inner">
+    <!-- Mockup side (left on desktop) -->
+    <div class="coach-mockup reveal">
+      <div class="cm-device primary">
+        <div class="cm-device-hdr">
+          <div class="cm-device-label">Head Coach</div>
+          <div class="cm-device-dot"></div>
+        </div>
+        <div class="cm-device-body">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;color:#555;text-transform:uppercase;margin-bottom:6px;">Live Game — Q2</div>
+          <div class="cm-stat-line"><div class="cm-stat-name">Jaxon B.</div><div class="cm-stat-badge">2 TD</div></div>
+          <div class="cm-stat-line"><div class="cm-stat-name">Reed J.</div><div class="cm-stat-badge flag">3 Flag</div></div>
+          <div class="cm-stat-line"><div class="cm-stat-name">Cade A.</div><div class="cm-stat-badge">1 TD</div></div>
+          <div class="cm-stat-line"><div class="cm-stat-name">Phoenix O.</div><div class="cm-stat-badge flag">2 Flag</div></div>
+          <div style="margin-top:8px;padding:5px 8px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:6px;font-size:10px;color:rgba(34,197,94,.7);text-align:center;">Stat Coach connected</div>
+        </div>
+      </div>
+      <div class="cm-sync-arrow">⇄</div>
+      <div class="cm-device">
+        <div class="cm-device-hdr">
+          <div class="cm-device-label">Stat Coach</div>
+          <div class="cm-device-dot"></div>
+        </div>
+        <div class="cm-device-body">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;color:#555;text-transform:uppercase;margin-bottom:6px;">Logging Stats</div>
+          <div class="cm-stat-line"><div class="cm-stat-name">Reed J.</div><div class="cm-stat-badge flag">+1 Flag</div></div>
+          <div class="cm-stat-line"><div class="cm-stat-name">Jaxon B.</div><div class="cm-stat-badge">+1 Catch</div></div>
+          <div style="margin-top:8px;padding:5px 8px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:6px;font-size:10px;color:rgba(59,130,246,.7);text-align:center;">Synced with Head Coach</div>
+        </div>
+      </div>
+    </div>
+    <!-- Text side -->
+    <div class="coach-band-text reveal">
+      <div class="sec-eyebrow">Pro Feature</div>
+      <h2>Stat Coach — <span class="acc">Co-Coaching</span></h2>
+      <p>Hand a second phone to your assistant coach or a parent volunteer. They log stats from their own device and everything syncs to yours in real time — no shared screen, no shouting across the field.</p>
+      <div class="coach-steps">
+        <div class="coach-step">
+          <div class="coach-step-num">1</div>
+          <div class="coach-step-txt"><strong>Tap "Stat Coach"</strong> in the Live Sync panel — a unique game link is created for your assistant</div>
+        </div>
+        <div class="coach-step">
+          <div class="coach-step-num">2</div>
+          <div class="coach-step-txt"><strong>Share the link</strong> with your co-coach — they open it in any browser, no app install or account needed</div>
+        </div>
+        <div class="coach-step">
+          <div class="coach-step-num">3</div>
+          <div class="coach-step-txt"><strong>Both coaches log stats simultaneously</strong> — touchdowns, catches, flag pulls, and more merge in real time on both devices</div>
+        </div>
+      </div>
+      <a href="./app.html" class="btn-gold" style="display:inline-flex;font-size:17px;padding:13px 28px;">⚡ Open The App</a>
+    </div>
+  </div>
+</section>
+
 <!-- WHAT'S NEW -->
 <section class="new-band" id="new">
   <div class="new-band-inner">
@@ -868,7 +967,7 @@ footer{
       <div class="plan-col">
         <div class="plan-badge lite">Free</div>
         <div class="plan-name">Lite</div>
-        <div class="plan-price">No cost · No account · No code needed</div>
+        <div class="plan-price">No cost · Optional free account · No code needed</div>
         <div class="plan-divider"></div>
         <div class="plan-features">
           <div class="pf-row">
@@ -920,12 +1019,12 @@ footer{
             <div class="pf-text active">Full Offline Mode — works with zero internet</div>
           </div>
           <div class="pf-row">
-            <div class="pf-icon no">✕</div>
-            <div class="pf-text inactive">Sign In — Google, Apple, or Email Link</div>
+            <div class="pf-icon yes">✓</div>
+            <div class="pf-text active">Free Sign In — Google, Apple, or Email link (optional account)</div>
           </div>
           <div class="pf-row">
-            <div class="pf-icon no">✕</div>
-            <div class="pf-text inactive">Cross-Device Cloud Sync — your data on every device</div>
+            <div class="pf-icon yes">✓</div>
+            <div class="pf-text active">Basic Cloud Sync — roster, colors, notes &amp; settings across devices</div>
           </div>
           <div class="pf-row">
             <div class="pf-icon no">✕</div>
@@ -965,7 +1064,7 @@ footer{
           </div>
         </div>
         <div class="plan-cta-area">
-          <div class="plan-cta-note">Free forever — no account needed</div>
+          <div class="plan-cta-note">Free forever — optional account for cloud sync</div>
           <a href="./app.html" class="plan-cta-btn lite-launch">⚡ Launch App</a>
         </div>
       </div>
@@ -988,7 +1087,7 @@ footer{
           </div>
           <div class="pf-row">
             <div class="pf-icon yes-pro">✓</div>
-            <div class="pf-text pro-active">Cross-Device Cloud Sync — your roster &amp; stats on every device, automatically</div>
+            <div class="pf-text pro-active">Full Cloud Sync — season history, photos, plays, multi-team &amp; everything else</div>
           </div>
           <div class="pf-row">
             <div class="pf-icon yes-pro">✓</div>
