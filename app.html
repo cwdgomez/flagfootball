@@ -995,6 +995,24 @@ body.light-mode .toast-msg{color:#1a1714;}
 .recap-dl-btn{background:var(--dark3);border:1px solid var(--dark5);border-radius:12px;padding:14px 16px;font-family:'Barlow Condensed',sans-serif;font-size:20px;color:var(--dim);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .recap-dl-btn:active{opacity:.8;}
 .recap-skip{background:transparent;border:none;padding:8px 20px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;color:var(--dimmer);cursor:pointer;text-transform:uppercase;}
+/* ── ROSTER SHARE / IMPORT MODALS ── */
+#roster-share-modal,#roster-import-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9995;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+#roster-share-modal.open,#roster-import-modal.open{display:flex;}
+.rsm-box{background:var(--dark2);border:1px solid var(--dark5);border-radius:20px;padding:28px 24px;width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:16px;}
+.rsm-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:var(--s);text-align:center;}
+.rsm-sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:var(--dim);text-align:center;line-height:1.5;}
+.rsm-code-wrap{background:var(--dark3);border:2px solid rgba(255,215,0,.3);border-radius:14px;padding:18px 24px;text-align:center;width:100%;}
+.rsm-code{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:8px;color:var(--s);line-height:1;}
+.rsm-expiry{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;color:var(--dimmer);margin-top:6px;text-transform:uppercase;}
+.rsm-includes{background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.2);border-radius:10px;padding:10px 14px;width:100%;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.5px;color:var(--teal);line-height:1.7;}
+.rsm-copy-btn{width:100%;background:linear-gradient(135deg,#14b8a6,#0d9488);border:none;border-radius:12px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;cursor:pointer;}
+.rsm-copy-btn:active{opacity:.8;}
+.rsm-close{background:none;border:none;padding:6px 16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;color:var(--dimmer);cursor:pointer;text-transform:uppercase;}
+.rsm-input{width:100%;background:var(--dark3);border:2px solid var(--dark5);border-radius:12px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:6px;color:var(--txt);text-align:center;text-transform:uppercase;outline:none;transition:border-color .2s;}
+.rsm-input:focus{border-color:rgba(59,130,246,.5);}
+.rsm-import-btn{width:100%;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border:none;border-radius:12px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;cursor:pointer;}
+.rsm-import-btn:active{opacity:.8;}
+.rsm-error{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:#ef4444;text-align:center;min-height:18px;letter-spacing:.5px;}
 </style>
 </head>
 <body>
@@ -1466,8 +1484,9 @@ body.light-mode .toast-msg{color:#1a1714;}
     </div>
     <div class="roster-sec" style="margin-top:18px">Actions</div>
     <div class="roster-actions">
-      <button type="button" class="ract-btn ract-share" onclick="shareRosterURL()">🔗 Share Roster URL</button>
-      <button type="button" class="ract-btn ract-reset" onclick="resetToDefault()">↩ Reset to Default</button>
+      <button type="button" class="ract-btn ract-share" onclick="shareRoster()">&#128279; Share Roster</button>
+      <button type="button" class="ract-btn ract-import-roster" onclick="openRosterImportModal()">&#128229; Import Roster</button>
+      <button type="button" class="ract-btn ract-reset" onclick="resetToDefault()">&#8617; Reset to Default</button>
     </div>
   </div>
 </div>
@@ -1661,6 +1680,33 @@ body.light-mode .toast-msg{color:#1a1714;}
 <div class="undo-toast" id="toast">
   <div class="toast-msg" id="toast-msg">Logged</div>
   <button type="button" class="toast-undo" id="toast-undo-btn" onclick="undoLast()">UNDO</button>
+</div>
+
+<!-- ROSTER SHARE MODAL -->
+<div id="roster-share-modal" role="dialog" aria-modal="true" aria-label="Share Roster">
+  <div class="rsm-box">
+    <div class="rsm-title">&#128279; Share Roster</div>
+    <div class="rsm-sub">Give this code to your assistant coach.<br>It expires in 48 hours.</div>
+    <div class="rsm-code-wrap">
+      <div class="rsm-code" id="rsm-code-display">------</div>
+      <div class="rsm-expiry" id="rsm-expiry-label">Generating...</div>
+    </div>
+    <div class="rsm-includes" id="rsm-includes-label">&#10003; Players &amp; Numbers &nbsp;&#10003; Team Colors</div>
+    <button type="button" class="rsm-copy-btn" id="rsm-copy-btn" onclick="copyRosterCode()">&#128203; Copy Code</button>
+    <button type="button" class="rsm-close" onclick="closeRosterShareModal()">Done</button>
+  </div>
+</div>
+
+<!-- ROSTER IMPORT MODAL -->
+<div id="roster-import-modal" role="dialog" aria-modal="true" aria-label="Import Roster">
+  <div class="rsm-box">
+    <div class="rsm-title">&#128229; Import Roster</div>
+    <div class="rsm-sub">Enter the 6-character code from your head coach.</div>
+    <input type="text" class="rsm-input" id="rsm-import-input" maxlength="6" placeholder="ABC123" autocomplete="off" autocorrect="off" spellcheck="false">
+    <div class="rsm-error" id="rsm-import-error"></div>
+    <button type="button" class="rsm-import-btn" id="rsm-import-btn" onclick="submitImportCode()">&#128229; Import Roster</button>
+    <button type="button" class="rsm-close" onclick="closeRosterImportModal()">Cancel</button>
+  </div>
 </div>
 
 <!-- POST-GAME RECAP CARD MODAL -->
@@ -3410,14 +3456,164 @@ function resetToDefault(){
   renderRosterScreen();
   showToast('Reset to default roster');
 }
-function shareRosterURL(){
+var ROSTER_SHARE_URL='https://cgmax-fftp-backend.vercel.app/api/roster-share';
+var _rosterShareCode='';
+
+async function shareRoster(){
+  // Need to be signed in
+  if(!sbClient){showToast('Sign in to share your roster');return;}
+  var session=null;
+  try{var sr=await sbClient.auth.getSession();session=sr.data.session;}catch(e){}
+  if(!session){showToast('Sign in to share your roster');return;}
+
+  // Show modal immediately with loading state
+  var modal=document.getElementById('roster-share-modal');
+  document.getElementById('rsm-code-display').textContent='......';
+  document.getElementById('rsm-expiry-label').textContent='Generating code...';
+  document.getElementById('rsm-includes-label').innerHTML='&#10003; Players &amp; Numbers &nbsp;&#10003; Team Colors';
+  modal.classList.add('open');
+
+  // Build payload
+  var photos=null;
+  if(isPro()){
+    try{
+      var allPhotos=loadPhotos();
+      var teamPhotos={};
+      LIVE_ROSTER.forEach(function(p){if(allPhotos[p.name])teamPhotos[p.name]=allPhotos[p.name];});
+      if(Object.keys(teamPhotos).length>0)photos=teamPhotos;
+    }catch(e){}
+  }
+
   try{
-    var encoded=btoa(JSON.stringify(LIVE_ROSTER));
-    var base=window.location.href.split('?')[0];
-    var url=base+'?roster='+encoded;
-    if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){showToast('Roster URL copied!');});}
-    else{prompt('Share this URL:',url);}
-  }catch(e){showToast('Could not generate URL');}
+    var resp=await fetch(ROSTER_SHARE_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},
+      body:JSON.stringify({
+        roster:LIVE_ROSTER,
+        colors:{primary:TC.primary,secondary:TC.secondary},
+        teamName:G.team||'',
+        photos:photos
+      })
+    });
+    var data=await resp.json();
+    if(!resp.ok||data.error){
+      modal.classList.remove('open');
+      showToast(data.error||'Could not create share code');
+      return;
+    }
+    _rosterShareCode=data.code;
+    document.getElementById('rsm-code-display').textContent=data.code;
+    // Show expiry as local time
+    var exp=new Date(data.expiresAt);
+    document.getElementById('rsm-expiry-label').textContent='Expires '+exp.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' at '+exp.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    // Show what's included
+    var inc='&#10003; Players &amp; Numbers &nbsp;&#10003; Team Colors';
+    if(photos)inc+=' &nbsp;&#10003; Player Photos';
+    document.getElementById('rsm-includes-label').innerHTML=inc;
+  }catch(e){
+    modal.classList.remove('open');
+    showToast('Network error — check connection');
+  }
+}
+
+function copyRosterCode(){
+  if(!_rosterShareCode)return;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(_rosterShareCode).then(function(){showToast('Code copied! \u2014 '+_rosterShareCode);});
+  }else{
+    prompt('Share this code with your assistant coach:',_rosterShareCode);
+  }
+}
+
+function closeRosterShareModal(){
+  var modal=document.getElementById('roster-share-modal');
+  if(modal)modal.classList.remove('open');
+  _rosterShareCode='';
+}
+
+function openRosterImportModal(){
+  document.getElementById('rsm-import-input').value='';
+  document.getElementById('rsm-import-error').textContent='';
+  document.getElementById('rsm-import-btn').disabled=false;
+  document.getElementById('rsm-import-btn').textContent='\u{1F4E5} Import Roster';
+  var modal=document.getElementById('roster-import-modal');
+  modal.classList.add('open');
+  setTimeout(function(){document.getElementById('rsm-import-input').focus();},200);
+}
+
+function closeRosterImportModal(){
+  var modal=document.getElementById('roster-import-modal');
+  if(modal)modal.classList.remove('open');
+}
+
+async function submitImportCode(){
+  var code=(document.getElementById('rsm-import-input').value||'').trim().toUpperCase();
+  var errEl=document.getElementById('rsm-import-error');
+  var btn=document.getElementById('rsm-import-btn');
+  errEl.textContent='';
+
+  if(!code||code.length!==6){
+    errEl.textContent='Enter the full 6-character code.';
+    return;
+  }
+
+  btn.disabled=true;
+  btn.textContent='Looking up code...';
+
+  try{
+    var resp=await fetch(ROSTER_SHARE_URL+'?code='+encodeURIComponent(code));
+    var data=await resp.json();
+
+    if(!resp.ok||data.error){
+      errEl.textContent=data.error||'Code not found. Double-check and try again.';
+      btn.disabled=false;
+      btn.textContent='\u{1F4E5} Import Roster';
+      return;
+    }
+
+    // Build preview for confirm dialog
+    var playerList=(data.roster||[]).slice(0,5).map(function(p){return '#'+p.num+' '+p.name;}).join(', ');
+    if((data.roster||[]).length>5)playerList+=' + '+(data.roster.length-5)+' more';
+    var includesPhotos=data.photos&&isPro()?' + photos':'';
+    var msg='Import roster from '+(data.teamName||'another coach')+'?\n\n'+playerList+includesPhotos+'\n\nThis will replace your current roster.';
+
+    if(!confirm(msg)){
+      btn.disabled=false;
+      btn.textContent='\u{1F4E5} Import Roster';
+      return;
+    }
+
+    // Apply roster
+    LIVE_ROSTER=(data.roster||[]).map(function(p){return{name:String(p.name||'').trim(),num:parseInt(p.num)||0};});
+    saveRosterData(LIVE_ROSTER);
+
+    // Apply colors
+    if(data.colors&&data.colors.primary&&data.colors.secondary){
+      TC.primary=data.colors.primary;
+      TC.secondary=data.colors.secondary;
+      var tcKey='ff_tc_'+(ACTIVE_TEAM_ID||'default');
+      try{localStorage.setItem(tcKey,JSON.stringify(TC));}catch(e){}
+      applyTeamColors();
+    }
+
+    // Apply photos (Pro only)
+    if(data.photos&&isPro()){
+      var existingPhotos=loadPhotos();
+      Object.keys(data.photos).forEach(function(name){
+        existingPhotos[name]=data.photos[name];
+      });
+      savePhotos(existingPhotos);
+    }
+
+    closeRosterImportModal();
+    renderRosterScreen();
+    showToast('\u2705 Roster imported \u2014 '+LIVE_ROSTER.length+' players');
+
+  }catch(e){
+    errEl.textContent='Network error \u2014 check your connection.';
+    btn.disabled=false;
+    btn.textContent='\u{1F4E5} Import Roster';
+  }
 }
 
 
