@@ -5734,4 +5734,9 @@ saveNote=function(name,val){
   if(CURRENT_USER&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
     try{
       var allNotes=JSON.parse(localStorage.getItem('ff_notes')||'{}');
-      SYNC_ENGINE.queueChange(ACTIVE_TEAM
+      SYNC_ENGINE.queueChange(ACTIVE_TEAM_ID,'notes',allNotes);
+    }catch(e){}
+  }
+};
+</script>
+</html>
