@@ -839,6 +839,14 @@ body.light-mode .toast-msg{color:#1a1714;}
   color:var(--s);background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);border-radius:6px;
   padding:3px 8px;cursor:pointer;white-space:nowrap;display:none;-webkit-tap-highlight-color:transparent;}
 .sync-parent-btn:active{background:rgba(255,215,0,.22);}
+.statcoach-bar{background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.25);border-radius:10px;
+  padding:7px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  margin-bottom:4px;font-family:'Barlow Condensed',sans-serif;}
+.statcoach-bar.hidden{display:none;}
+.statcoach-copy-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;
+  color:#c084fc;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);border-radius:6px;
+  padding:3px 8px;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
+.statcoach-copy-btn:active{background:rgba(168,85,247,.25);}
 
 /* ── PRO SYSTEM ── */
 .pro-badge{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;
@@ -1350,6 +1358,35 @@ body.light-mode .toast-msg{color:#1a1714;}
       </div>
     </div>
   </div>
+
+  <!-- STAT COACH BAR -->
+  <div class="statcoach-bar" id="statcoach-bar">
+    <!-- INACTIVE STATE -->
+    <div id="statcoach-bar-inactive" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:12px;">🤝</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.4);">STAT COACH</span>
+      </div>
+      <button type="button" onclick="proGate('statcoach',activateStatCoach)"
+        style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);border-radius:6px;padding:4px 12px;
+               font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;
+               color:#c084fc;cursor:pointer;">ACTIVATE<span class="pro-badge" style="margin-left:4px;">PRO</span></button>
+    </div>
+    <!-- ACTIVE STATE -->
+    <div id="statcoach-bar-active" style="display:none;align-items:center;justify-content:space-between;width:100%;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:#a855f7;box-shadow:0 0 6px #a855f7;flex-shrink:0;animation:pulse 1.2s ease-in-out infinite;"></div>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:#c084fc;">Stat Coach Active</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <button type="button" class="statcoach-copy-btn" onclick="copyCocoachLink()">🤝 Copy Link</button>
+        <button type="button" onclick="deactivateStatCoach()"
+          style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;
+                 color:rgba(239,68,68,.7);background:transparent;border:none;cursor:pointer;padding:3px 4px;">✕</button>
+      </div>
+    </div>
+  </div>
+
   <div id="quick-action-strip" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:6px 12px 2px;">
     <button type="button" onclick="proGate('tournament',function(){window.open('./tournament.html','_blank')})"
       style="background:rgba(170,0,0,.1);border:1px solid rgba(170,0,0,.28);border-radius:8px;padding:6px 4px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.55);text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;">🏆 Tournament<span class="pro-badge" style="margin-left:3px;">PRO</span></button>
@@ -4289,6 +4326,11 @@ function stopLiveSync(){
   if(scBtn){scBtn.style.display='none';}
   var strip=document.getElementById('quick-action-strip');
   if(strip){strip.style.gridTemplateColumns='1fr 1fr 1fr';}
+  // Reset stat coach bar to inactive (session is ending)
+  var scInactive=document.getElementById('statcoach-bar-inactive');
+  var scActive=document.getElementById('statcoach-bar-active');
+  if(scInactive)scInactive.style.display='flex';
+  if(scActive)scActive.style.display='none';
   resetSyncBar();
   var section=document.getElementById('parent-link-section');
   if(section)section.style.display='none';
@@ -4459,7 +4501,7 @@ function generateCocoachLink(){
 
 function copyCocoachLink(){
   var link=generateCocoachLink();
-  if(!link||!syncActive){showToast('❌ Tap "Go Live" first');return;}
+  if(!link){showToast('❌ Activate Stat Coach first');return;}
   if(navigator.clipboard){
     navigator.clipboard.writeText(link).then(function(){showToast('🤝 Stat coach link copied!');}).catch(fallback);
   }else{fallback();}
@@ -4470,6 +4512,25 @@ function copyCocoachLink(){
     try{document.execCommand('copy');showToast('🤝 Stat coach link copied!');}catch(e){showToast('📋 Copy the stat coach link');}
     document.body.removeChild(ta);
   }
+}
+
+function activateStatCoach(){
+  if(!syncSession)syncSession=genSessionCode();
+  startCocoachChannel();
+  var inactive=document.getElementById('statcoach-bar-inactive');
+  var active=document.getElementById('statcoach-bar-active');
+  if(inactive)inactive.style.display='none';
+  if(active)active.style.display='flex';
+  copyCocoachLink();
+}
+
+function deactivateStatCoach(){
+  if(cocoachChannel){try{sbClient.removeChannel(cocoachChannel);}catch(e){}cocoachChannel=null;}
+  var inactive=document.getElementById('statcoach-bar-inactive');
+  var active=document.getElementById('statcoach-bar-active');
+  if(inactive)inactive.style.display='flex';
+  if(active)active.style.display='none';
+  showToast('🤝 Stat Coach deactivated');
 }
 
 // Open consent form — passes team name and season for pre-fill
