@@ -1802,7 +1802,15 @@ function loadRosterData(){
   try{var saved=JSON.parse(localStorage.getItem(LS_ROSTER));if(Array.isArray(saved)&&saved.length>0)return saved.map(migratePlayer);}catch(e){}
   return DEFAULT_ROSTER.map(function(p){return {name:p.name,num:p.num};});
 }
-function saveRosterData(roster){try{localStorage.setItem(LS_ROSTER,JSON.stringify(roster));}catch(e){}}
+function saveRosterData(roster){
+  try{localStorage.setItem(LS_ROSTER,JSON.stringify(roster));}
+  catch(e){
+    console.warn('saveRosterData failed:',e);
+    if(e&&(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED')){
+      showToast('⚠️ Storage full — roster not saved. Clear old data in Settings.');
+    }
+  }
+}
 
 var LIVE_ROSTER=[];
 var PLAYER_DATA={};
@@ -1878,7 +1886,12 @@ function saveGameState(){
       screen:document.getElementById('screen-main').classList.contains('active')?'main':'setup'
     };
     localStorage.setItem(LS_GAME_STATE,JSON.stringify(snap));
-  }catch(e){}
+  }catch(e){
+    console.warn('saveGameState failed:',e);
+    if(e&&(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED')){
+      showToast('⚠️ Storage full — game state not saved. Clear old data in Settings.');
+    }
+  }
 }
 
 function clearSavedGameState(){
@@ -2185,7 +2198,15 @@ function loadTeams(){
   try{var t=JSON.parse(localStorage.getItem(LS_TEAMS));if(Array.isArray(t)&&t.length>0)return t;}catch(e){}
   return [{id:'default',name:'My Team'}];
 }
-function saveTeams(teams){try{localStorage.setItem(LS_TEAMS,JSON.stringify(teams));}catch(e){}}
+function saveTeams(teams){
+  try{localStorage.setItem(LS_TEAMS,JSON.stringify(teams));}
+  catch(e){
+    console.warn('[FFTP] saveTeams failed:',e);
+    if(e&&(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED')){
+      showToast('⚠️ Storage full — team data not saved. Use Cloud Backup to free space.');
+    }
+  }
+}
 function getActiveTeamName(){var teams=loadTeams();var t=teams.find(function(x){return x.id===ACTIVE_TEAM_ID;});return t?t.name:'My Team';}
 
 /* Switch to a different team — reloads roster, season, notes, colors */
@@ -2207,7 +2228,8 @@ function setActiveTeam(id){
 
 /* Save current colors to active team */
 function saveTeamColors(){
-  try{localStorage.setItem(getTeamColorsKey(ACTIVE_TEAM_ID),JSON.stringify({primary:TC.primary,secondary:TC.secondary}));}catch(e){}
+  try{localStorage.setItem(getTeamColorsKey(ACTIVE_TEAM_ID),JSON.stringify({primary:TC.primary,secondary:TC.secondary}));}
+  catch(e){console.warn('[FFTP] saveTeamColors failed:',e);}
 }
 
 /* ── TEAMS MODAL ── */
@@ -2907,7 +2929,8 @@ function doReset(){
 /* ── COACH NOTES ── */
 function saveNote(name,val){
   G.notes[name]=val;
-  try{var saved=JSON.parse(localStorage.getItem('ff_notes')||'{}');saved[name]=val;localStorage.setItem('ff_notes',JSON.stringify(saved));}catch(e){}
+  try{var saved=JSON.parse(localStorage.getItem('ff_notes')||'{}');saved[name]=val;localStorage.setItem('ff_notes',JSON.stringify(saved));}
+  catch(e){console.warn('[FFTP] saveNote failed:',e);}
 }
 function loadNotes(){
   try{G.notes=JSON.parse(localStorage.getItem('ff_notes')||'{}')||{};}catch(e){G.notes={};}
@@ -2916,7 +2939,15 @@ function loadNotes(){
 /* ── SEASON / localStorage ── */
 var LS_KEY='ff_season_v1';
 function loadSeason(){try{return JSON.parse(localStorage.getItem(LS_KEY))||[];}catch(e){return[];}}
-function saveSeason(games){try{localStorage.setItem(LS_KEY,JSON.stringify(games));}catch(e){}}
+function saveSeason(games){
+  try{localStorage.setItem(LS_KEY,JSON.stringify(games));}
+  catch(e){
+    console.warn('saveSeason failed:',e);
+    if(e&&(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED')){
+      showToast('⚠️ Storage full — season not saved. Export a backup then clear old data in Settings.');
+    }
+  }
+}
 
 function endAndSave(){
   if(!confirm('Save this game to Season History?'))return;
@@ -3604,7 +3635,8 @@ async function submitImportCode(){
       TC.primary=data.colors.primary;
       TC.secondary=data.colors.secondary;
       var tcKey='ff_tc_'+(ACTIVE_TEAM_ID||'default');
-      try{localStorage.setItem(tcKey,JSON.stringify(TC));}catch(e){}
+      try{localStorage.setItem(tcKey,JSON.stringify(TC));}
+      catch(e){console.warn('[FFTP] roster import — color save failed:',e);}
       applyTeamColors();
     }
 
@@ -4282,7 +4314,15 @@ function updateTimerDisplay(){
 ════════════════════════════════════════════════════════════ */
 var LS_PHOTOS='ff_photos_v1';
 function loadPhotos(){try{return JSON.parse(localStorage.getItem(LS_PHOTOS))||{};}catch(e){return{};}}
-function savePhotos(p){try{localStorage.setItem(LS_PHOTOS,JSON.stringify(p));}catch(e){}}
+function savePhotos(p){
+  try{localStorage.setItem(LS_PHOTOS,JSON.stringify(p));}
+  catch(e){
+    console.warn('[FFTP] savePhotos failed:',e);
+    if(e&&(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED')){
+      showToast('⚠️ Storage full — photo not saved. Remove old photos to free space.');
+    }
+  }
+}
 function triggerPhotoUpload(idx){
   proGate('photos',function(){
     var inp=document.getElementById('rpr-photo-'+idx);
@@ -4818,6 +4858,9 @@ function syncPush(){
         }else{
           showSyncBar('Reconnecting…','','——');
         }
+      }else{
+        // Restore "Live" status on successful push
+        showSyncBar('Live · Code: '+syncSession,'online',syncSession);
       }
     }).catch(function(){
       showSyncBar('Reconnecting…','','——');
@@ -5018,7 +5061,8 @@ function acceptTos(){
   var cb=document.getElementById('tos-check');
   if(!cb||!cb.checked)return;
   var consent={version:TOS_VERSION,timestamp:new Date().toISOString(),userAgent:navigator.userAgent};
-  try{localStorage.setItem(LS_TOS_CONSENT,JSON.stringify(consent));}catch(e){}
+  try{localStorage.setItem(LS_TOS_CONSENT,JSON.stringify(consent));}
+  catch(e){console.warn('[FFTP] acceptTos — consent save failed:',e);}
   // Hide overlay
   var overlay=document.getElementById('tos-overlay');
   if(overlay)overlay.classList.add('hidden');
@@ -5293,7 +5337,8 @@ function proUnlockWithCode(code){
   .then(function(r){return r.json();})
   .then(function(data){
     if(data.valid){
-      try{localStorage.setItem(LS_PRO,'unlocked');localStorage.setItem(LS_LICENSE,code);}catch(e){}
+      try{localStorage.setItem(LS_PRO,'unlocked');localStorage.setItem(LS_LICENSE,code);}
+      catch(e){console.warn('[FFTP] Pro key save failed:',e);}
       closeProModal();
       showToast('⭐ Pro unlocked! Enjoy all features.');
       vibe([30,15,30,15,50]);

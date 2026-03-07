@@ -55,6 +55,22 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
 .foot-link:hover{color:rgba(255,215,0,.6);}
 .foot-copy{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,.1);text-transform:uppercase;width:100%;margin-top:8px;}
 @media(max-width:480px){footer{padding:18px 16px;}.foot-inner{flex-direction:column;align-items:flex-start;gap:8px;}}
+/* Mobile: increase paragraph breathing room */
+@media(max-width:600px){
+  .doc-section p{line-height:1.85;margin-bottom:18px;font-size:14px;}
+  .doc-section ul li{font-size:14px;line-height:1.72;margin-bottom:4px;}
+  .doc-section{margin-bottom:40px;}
+}
+/* Accordion for dense sections */
+.doc-accordion{border:1px solid rgba(255,215,0,.12);border-radius:10px;overflow:hidden;margin:12px 0 16px;}
+.doc-accordion summary{list-style:none;padding:14px 18px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.5px;color:rgba(255,215,0,.75);background:rgba(255,215,0,.04);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .2s;}
+.doc-accordion summary::-webkit-details-marker{display:none;}
+.doc-accordion summary::after{content:'▸';font-size:11px;color:rgba(255,215,0,.5);transition:transform .2s;flex-shrink:0;margin-left:8px;}
+.doc-accordion[open] summary::after{transform:rotate(90deg);}
+.doc-accordion summary:hover{background:rgba(255,215,0,.07);}
+.doc-accordion-body{padding:14px 18px 16px;border-top:1px solid rgba(255,215,0,.08);}
+.doc-accordion-body p,.doc-accordion-body ul{margin-bottom:10px;}
+.doc-accordion-body p:last-child,.doc-accordion-body ul:last-child{margin-bottom:0;}
 </style>
 </head>
 <body>
@@ -71,7 +87,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
 
   <div class="doc-meta">
     <div class="doc-meta-item"><strong>Effective Date:</strong> January 1, 2026</div>
-    <div class="doc-meta-item"><strong>Last Updated:</strong> March 2026</div>
+    <div class="doc-meta-item"><strong>Last Updated:</strong> March 7, 2026</div>
     <div class="doc-meta-item"><strong>Operator:</strong> ITCC LLC</div>
     <div class="doc-meta-item"><strong>Contact:</strong> <a href="mailto:cgmaxfftp@itcc.llc">cgmaxfftp@itcc.llc</a></div>
   </div>
@@ -113,7 +129,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
       <li>Cloud Backup &amp; Restore — optional Pro feature to back up season history to ITCC LLC's secure cloud and restore it on any device</li>
       <li>Configurable Field Size — set the number of players per side (4, 5, 6, 7, or 8) to match your league rules</li>
     </ul>
-    <p>The App operates primarily via client-side local storage on your device. ITCC LLC does not store your coaching data, rosters, or game statistics on its servers, with the exception of: the optional Live Parent Scoreboard feature (which temporarily stores live game data expiring after 12 hours), the optional Cloud Backup feature (which stores season history data persistently), the optional Coach Account &amp; Cloud Sync feature (which stores your roster and season history persistently linked to your account), and the optional Parent Media Consent Form (which transmits consent records via email for COPPA compliance). The optional Stat Coach feature transmits game state data via Supabase Realtime Broadcast — this data is ephemeral and is never written to any database. See our Privacy Policy for full details.</p>
+    <p>The App operates primarily via client-side local storage on your device. ITCC LLC does not store your coaching data, rosters, or game statistics on its servers, with the exception of: the optional Live Parent Scoreboard feature (which temporarily stores live game data expiring after 12 hours), the optional Cloud Backup feature (which stores season history data persistently), the optional Coach Account &amp; Cloud Sync feature (which stores your roster and season history persistently linked to your account), and the optional Parent Media Consent Form (which transmits consent records — including player name, age, guardian name, guardian email, and signature — to ITCC LLC's secure Vercel/Supabase backend for COPPA compliance, with an email notification also sent to ITCC LLC's team inbox as a backup record). The optional Stat Coach feature transmits game state data via Supabase Realtime Broadcast — this data is ephemeral and is never written to any database. See our Privacy Policy for full details.</p>
 
     <p><strong>Service Tiers — Lite and Pro:</strong> CGMax FFTP is offered in two tiers. The <strong>Lite tier</strong> is available at no cost to any coach — no account, no code, and no payment is required. The Lite tier includes core game-day features: live scoring, player stats, smart rotations, in-game MVP rankings, roster management (single team), attendance tracking, quarter timer, penalty tracker, full offline functionality, and the ability to create a free optional coach account to sync your roster, team colors, notes, and settings across devices. The <strong>Pro tier</strong> unlocks advanced features including full cross-device sync of season history and all team data, player photos with parent consent logging, voice-activated stat logging with audio feedback, season history and leaderboard, season summary report, Live Parent Scoreboard, Stat Coach co-coaching on a second device, multiple team management, Tournament Mode, Play Designer, Player Development Trends, cloud backup and restore, game export, share card generation, print summaries, touchdown fanfare, and penalty sound effects. Pro access is granted through a license key (format: CGMAX-XXXX-XXXX-XXXX) emailed after payment and validated by ITCC LLC's backend. ITCC LLC reserves the right to modify the features included in each tier at any time.</p>
 
@@ -123,7 +139,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
 
     <p><strong>Cloud Backup &amp; Restore (optional, Pro):</strong> This feature allows you to back up your season history data to ITCC LLC's secure backend and restore it on any device using the same Pro license key. By using Cloud Backup, you acknowledge that your season data (game scores, player statistics, MVP records, team name, player names in first name + last initial format) will be transmitted to and stored in ITCC LLC's Supabase database. One backup per license key is retained; each new backup replaces the previous one. Backups persist until replaced or deleted upon your request. ITCC LLC is not responsible for any data loss due to service interruption, and Cloud Backup is provided on an "as is" basis without guarantee of availability.</p>
 
-    <p><strong>Optional Coach Account &amp; Cross-Device Cloud Sync (optional, Lite &amp; Pro):</strong> Any coach — Lite or Pro — may create a free optional account by signing in with Google, Apple, or a magic link email. Account creation is entirely voluntary. By signing in, you authorize ITCC LLC to store your email address and authentication credentials in our Supabase backend. <em>Lite accounts</em> sync basic team data (roster, colors, notes, and settings) for your one active team across devices. <em>Pro accounts</em> additionally link your license to your identity and sync full season history and data across all your teams. Your data is protected by Row Level Security and is not accessible to other users. You may sign out or request account deletion at any time. See our Privacy Policy for full details on what data is synced and how it is stored.</p>
+    <p><strong>Optional Coach Account &amp; Cross-Device Cloud Sync (optional, Lite &amp; Pro):</strong> Any coach — Lite or Pro — may create a free optional account by signing in with Google or a magic link email. Account creation is entirely voluntary. By signing in, you authorize ITCC LLC to store your email address and authentication credentials in our Supabase backend. <em>Lite accounts</em> sync basic team data (roster, colors, notes, and settings) for your one active team across devices. <em>Pro accounts</em> additionally link your license to your identity and sync full season history and data across all your teams. Your data is protected by Row Level Security and is not accessible to other users. You may sign out or request account deletion at any time. See our Privacy Policy for full details on what data is synced and how it is stored.</p>
   </div>
   <div class="doc-divider"></div>
 
@@ -150,7 +166,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
   <div class="doc-section">
     <div class="doc-section-num">Section 03A</div>
     <h2>Optional Coach Accounts — Sign-In and Data Ownership</h2>
-    <p>Any coach — Lite or Pro — may create a free optional account by signing in with Google, Apple, or a magic link email. Account creation and sign-in are entirely voluntary. You may use all local App features without creating an account at any time.</p>
+    <p>Any coach — Lite or Pro — may create a free optional account by signing in with Google or a magic link email. Account creation and sign-in are entirely voluntary. You may use all local App features without creating an account at any time.</p>
     <p><strong>Account responsibilities:</strong></p>
     <ul>
       <li>You are responsible for maintaining the confidentiality of your account and for all activities that occur through your sign-in session. Notify us immediately at <a href="mailto:cgmaxfftp@itcc.llc" style="color:var(--gold);text-decoration:none;">cgmaxfftp@itcc.llc</a> if you suspect unauthorized access to your account.</li>
@@ -159,7 +175,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
     </ul>
     <p><strong>Your data and ownership:</strong> You retain full ownership of all coaching data you sync to ITCC LLC's infrastructure through the cloud sync feature. ITCC LLC uses your data solely to provide the sync service — we do not analyze, sell, or share your coaching data with any third party. You may request deletion of your account and all associated cloud data at any time by contacting <a href="mailto:cgmaxfftp@itcc.llc" style="color:var(--gold);text-decoration:none;">cgmaxfftp@itcc.llc</a>. We will process deletion requests within 15 business days. If you are a Pro subscriber, cancelling your subscription does not automatically delete your cloud data — you must request deletion separately if desired.</p>
     <p><strong>Marketing communications (optional, consent-based):</strong> At the time of account creation, you may optionally check a box to receive occasional tips, product updates, and offers from CGMax FFTP by email. This opt-in is unchecked by default and is entirely voluntary — it has no effect on your access to any App feature. If you opt in, you may withdraw your consent and unsubscribe at any time using the unsubscribe link in any marketing email or by contacting us at <a href="mailto:cgmaxfftp@itcc.llc" style="color:var(--gold);text-decoration:none;">cgmaxfftp@itcc.llc</a>. Opting out of marketing emails will not affect the delivery of transactional emails such as license key delivery, sign-in magic links, or support responses.</p>
-    <p><strong>Third-party sign-in providers:</strong> Sign-in via Google or Apple is facilitated by those companies' OAuth services. Your use of Google Sign-In is subject to <a href="https://policies.google.com/terms" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">Google's Terms of Service</a>. Your use of Sign in with Apple is subject to <a href="https://www.apple.com/legal/internet-services/itunes/us/terms.html" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">Apple's Terms of Service</a>. ITCC LLC receives only your email address and a unique identifier from these providers and does not receive or store your Google or Apple password.</p>
+    <p><strong>Third-party sign-in providers:</strong> Sign-in via Google is facilitated by Google's OAuth service. Your use of Google Sign-In is subject to <a href="https://policies.google.com/terms" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">Google's Terms of Service</a>. ITCC LLC receives only your email address and a unique identifier from Google and does not receive or store your Google password.</p>
   </div>
   <div class="doc-divider"></div>
 
@@ -264,7 +280,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
     <p>Any dispute, claim, or controversy arising out of or relating to these Terms or the App that is not resolved informally shall be submitted to binding arbitration administered by a mutually agreed-upon arbitration provider in accordance with its commercial arbitration rules. The arbitration shall be conducted in California. Judgment on the award rendered by the arbitrator(s) may be entered in any court having jurisdiction thereof.</p>
     <p>You agree that any claims against ITCC LLC must be brought in your individual capacity and not as a plaintiff or class member in any purported class, collective, or representative proceeding. You waive any right to a jury trial or to participate in a class action.</p>
     <div class="doc-highlight">
-      <p>This is a preliminary Terms of Service. ITCC LLC intends to work with qualified legal counsel to finalize these Terms prior to any large-scale commercial distribution of the App.</p>
+      <p><strong>Legal Review Notice:</strong> These Terms of Service are currently under review by qualified legal counsel prior to large-scale commercial distribution. If you have questions about specific provisions or would like to discuss legal matters directly, contact <a href="mailto:cgmaxfftp@itcc.llc" style="color:var(--gold);">cgmaxfftp@itcc.llc</a>.</p>
     </div>
   </div>
   <div class="doc-divider"></div>
@@ -288,7 +304,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
       <p style="margin-top:12px;"><strong>Email:</strong> <a href="mailto:cgmaxfftp@itcc.llc">cgmaxfftp@itcc.llc</a></p>
       <p><strong>Company:</strong> ITCC LLC</p>
       <p><strong>Product:</strong> CGMax FFTP — Flag Football Tracker Pro</p>
-      <p style="margin-top:12px;font-size:13px;color:rgba(255,255,255,.4);">We aim to respond to all legal inquiries within 15 business days. These Terms were prepared in good faith and will be reviewed by qualified legal counsel prior to large-scale commercial deployment.</p>
+      <p style="margin-top:12px;font-size:13px;color:rgba(255,255,255,.4);">We aim to respond to all legal inquiries within 15 business days. These Terms are currently under review by qualified legal counsel.</p>
     </div>
   </div>
 

@@ -79,6 +79,11 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
 .score-num{font-family:'Bebas Neue',sans-serif;font-size:84px;line-height:.88;color:var(--dimmer);}
 .score-num.us{color:var(--s);}
 .score-sep{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--dimmer);flex-shrink:0;}
+@media(max-width:400px){
+  .score-num{font-size:58px;}
+  .score-sep{font-size:30px;}
+  .scoreboard{gap:8px;padding:8px 10px 4px;}
+}
 
 /* QUARTER BAR */
 .quarter-bar{display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 16px 12px;}
@@ -415,7 +420,13 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
       .then(function(r){return r.json();})
       .then(function(resp){
         if(!resp.found){
-          if(!lastData)showWaiting();
+          if(!lastData){
+            showWaiting();
+          } else {
+            // Had live data before but game is now gone — session ended or expired
+            showError('📴 Game session ended or expired. Stats above are from the last update.');
+            if(pollTimer){clearInterval(pollTimer);pollTimer=null;}
+          }
           return;
         }
         renderState(resp.game_data);

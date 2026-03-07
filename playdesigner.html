@@ -511,6 +511,17 @@
         }
 
         /* Responsive */
+
+        /* Tablet landscape (900–1100px): shrink sidebar to prevent overflow */
+        @media (min-width: 769px) and (max-width: 1100px) {
+            .sidebar {
+                width: 200px;
+            }
+            .designer-container {
+                gap: 12px;
+            }
+        }
+
         @media (max-width: 768px) {
             main {
                 margin-top: 60px;
@@ -525,8 +536,9 @@
                 width: 100%;
             }
 
+            /* Fixed: was 3 columns on mobile (thumbnails too small). Now 1 column. */
             .playbook-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: 1fr;
             }
 
             .play-info {
@@ -556,8 +568,9 @@
                 width: 100%;
             }
 
+            /* 1 column on small phones too */
             .playbook-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
             }
         }
 
@@ -688,11 +701,25 @@
         const ctx = canvas.getContext('2d');
         let animationFrameId;
 
+        // Logical (CSS-pixel) dimensions used for all position math & hit testing.
+        // The actual canvas buffer is scaled by devicePixelRatio for sharp rendering
+        // on Retina / HiDPI screens — without this every line looks blurry on iPhone.
+        let cLogW = 560;
+        let cLogH = 364;
+
         function resizeCanvas() {
             const wrapper = canvas.parentElement;
-            const width = Math.min(wrapper.clientWidth - 24, 560);
-            canvas.width = width;
-            canvas.height = width * 0.65;
+            const dpr = window.devicePixelRatio || 1;
+            cLogW = Math.min(wrapper.clientWidth - 24, 560);
+            cLogH = Math.round(cLogW * 0.65);
+            // Physical buffer = logical × DPR → sharp pixels on HiDPI screens
+            canvas.width  = Math.round(cLogW * dpr);
+            canvas.height = Math.round(cLogH * dpr);
+            // CSS display size = logical pixels so all position math stays in CSS coords
+            canvas.style.width  = cLogW + 'px';
+            canvas.style.height = cLogH + 'px';
+            // Scale the context once so every draw() call works in CSS pixel coordinates
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             draw();
         }
 
@@ -702,21 +729,21 @@
         // Initialize field with default formations
         function initializePlay() {
             state.players = [
-                { x: canvas.width / 2, y: canvas.height * 0.5, label: 'C', type: 'center', color: '#FFD700' },
-                { x: canvas.width / 2, y: canvas.height * 0.35, label: 'QB', type: 'qb', color: '#FFD700' },
-                { x: canvas.width * 0.25, y: canvas.height * 0.15, label: 'WR1', type: 'wr', color: '#FFD700' },
-                { x: canvas.width * 0.75, y: canvas.height * 0.15, label: 'WR2', type: 'wr', color: '#FFD700' },
-                { x: canvas.width * 0.15, y: canvas.height * 0.75, label: 'WR3', type: 'wr', color: '#FFD700' },
-                { x: canvas.width * 0.85, y: canvas.height * 0.75, label: 'WR4', type: 'wr', color: '#FFD700' }
+                { x: cLogW / 2, y: cLogH * 0.5, label: 'C', type: 'center', color: '#FFD700' },
+                { x: cLogW / 2, y: cLogH * 0.35, label: 'QB', type: 'qb', color: '#FFD700' },
+                { x: cLogW * 0.25, y: cLogH * 0.15, label: 'WR1', type: 'wr', color: '#FFD700' },
+                { x: cLogW * 0.75, y: cLogH * 0.15, label: 'WR2', type: 'wr', color: '#FFD700' },
+                { x: cLogW * 0.15, y: cLogH * 0.75, label: 'WR3', type: 'wr', color: '#FFD700' },
+                { x: cLogW * 0.85, y: cLogH * 0.75, label: 'WR4', type: 'wr', color: '#FFD700' }
             ];
 
             state.defenders = [
-                { x: canvas.width / 2, y: canvas.height * 0.5, label: 'D1', color: '#AA0000' },
-                { x: canvas.width * 0.2, y: canvas.height * 0.3, label: 'D2', color: '#AA0000' },
-                { x: canvas.width * 0.8, y: canvas.height * 0.3, label: 'D3', color: '#AA0000' },
-                { x: canvas.width * 0.3, y: canvas.height * 0.7, label: 'D4', color: '#AA0000' },
-                { x: canvas.width * 0.7, y: canvas.height * 0.7, label: 'D5', color: '#AA0000' },
-                { x: canvas.width / 2, y: canvas.height * 0.85, label: 'D6', color: '#AA0000' }
+                { x: cLogW / 2, y: cLogH * 0.5, label: 'D1', color: '#AA0000' },
+                { x: cLogW * 0.2, y: cLogH * 0.3, label: 'D2', color: '#AA0000' },
+                { x: cLogW * 0.8, y: cLogH * 0.3, label: 'D3', color: '#AA0000' },
+                { x: cLogW * 0.3, y: cLogH * 0.7, label: 'D4', color: '#AA0000' },
+                { x: cLogW * 0.7, y: cLogH * 0.7, label: 'D5', color: '#AA0000' },
+                { x: cLogW / 2, y: cLogH * 0.85, label: 'D6', color: '#AA0000' }
             ];
 
             state.routes = [];
@@ -727,40 +754,40 @@
         // Drawing Functions
         function draw() {
             ctx.fillStyle = '#1a4a1a';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, cLogW, cLogH);
 
             // Grid lines (yard markers)
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
             ctx.lineWidth = 1;
-            const spacing = canvas.width / 8;
+            const spacing = cLogW / 8;
             for (let i = 0; i <= 8; i++) {
                 ctx.beginPath();
                 ctx.moveTo(i * spacing, 0);
-                ctx.lineTo(i * spacing, canvas.height);
+                ctx.lineTo(i * spacing, cLogH);
                 ctx.stroke();
             }
 
             // Horizontal lines
-            const hSpacing = canvas.height / 4;
+            const hSpacing = cLogH / 4;
             for (let i = 0; i <= 4; i++) {
                 ctx.beginPath();
                 ctx.moveTo(0, i * hSpacing);
-                ctx.lineTo(canvas.width, i * hSpacing);
+                ctx.lineTo(cLogW, i * hSpacing);
                 ctx.stroke();
             }
 
             // End zones
             ctx.fillStyle = 'rgba(26, 74, 26, 0.5)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height * 0.15);
-            ctx.fillRect(0, canvas.height * 0.85, canvas.width, canvas.height * 0.15);
+            ctx.fillRect(0, 0, cLogW, cLogH * 0.15);
+            ctx.fillRect(0, cLogH * 0.85, cLogW, cLogH * 0.15);
 
             // Line of scrimmage (dashed)
             ctx.strokeStyle = '#FFD700';
             ctx.lineWidth = 2;
             ctx.setLineDash([5, 5]);
             ctx.beginPath();
-            ctx.moveTo(0, canvas.height * 0.5);
-            ctx.lineTo(canvas.width, canvas.height * 0.5);
+            ctx.moveTo(0, cLogH * 0.5);
+            ctx.lineTo(cLogW, cLogH * 0.5);
             ctx.stroke();
             ctx.setLineDash([]);
 
@@ -867,18 +894,17 @@
         }
 
         // Touch and Mouse Events
+        // getMousePos returns CSS-pixel coordinates matching the cLogW/cLogH space.
+        // No DPR scaling here — ctx.setTransform already handles the buffer scaling.
         function getMousePos(e) {
             const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-
             let x, y;
             if (e.touches) {
-                x = (e.touches[0].clientX - rect.left) * scaleX;
-                y = (e.touches[0].clientY - rect.top) * scaleY;
+                x = e.touches[0].clientX - rect.left;
+                y = e.touches[0].clientY - rect.top;
             } else {
-                x = (e.clientX - rect.left) * scaleX;
-                y = (e.clientY - rect.top) * scaleY;
+                x = e.clientX - rect.left;
+                y = e.clientY - rect.top;
             }
             return { x, y };
         }
@@ -902,11 +928,15 @@
         }
 
         canvas.addEventListener('mousedown', handleStart);
-        canvas.addEventListener('touchstart', handleStart);
+        canvas.addEventListener('touchstart', handleStart, { passive: false });
         canvas.addEventListener('mousemove', handleMove);
-        canvas.addEventListener('touchmove', handleMove);
+        canvas.addEventListener('touchmove', handleMove, { passive: false });
         canvas.addEventListener('mouseup', handleEnd);
         canvas.addEventListener('touchend', handleEnd);
+
+        // rAF throttle — ensures we only redraw once per display frame even if
+        // pointer events fire faster (prevents lag on older devices during route drawing)
+        let _rafPending = false;
 
         let draggedPlayerIdx = -1;
         let draggedDefenderIdx = -1;
@@ -962,20 +992,27 @@
                 }
             }
 
-            draw();
+            // rAF throttle — state is updated immediately above; only skip extra redraws
+            if (!_rafPending) {
+                _rafPending = true;
+                requestAnimationFrame(function() {
+                    _rafPending = false;
+                    draw();
 
-            // Draw preview route while drawing
-            if (state.mode === 'route' && currentRoutePoints.length > 0) {
-                ctx.strokeStyle = getColorForPlayer(state.selectedPlayer);
-                ctx.lineWidth = 2.5;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-                ctx.beginPath();
-                ctx.moveTo(currentRoutePoints[0][0], currentRoutePoints[0][1]);
-                for (let i = 1; i < currentRoutePoints.length; i++) {
-                    ctx.lineTo(currentRoutePoints[i][0], currentRoutePoints[i][1]);
-                }
-                ctx.stroke();
+                    // Draw preview route while drawing
+                    if (state.mode === 'route' && currentRoutePoints.length > 0) {
+                        ctx.strokeStyle = getColorForPlayer(state.selectedPlayer);
+                        ctx.lineWidth = 2.5;
+                        ctx.lineCap = 'round';
+                        ctx.lineJoin = 'round';
+                        ctx.beginPath();
+                        ctx.moveTo(currentRoutePoints[0][0], currentRoutePoints[0][1]);
+                        for (let i = 1; i < currentRoutePoints.length; i++) {
+                            ctx.lineTo(currentRoutePoints[i][0], currentRoutePoints[i][1]);
+                        }
+                        ctx.stroke();
+                    }
+                });
             }
         }
 

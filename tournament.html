@@ -724,18 +724,96 @@
             margin-bottom: 8px;
         }
 
+        /* Mobile round-by-round navigation */
+        .mobile-round-nav {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 16px 16px;
+        }
+        .mrn-btn {
+            background: var(--dark4);
+            border: 1px solid var(--dark5);
+            border-radius: 8px;
+            padding: 10px 18px;
+            color: var(--gold);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mrn-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .mrn-btn:not(:disabled):hover {
+            background: var(--dark5);
+            border-color: var(--gold);
+        }
+        .mrn-label {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: var(--txt);
+            text-align: center;
+            flex: 1;
+        }
+        .mrn-label span {
+            display: block;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--dim);
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+        .mrn-pips {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .mrn-pip {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--dark5);
+            border: 1px solid var(--dim);
+            transition: all 0.2s;
+        }
+        .mrn-pip.active {
+            background: var(--gold);
+            border-color: var(--gold);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             main {
                 padding: 16px;
             }
 
-            .bracket-round {
-                min-width: 180px;
+            /* On mobile: hide horizontal scroll bracket, show round-by-round nav instead */
+            .bracket-container {
+                overflow-x: visible;
             }
-
             .bracket {
-                gap: 20px;
+                display: block;
+            }
+            .bracket-round {
+                display: none;
+                min-width: unset;
+                width: 100%;
+            }
+            .bracket-round.mobile-active {
+                display: flex;
+            }
+            .mobile-round-nav {
+                display: flex;
             }
 
             .modal {
@@ -875,6 +953,17 @@
             <div class="bracket-header">
                 <h2 id="bracketTitle">Tournament Bracket</h2>
                 <p id="bracketSubtitle">Single Elimination</p>
+            </div>
+
+            <!-- Mobile round-by-round navigation (hidden on desktop) -->
+            <div class="mobile-round-nav" id="mobileRoundNav">
+                <button class="mrn-btn" id="mrnPrev" onclick="mobileRoundStep(-1)">&#8592; Prev</button>
+                <div class="mrn-label">
+                    <span>Round</span>
+                    <div id="mrnRoundName">—</div>
+                    <div class="mrn-pips" id="mrnPips"></div>
+                </div>
+                <button class="mrn-btn" id="mrnNext" onclick="mobileRoundStep(1)">Next &#8594;</button>
             </div>
 
             <div class="bracket-container" id="bracketContainer"></div>
@@ -1187,6 +1276,36 @@
             renderHistory();
         }
 
+        // Track which round is currently shown on mobile
+        var mobileRoundIdx = 0;
+
+        function mobileRoundStep(delta) {
+            if (!state.tournament) return;
+            var total = state.tournament.bracket.length;
+            mobileRoundIdx = Math.max(0, Math.min(total - 1, mobileRoundIdx + delta));
+            renderSingleElimination();
+        }
+
+        function updateMobileRoundNav(rounds) {
+            var isMobile = window.innerWidth <= 768;
+            var nav = document.getElementById('mobileRoundNav');
+            if (!nav) return;
+            if (!isMobile) { nav.style.display = 'none'; return; }
+            nav.style.display = 'flex';
+
+            document.getElementById('mrnRoundName').textContent = rounds[mobileRoundIdx] ? rounds[mobileRoundIdx].name : '';
+            document.getElementById('mrnPrev').disabled = mobileRoundIdx === 0;
+            document.getElementById('mrnNext').disabled = mobileRoundIdx === rounds.length - 1;
+
+            var pips = document.getElementById('mrnPips');
+            pips.innerHTML = '';
+            rounds.forEach(function(_, i) {
+                var pip = document.createElement('div');
+                pip.className = 'mrn-pip' + (i === mobileRoundIdx ? ' active' : '');
+                pips.appendChild(pip);
+            });
+        }
+
         function renderSingleElimination() {
             const container = document.getElementById('bracketContainer');
             container.innerHTML = '';
@@ -1195,10 +1314,17 @@
             document.getElementById('bracketSubtitle').textContent = 'Single Elimination';
 
             const bracket = state.tournament.bracket;
+            const isMobile = window.innerWidth <= 768;
+
+            // Clamp mobileRoundIdx in case bracket shrank
+            mobileRoundIdx = Math.max(0, Math.min(bracket.length - 1, mobileRoundIdx));
 
             bracket.forEach((round, roundIdx) => {
                 const roundDiv = document.createElement('div');
                 roundDiv.className = 'bracket-round';
+                if (isMobile) {
+                    if (roundIdx === mobileRoundIdx) roundDiv.classList.add('mobile-active');
+                }
 
                 const label = document.createElement('div');
                 label.className = 'bracket-round-label';
@@ -1229,11 +1355,13 @@
                     roundDiv.appendChild(matchupDiv);
                 });
 
-                const bracket = document.createElement('div');
-                bracket.className = 'bracket';
-                bracket.appendChild(roundDiv);
-                container.appendChild(bracket);
+                const bracketRow = document.createElement('div');
+                bracketRow.className = 'bracket';
+                bracketRow.appendChild(roundDiv);
+                container.appendChild(bracketRow);
             });
+
+            updateMobileRoundNav(bracket);
 
             // Check for champion
             const lastRound = bracket[bracket.length - 1];

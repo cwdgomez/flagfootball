@@ -185,6 +185,37 @@ hr.div{border:none;border-top:1px solid var(--dark3);margin:8px 0 4px;}
 }
 .sec-nav a:hover{color:var(--s);border-bottom-color:rgba(255,215,0,.4);}
 
+/* ── SEARCH ── */
+.search-wrap{
+  position:relative;z-index:10;
+  max-width:680px;margin:16px auto 0;padding:0 16px;
+}
+.search-input{
+  width:100%;background:var(--sur);
+  border:1px solid var(--dark4);border-radius:10px;
+  padding:11px 14px 11px 40px;
+  font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;
+  letter-spacing:.5px;color:var(--txt);
+  outline:none;transition:border-color .2s;
+}
+.search-input::placeholder{color:var(--dimmer);}
+.search-input:focus{border-color:rgba(255,215,0,.35);}
+.search-icon{
+  position:absolute;left:28px;top:50%;transform:translateY(-50%);
+  font-size:14px;color:var(--dimmer);pointer-events:none;
+}
+.search-clear{
+  position:absolute;right:28px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--dimmer);font-size:16px;
+  cursor:pointer;padding:4px;line-height:1;display:none;
+}
+.search-clear.visible{display:block;}
+.search-no-results{
+  display:none;text-align:center;padding:40px 16px;
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
+  letter-spacing:2px;color:var(--dimmer);text-transform:uppercase;
+}
+
 /* ── FOOTER ── */
 .help-footer{
   position:relative;z-index:10;
@@ -232,6 +263,14 @@ hr.div{border:none;border-top:1px solid var(--dark3);margin:8px 0 4px;}
   <a href="#pro">Pro</a>
   <a href="#tips">Tips</a>
 </div>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <span class="search-icon">🔍</span>
+  <input class="search-input" id="helpSearch" type="search" placeholder="Search tips, features, commands…" autocomplete="off" aria-label="Search help topics">
+  <button class="search-clear" id="helpSearchClear" aria-label="Clear search" onclick="clearHelpSearch()">✕</button>
+</div>
+<div class="search-no-results" id="helpNoResults">No results — try a different keyword</div>
 
 <!-- HERO -->
 <div class="hero">
@@ -933,14 +972,14 @@ hr.div{border:none;border-top:1px solid var(--dark3);margin:8px 0 4px;}
       <div class="step-num">1</div>
       <div class="step-body">
         <div class="step-title">Find the Sign-In Button</div>
-        <div class="step-desc">On the app setup screen, look for the <strong>👤 Signed In</strong> strip or a sign-in option in the header. You can sign in with <strong>Google</strong>, <strong>Apple</strong>, or a <strong>magic link email</strong> sent to your inbox.</div>
+        <div class="step-desc">On the app setup screen, look for the <strong>👤 Signed In</strong> strip or a sign-in option in the header. You can sign in with <strong>Google</strong> or a <strong>magic link email</strong> sent to your inbox.</div>
       </div>
     </div>
     <div class="step-item">
       <div class="step-num">2</div>
       <div class="step-body">
         <div class="step-title">Choose Your Sign-In Method</div>
-        <div class="step-desc"><strong>Google</strong> — tap and sign in via Google's secure OAuth popup. <strong>Apple</strong> — uses Apple ID with Face ID / Touch ID. <strong>Email link</strong> — enter your email and tap the magic link sent to you; no password needed.</div>
+        <div class="step-desc"><strong>Google</strong> — tap and sign in via Google's secure OAuth popup. <strong>Email link</strong> — enter your email and tap the magic link sent to you; no password needed.</div>
       </div>
     </div>
     <div class="step-item">
@@ -1147,6 +1186,60 @@ hr.div{border:none;border-top:1px solid var(--dark3);margin:8px 0 4px;}
 <div class="help-footer">
   <a href="./app.html">← Back to CGMax FFTP</a>
 </div>
+
+<script>
+(function(){
+  // Build section groups: each group = .sec-hdr + all following siblings until the next .sec-hdr
+  var content = document.querySelector('.content');
+  if (!content) return;
+  var children = Array.from(content.children);
+  var sections = [];
+  var current = null;
+  children.forEach(function(el) {
+    if (el.classList.contains('sec-hdr')) {
+      current = { header: el, items: [] };
+      sections.push(current);
+    } else if (current) {
+      current.items.push(el);
+    }
+  });
+
+  var input = document.getElementById('helpSearch');
+  var clearBtn = document.getElementById('helpSearchClear');
+  var noResults = document.getElementById('helpNoResults');
+  if (!input) return;
+
+  function filterHelp(q) {
+    q = q.trim().toLowerCase();
+    clearBtn.classList.toggle('visible', q.length > 0);
+    if (!q) {
+      sections.forEach(function(s) {
+        s.header.style.display = '';
+        s.items.forEach(function(i) { i.style.display = ''; });
+      });
+      noResults.style.display = 'none';
+      return;
+    }
+    var anyVisible = false;
+    sections.forEach(function(s) {
+      var text = (s.header.textContent + ' ' + s.items.map(function(i) { return i.textContent; }).join(' ')).toLowerCase();
+      var match = text.includes(q);
+      s.header.style.display = match ? '' : 'none';
+      s.items.forEach(function(i) { i.style.display = match ? '' : 'none'; });
+      if (match) anyVisible = true;
+    });
+    noResults.style.display = anyVisible ? 'none' : 'block';
+  }
+
+  input.addEventListener('input', function() { filterHelp(input.value); });
+
+  window.clearHelpSearch = function() {
+    input.value = '';
+    filterHelp('');
+    input.focus();
+  };
+})();
+</script>
 
 </body>
 </html>

@@ -157,6 +157,37 @@ nav{
   margin:0 0 48px;
 }
 
+/* ── ACCORDIONS for dense mobile sections ── */
+.doc-accordion{
+  border:1px solid rgba(255,215,0,.12);border-radius:10px;
+  overflow:hidden;margin:12px 0 16px;
+}
+.doc-accordion summary{
+  list-style:none;padding:14px 18px;
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
+  letter-spacing:.5px;color:rgba(255,215,0,.75);
+  background:rgba(255,215,0,.04);cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:background .2s;
+}
+.doc-accordion summary::-webkit-details-marker{display:none;}
+.doc-accordion summary::after{
+  content:'▸';font-size:11px;color:rgba(255,215,0,.5);
+  transition:transform .2s;flex-shrink:0;margin-left:8px;
+}
+.doc-accordion[open] summary::after{transform:rotate(90deg);}
+.doc-accordion summary:hover{background:rgba(255,215,0,.07);}
+.doc-accordion-body{padding:14px 18px 16px;border-top:1px solid rgba(255,215,0,.08);}
+.doc-accordion-body p,.doc-accordion-body ul{margin-bottom:10px;}
+.doc-accordion-body p:last-child,.doc-accordion-body ul:last-child{margin-bottom:0;}
+
+/* Mobile: increase paragraph breathing room */
+@media(max-width:600px){
+  .doc-section p{line-height:1.85;margin-bottom:18px;font-size:14px;}
+  .doc-section ul li{font-size:14px;line-height:1.72;margin-bottom:4px;}
+  .doc-section{margin-bottom:40px;}
+}
+
 /* ── FOOTER ── */
 footer{
   position:relative;z-index:10;
@@ -196,7 +227,7 @@ footer{
 
   <div class="doc-meta">
     <div class="doc-meta-item"><strong>Effective Date:</strong> January 1, 2026</div>
-    <div class="doc-meta-item"><strong>Last Updated:</strong> March 2026</div>
+    <div class="doc-meta-item"><strong>Last Updated:</strong> March 7, 2026</div>
     <div class="doc-meta-item"><strong>Controller:</strong> ITCC LLC</div>
     <div class="doc-meta-item"><strong>Contact:</strong> <a href="mailto:cgmaxfftp@itcc.llc">cgmaxfftp@itcc.llc</a></div>
   </div>
@@ -209,7 +240,7 @@ footer{
     <p>By using the App, you acknowledge you have read and understood this Privacy Policy. If you do not agree, please do not use the App.</p>
     <div class="doc-highlight">
       <p><strong>Key fact:</strong> FFTP is designed around local-first data storage. All game data, rosters, and statistics you enter are stored primarily in your device's local browser storage (localStorage). ITCC LLC's servers are only involved for the optional Pro features described below.</p>
-      <p style="margin-top:8px;"><strong>Optional Coach Account &amp; Cloud Sync (Lite &amp; Pro):</strong> Any FFTP coach — Lite or Pro — may sign in using Google, Apple, or a magic link email to create a free account. Lite accounts sync basic team data (roster, colors, settings, and notes) for your one team. Pro accounts additionally link your license to your identity and sync full season history and game data across all your teams. When signed in, your data syncs silently to ITCC LLC's secure backend (Vercel + Supabase) so it is available on every device you use. See Section 2 for the full list of data synced by tier.</p>
+      <p style="margin-top:8px;"><strong>Optional Coach Account &amp; Cloud Sync (Lite &amp; Pro):</strong> Any FFTP coach — Lite or Pro — may sign in using Google or a magic link email to create a free account. Lite accounts sync basic team data (roster, colors, settings, and notes) for your one team. Pro accounts additionally link your license to your identity and sync full season history and game data across all your teams. When signed in, your data syncs silently to ITCC LLC's secure backend (Vercel + Supabase) so it is available on every device you use. See Section 2 for the full list of data synced by tier.</p>
       <p style="margin-top:8px;"><strong>Optional Live Sync &amp; Parent View (Pro):</strong> FFTP Pro includes an optional Live Sync feature. When activated, the coach generates a 6-character game code and shares a parent link. Live game data (scores, player stats, team name) is transmitted to and temporarily stored in ITCC LLC's Supabase database. This data automatically expires and is deleted after 12 hours. Parents access a read-only scoreboard view and do not create accounts or submit any personal information.</p>
     </div>
   </div>
@@ -220,23 +251,27 @@ footer{
     <div class="doc-section-num">Section 02</div>
     <h2>Information We Collect — and What We Do Not Collect</h2>
     <p>FFTP is designed with a minimal data footprint. Here is exactly what happens with information when you use the App:</p>
-    <p><strong>What is stored locally on your device (not transmitted to us):</strong></p>
-    <ul>
-      <li>Team name and coach name you enter during setup</li>
-      <li>Player roster: first names and last initials only (e.g., "Jaxon B.") — never full last names</li>
-      <li>Jersey numbers</li>
-      <li>Game scores, per-player statistics, and rotation play counts</li>
-      <li>Season history, MVP records, and quarter-by-quarter data</li>
-      <li>Your app tier selection (Lite or Pro), stored as a local flag — no personal data is transmitted for the Lite tier</li>
-      <li>Your selected team colors and app preferences</li>
-      <li>Multiple team profiles (team names and roster associations for coaches managing more than one team)</li>
-      <li>Per-game attendance records (which players were present or absent for each game)</li>
-      <li>Penalty flag counts per game (stored in the game summary, not transmitted)</li>
-      <li>Tournament records (bracket format, team names, scores, and champion — stored locally in <code>ff_tournaments</code>)</li>
-      <li>Saved plays from the Play Designer (canvas drawings stored as serialized data in <code>ff_plays</code>, up to 20 plays)</li>
-      <li><strong>In-game auto-save state</strong> (localStorage key: <code>ff_live_game_v1</code>): To prevent data loss when you switch apps or your screen turns off during a live game, the App automatically saves a snapshot of the active game state to localStorage. This snapshot is deleted when the game ends normally (saved to Season History) or when you start a new game. It is retained for up to 24 hours and is used solely to offer a "resume game" prompt on next app open.</li>
-      <li><strong>Pro tier status</strong> (localStorage keys: <code>ff_pro_v1</code>, <code>ff_license_key</code>): If you have activated a valid Pro license key, the App stores a flag locally indicating your Pro tier is active, along with your license key for re-validation purposes. License key validation is performed by transmitting your key to ITCC LLC's secure backend (hosted on Vercel) where it is checked against your subscription record in our license database (hosted on Supabase). See Section 5 for details on these third-party processors.</li>
-    </ul>
+    <details class="doc-accordion">
+      <summary>▾ What is stored locally on your device (not transmitted to us)</summary>
+      <div class="doc-accordion-body">
+        <ul>
+          <li>Team name and coach name you enter during setup</li>
+          <li>Player roster: first names and last initials only (e.g., "Jaxon B.") — never full last names</li>
+          <li>Jersey numbers</li>
+          <li>Game scores, per-player statistics, and rotation play counts</li>
+          <li>Season history, MVP records, and quarter-by-quarter data</li>
+          <li>Your app tier selection (Lite or Pro), stored as a local flag — no personal data is transmitted for the Lite tier</li>
+          <li>Your selected team colors and app preferences</li>
+          <li>Multiple team profiles (team names and roster associations for coaches managing more than one team)</li>
+          <li>Per-game attendance records (which players were present or absent for each game)</li>
+          <li>Penalty flag counts per game (stored in the game summary, not transmitted)</li>
+          <li>Tournament records (bracket format, team names, scores, and champion — stored locally in <code>ff_tournaments</code>)</li>
+          <li>Saved plays from the Play Designer (canvas drawings stored as serialized data in <code>ff_plays</code>, up to 20 plays)</li>
+          <li><strong>In-game auto-save state</strong> (localStorage key: <code>ff_live_game_v1</code>): To prevent data loss when you switch apps or your screen turns off during a live game, the App automatically saves a snapshot of the active game state to localStorage. This snapshot is deleted when the game ends normally (saved to Season History) or when you start a new game. It is retained for up to 24 hours and is used solely to offer a "resume game" prompt on next app open.</li>
+          <li><strong>Pro tier status</strong> (localStorage keys: <code>ff_pro_v1</code>, <code>ff_license_key</code>): If you have activated a valid Pro license key, the App stores a flag locally indicating your Pro tier is active, along with your license key for re-validation purposes. License key validation is performed by transmitting your key to ITCC LLC's secure backend (hosted on Vercel) where it is checked against your subscription record in our license database (hosted on Supabase). See Section 5 for details on these third-party processors.</li>
+        </ul>
+      </div>
+    </details>
     <p><strong>Optional: Coach Account &amp; Cloud Sync data transmitted to ITCC LLC's backend</strong> (Lite &amp; Pro tiers, only when you sign in with an account):</p>
     <p><em>Lite account (free, basic sync — one team only):</em></p>
     <ul>
@@ -277,13 +312,13 @@ footer{
     <p><strong>What we do NOT collect on our servers (stored locally on your device only, if collected at all):</strong></p>
     <ul>
       <li>Full names, addresses, or phone numbers of players — the App only asks for first name and last initial (e.g., "Jaxon B.")</li>
-      <li>Player photos — if a coach adds a player photo, it is stored exclusively in the browser's localStorage on the coach's device. Photos are never uploaded to our servers. See Section 3A regarding the optional parent consent form for player photos.</li>
+      <li>Coach-added player photos — when a coach adds a player photo from their device's camera roll via the in-app player photo feature, it is stored exclusively in the browser's localStorage on the coach's device (resized to 120×120px). These photos are never uploaded to our servers. <strong>Exception:</strong> If a parent/guardian submits a photo via the optional Parent Media Consent Form, that photo is transmitted to and stored in ITCC LLC's Supabase database as part of the consent record — see Section 3A.</li>
       <li>Payment card numbers or full payment details — all payments are processed directly by Stripe, Inc. ITCC LLC never receives or stores your card data</li>
       <li>Precise geolocation data</li>
       <li>Device identifiers, advertising IDs, or behavioral tracking data</li>
       <li>Audio recordings — voice commands are processed entirely by your device's on-device speech recognition engine (the browser's Speech Recognition API). The App receives only text transcriptions of recognized commands; no audio stream is captured or transmitted by ITCC LLC.</li>
     </ul>
-    <p><strong>Note on email addresses:</strong> ITCC LLC collects your email address in the following scenarios: (1) when you purchase a Pro subscription — your billing email is used to send your license key and manage your subscription; (2) when you create an optional coach account by signing in with Google, Apple, or a magic link — your email is stored in our Supabase auth system to identify your account and enable sign-in; and (3) optionally, when you check the box to receive occasional tips and offers from CGMax FFTP at the time of account creation — we store your marketing opt-in preference and may send you infrequent promotional emails. You may opt out of marketing emails at any time using the unsubscribe link in any such email or by contacting us at <a href="mailto:cgmaxfftp@itcc.llc" style="color:var(--gold);text-decoration:none;">cgmaxfftp@itcc.llc</a>. Opting out does not affect transactional emails (license delivery, sign-in magic links). You may use the Lite tier and all local features of the App without providing an email address at any time. Additionally, if a coach uses the optional Parent Media Consent Form feature and submits the form, an email notification is sent to ITCC LLC's team inbox for record-keeping purposes. See Section 3A for full details.</p>
+    <p><strong>Note on email addresses:</strong> ITCC LLC collects your email address in the following scenarios: (1) when you purchase a Pro subscription — your billing email is used to send your license key and manage your subscription; (2) when you create an optional coach account by signing in with Google or a magic link — your email is stored in our Supabase auth system to identify your account and enable sign-in; and (3) optionally, when you check the box to receive occasional tips and offers from CGMax FFTP at the time of account creation — we store your marketing opt-in preference and may send you infrequent promotional emails. You may opt out of marketing emails at any time using the unsubscribe link in any such email or by contacting us at <a href="mailto:cgmaxfftp@itcc.llc" style="color:var(--gold);text-decoration:none;">cgmaxfftp@itcc.llc</a>. Opting out does not affect transactional emails (license delivery, sign-in magic links). You may use the Lite tier and all local features of the App without providing an email address at any time. Additionally, if a coach uses the optional Parent Media Consent Form feature and submits the form, an email notification is sent to ITCC LLC's team inbox for record-keeping purposes. See Section 3A for full details.</p>
     <p><strong>Web server access logs:</strong> Like all websites, our web host may automatically log basic access information such as your IP address, browser type, operating system, and pages visited for security and operational purposes. This data is controlled by our web hosting provider under their own privacy policy and is not linked to your coaching data.</p>
   </div>
   <div class="doc-divider"></div>
@@ -314,14 +349,20 @@ footer{
       <li>Player's age</li>
       <li>Player's jersey number</li>
       <li>Team name and season</li>
-      <li>Parent or legal guardian's name and signature</li>
+      <li>Parent or legal guardian's full name and relationship to player</li>
+      <li>Parent or legal guardian's email address — used to send a confirmation copy of the consent record</li>
+      <li>Parent or legal guardian's phone number (optional)</li>
+      <li>Parent or legal guardian's digital signature (captured as a base64-encoded PNG image)</li>
+      <li>Player photo (optional, base64-encoded image) — only if the coach or parent chooses to include one</li>
     </ul>
     <p><strong>How this information is used and stored:</strong></p>
     <ul>
-      <li>The completed consent form generates an email notification sent to ITCC LLC's team inbox (<a href="mailto:cgmaxfftp@itcc.llc">cgmaxfftp@itcc.llc</a>), hosted and secured by Microsoft 365 (Exchange Online). This email serves as the official record of parental consent.</li>
-      <li>This consent data is stored exclusively in ITCC LLC's Microsoft 365 email environment and is not transmitted to or stored in any third-party database beyond Microsoft's platform.</li>
-      <li>Consent records are retained for the duration of the applicable sports season and may be retained for up to one year thereafter for compliance purposes.</li>
-      <li>Player photos themselves are stored exclusively in the browser's localStorage on the coach's personal device. Photos are automatically resized to a 120×120 pixel thumbnail before storage. Photos are <strong>never</strong> uploaded to any server, shared externally, or transmitted in any way.</li>
+      <li>The completed consent form is transmitted via HTTPS to ITCC LLC's Vercel serverless backend (<code>send-consent.js</code>) and stored in ITCC LLC's Supabase database in the <code>parent_photos</code> table. This database record serves as the official, auditable record of parental consent.</li>
+      <li>An email notification is simultaneously sent to ITCC LLC's team inbox (<a href="mailto:cgmaxfftp@itcc.llc">cgmaxfftp@itcc.llc</a>) as a backup human-readable copy of the consent record.</li>
+      <li>A confirmation email is sent to the parent or guardian's email address (as provided on the form) via Resend, confirming that their consent has been received and recorded.</li>
+      <li>Consent records are retained in ITCC LLC's Supabase database for the duration of the applicable sports season and may be retained for up to one year thereafter for legal compliance purposes.</li>
+      <li>Coach-side player photos (added by the coach from their device's camera roll) are stored exclusively in the browser's localStorage on the coach's personal device. These coach-side photos are automatically resized to a 120×120 pixel thumbnail. They are <strong>never</strong> uploaded to any server.</li>
+      <li>If a photo is submitted via the Parent Media Consent Form, that photo is transmitted and stored in ITCC LLC's Supabase database as described above, associated with the consent record.</li>
     </ul>
     <p><strong>COPPA compliance:</strong> This consent form is specifically designed to serve as the verifiable parental consent mechanism required by COPPA (Children's Online Privacy Protection Act) before any player-identifying information (photo) is associated with a minor's profile in the App. Consent is collected directly from the parent or legal guardian, not from the child. Participation is entirely voluntary — a player may fully participate on the team without a profile photo.</p>
     <div class="doc-highlight">
@@ -340,7 +381,7 @@ footer{
       <li><strong>Lite tier access:</strong> The Lite tier is freely accessible — no code or account is required. App access is controlled entirely on your device with no server-side validation for Lite.</li>
       <li><strong>Pro license validation:</strong> When you enter or re-validate a Pro license key, the key is transmitted via HTTPS to ITCC LLC's validation endpoint (hosted on Vercel) and checked against our license database (hosted on Supabase). The response indicates whether your subscription is active. No other personal data is transmitted during this check beyond the license key itself.</li>
       <li><strong>Pro subscription payments:</strong> When you purchase a Pro subscription, payment is handled entirely by Stripe, Inc. Stripe transmits a webhook event to our backend confirming a successful payment. We use this event to generate your license key and email it to your billing address via Resend. We store your email address, license key, Stripe customer ID, and subscription status in our Supabase license database solely to manage your subscription. If you have a coach account, your new license is automatically linked to your account at the time of purchase.</li>
-      <li><strong>Coach Account &amp; Sign-In (optional, all tiers):</strong> Any coach — Lite or Pro — may create a free optional account by signing in with Google, Apple, or a magic link email. We create a coach account in our Supabase auth system. Your email and authentication provider are stored to manage your sign-in session and to enable cloud sync. We do not store your Google or Apple password — authentication is handled entirely by those providers' OAuth flows. Your session is maintained via a JWT token stored in your browser. You may sign out at any time from within the App.</li>
+      <li><strong>Coach Account &amp; Sign-In (optional, all tiers):</strong> Any coach — Lite or Pro — may create a free optional account by signing in with Google or a magic link email. We create a coach account in our Supabase auth system. Your email and authentication provider are stored to manage your sign-in session and to enable cloud sync. We do not store your Google password — authentication is handled entirely by Google's OAuth flow. Your session is maintained via a JWT token stored in your browser. You may sign out at any time from within the App.</li>
       <li><strong>Cross-Device Cloud Sync (optional, all tiers when signed in):</strong> When you are signed in, your coaching data is automatically synced to ITCC LLC's Supabase database. <em>Lite accounts</em> sync basic team data — roster, team colors, notes, and settings — for your one active team. <em>Pro accounts</em> sync all of the above plus full season history and game data across all your teams. Sync uses a "last write wins" model with version tracking. Your data is stored in the <code>coach_data</code> table protected by Row Level Security — no other user can access your data. Sync occurs in the background and does not interrupt your workflow. You may sign out at any time to stop syncing.</li>
       <li><strong>Promotional communications (optional, only with consent):</strong> At the time of account creation, you may optionally check a box to receive occasional tips, product updates, and offers from CGMax FFTP. If you opt in, we will send infrequent marketing emails to the address associated with your account. Your marketing preference is stored as part of your coach profile. You may withdraw consent and unsubscribe at any time via the unsubscribe link in any such email or by contacting us at <a href="mailto:cgmaxfftp@itcc.llc" style="color:var(--gold);text-decoration:none;">cgmaxfftp@itcc.llc</a>. Opting out has no effect on transactional emails (license delivery, sign-in magic links, support replies).</li>
       <li><strong>Stat Coach / Co-Coach (optional, Pro tier):</strong> When you share a Stat Coach link, game state and stat events are transmitted as ephemeral Supabase Realtime broadcasts between your device and the assistant's device. No data is written to any database. Broadcasts are discarded automatically when the session ends. No personal data of the assistant coach is collected.</li>
@@ -363,9 +404,9 @@ footer{
     <ul>
       <li><strong>Web hosting (GitHub Pages):</strong> The App's static files are hosted on GitHub Pages. GitHub may log basic access information. See <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub's Privacy Statement</a>.</li>
       <li><strong>Stripe, Inc. (payment processing):</strong> Pro subscriptions are processed by Stripe. When you purchase a subscription, Stripe collects your payment details and billing email. Stripe shares with us only your email address, subscription status, and customer ID — never your full card details. Stripe's use of your data is governed by <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe's Privacy Policy</a>.</li>
-      <li><strong>Supabase (auth, license database, cloud sync, Live Sync &amp; Cloud Backup storage):</strong> We use Supabase as our primary backend database and authentication provider. The following data is stored in Supabase: your email address and authentication provider (for coach accounts), license key, Stripe customer ID, subscription plan, and subscription status (for Pro subscription management), coach data including rosters, season history, team profiles, and settings (for cloud sync, associated with your user account and protected by Row Level Security), temporary live game data under a session code (expires after 12 hours), season history backups (persists until replaced or deleted on request), and ToS consent records for Pro users. Supabase's data processing is governed by <a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase's Privacy Policy</a>.</li>
+      <li><strong>Supabase (auth, license database, cloud sync, Live Sync, Cloud Backup, and consent storage):</strong> We use Supabase as our primary backend database and authentication provider. The following data is stored in Supabase: your email address and authentication provider (for coach accounts), license key, Stripe customer ID, subscription plan, and subscription status (for Pro subscription management), coach data including rosters, season history, team profiles, and settings (for cloud sync, associated with your user account and protected by Row Level Security), temporary live game data under a session code (expires after 12 hours), season history backups (persists until replaced or deleted on request), ToS consent records for Pro users, and parent media consent records (player name, guardian name, guardian email, guardian phone, digital signature, optional photo) submitted via the optional Parent Media Consent Form — stored in the <code>parent_photos</code> table and protected by Row Level Security. Supabase's data processing is governed by <a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase's Privacy Policy</a>.</li>
       <li><strong>Vercel (serverless backend):</strong> Our license validation and webhook processing functions are hosted on Vercel. License key validation requests and Stripe webhook events are processed through Vercel's infrastructure. See <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel's Privacy Policy</a>.</li>
-      <li><strong>Resend (transactional email):</strong> When you purchase a Pro subscription, your license key delivery email is sent via Resend. Resend processes your email address and email content for delivery purposes only. See <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">Resend's Privacy Policy</a>.</li>
+      <li><strong>Resend (transactional email):</strong> We use Resend for all transactional email delivery: (1) Pro license key delivery email sent to the billing address after purchase; (2) Supabase auth magic link OTP emails for sign-in (Resend is configured as our Supabase SMTP provider); and (3) parent/guardian consent confirmation emails sent after a Parent Media Consent Form is submitted. Resend processes your email address and email content for delivery purposes only. See <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">Resend's Privacy Policy</a>.</li>
       <li><strong>Legal requirements:</strong> We may disclose information if required to do so by law, court order, or government regulation, or to protect the rights, safety, or property of ITCC LLC or others.</li>
       <li><strong>Business transitions:</strong> In the event of a merger, acquisition, or sale of ITCC LLC or its assets, any data we hold may be transferred as part of that transaction. We will notify affected users if this occurs.</li>
     </ul>
