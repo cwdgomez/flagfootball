@@ -1606,12 +1606,6 @@ body.light-mode .toast-msg{color:#1a1714;}
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,.35);text-align:center;letter-spacing:1px;margin-bottom:8px;">Parents open the link on their phone — no app needed · Updates every 15 sec</div>
         <button type="button" onclick="stopLiveSync();closeSyncModal();" style="width:100%;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);border-radius:9px;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:#ef4444;cursor:pointer;">⏹ Stop Live Score</button>
       </div>
-      <!-- CO-COACH LINK SECTION -->
-      <div id="cocoach-link-section" style="display:none;margin-top:10px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:12px 14px;">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(168,85,247,.9);margin-bottom:8px;">🤝 STAT COACH LINK</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);margin-bottom:10px;line-height:1.5;">Share this link with your stat coach. They'll see the roster and record player stats in real time.</div>
-        <button type="button" onclick="copyCocoachLink()" style="width:100%;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;border-radius:10px;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;color:#fff;cursor:pointer;">🤝 Copy Stat Coach Link</button>
-      </div>
     </div>
     <div class="sync-panel" id="sync-panel-join">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;">Enter a 6-character game code to view live:</div>
@@ -4289,9 +4283,6 @@ function hostSession(){
   syncActive=true;
   showSyncBar('Live · Code: '+syncSession,'online',syncSession);
   updateParentLinkUI();
-  // Show co-coach link section (inside sync modal)
-  var ccSection=document.getElementById('cocoach-link-section');
-  if(ccSection)ccSection.style.display='block';
   // Show stat coach quick-action button + expand grid to 4 cols
   var scBtn=document.getElementById('statcoach-btn');
   if(scBtn){scBtn.style.display='flex';}
@@ -4319,8 +4310,6 @@ function stopLiveSync(){
   }
   // Clean up co-coach channel
   if(cocoachChannel){try{sbClient.removeChannel(cocoachChannel);}catch(e){}cocoachChannel=null;}
-  var ccSection=document.getElementById('cocoach-link-section');
-  if(ccSection)ccSection.style.display='none';
   // Hide stat coach quick-action button + collapse grid back to 3 cols
   var scBtn=document.getElementById('statcoach-btn');
   if(scBtn){scBtn.style.display='none';}
