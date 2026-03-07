@@ -3757,46 +3757,58 @@ function getAudioCtx(){
   if(!_audioCtx){
     try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
   }
+  // Resume suspended context — iOS requires this inside a user gesture
+  if(_audioCtx&&_audioCtx.state==='suspended'){
+    try{_audioCtx.resume();}catch(e){}
+  }
   return _audioCtx;
 }
 // Unlock audio context on first user tap (required by browsers)
-document.addEventListener('touchstart',function _unlockAudio(){
-  getAudioCtx();
-  document.removeEventListener('touchstart',_unlockAudio);
+document.addEventListener('touchstart',function(){
+  var ctx=getAudioCtx();
+  if(ctx&&ctx.state==='suspended'){try{ctx.resume();}catch(e){}}
 },{once:true,passive:true});
 
 function playTick(freq,dur,vol){
   // Short synthesized click — works on iOS Safari
   var ctx=getAudioCtx();
   if(!ctx)return;
-  try{
-    var o=ctx.createOscillator();
-    var g=ctx.createGain();
-    o.connect(g);g.connect(ctx.destination);
-    o.frequency.value=freq||800;
-    o.type='sine';
-    g.gain.setValueAtTime(vol||0.18,ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+(dur||0.07));
-    o.start(ctx.currentTime);
-    o.stop(ctx.currentTime+(dur||0.07));
-  }catch(e){}
+  function _doTick(){
+    try{
+      var o=ctx.createOscillator();
+      var g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=freq||800;
+      o.type='sine';
+      g.gain.setValueAtTime(vol||0.18,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+(dur||0.07));
+      o.start(ctx.currentTime);
+      o.stop(ctx.currentTime+(dur||0.07));
+    }catch(e){}
+  }
+  if(ctx.state==='suspended'){ctx.resume().then(_doTick).catch(function(){});}
+  else{_doTick();}
 }
 
 function playPenaltySound(){
-  // Harsh buzzer for penalty flags
+  // Harsh buzzer for negative stats
   var ctx=getAudioCtx();
   if(!ctx)return;
-  try{
-    var o=ctx.createOscillator();
-    var g=ctx.createGain();
-    o.connect(g);g.connect(ctx.destination);
-    o.frequency.value=160;
-    o.type='sawtooth';
-    g.gain.setValueAtTime(0.35,ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.45);
-    o.start(ctx.currentTime);
-    o.stop(ctx.currentTime+0.45);
-  }catch(e){}
+  function _doPlay(){
+    try{
+      var o=ctx.createOscillator();
+      var g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=160;
+      o.type='sawtooth';
+      g.gain.setValueAtTime(0.35,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.45);
+      o.start(ctx.currentTime);
+      o.stop(ctx.currentTime+0.45);
+    }catch(e){}
+  }
+  if(ctx.state==='suspended'){ctx.resume().then(_doPlay).catch(function(){});}
+  else{_doPlay();}
 }
 
 function playTDFanfare(){
@@ -3804,21 +3816,25 @@ function playTDFanfare(){
   var ctx=getAudioCtx();
   if(!ctx)return;
   var notes=[{f:523,t:0},{f:659,t:0.13},{f:784,t:0.26},{f:1047,t:0.39}]; // C5 E5 G5 C6
-  notes.forEach(function(n){
-    try{
-      var o=ctx.createOscillator();
-      var g=ctx.createGain();
-      o.connect(g);g.connect(ctx.destination);
-      o.frequency.value=n.f;
-      o.type='triangle';
-      var t=ctx.currentTime+n.t;
-      g.gain.setValueAtTime(0,t);
-      g.gain.linearRampToValueAtTime(0.28,t+0.04);
-      g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
-      o.start(t);
-      o.stop(t+0.32);
-    }catch(e){}
-  });
+  function _doFanfare(){
+    notes.forEach(function(n){
+      try{
+        var o=ctx.createOscillator();
+        var g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.frequency.value=n.f;
+        o.type='triangle';
+        var t=ctx.currentTime+n.t;
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(0.28,t+0.04);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+        o.start(t);
+        o.stop(t+0.32);
+      }catch(e){}
+    });
+  }
+  if(ctx.state==='suspended'){ctx.resume().then(_doFanfare).catch(function(){});}
+  else{_doFanfare();}
 }
 
 function vibe(pattern,ev){
@@ -4708,7 +4724,7 @@ function genSessionCode(){
 function openSyncModal(){
   proGate('liveSync',function(){
     if(!syncSession)syncSession=genSessionCode();
-    document.getElementById('sync-host-code').textContent=syncSession;
+    var hc=document.getElementById('sync-host-code');if(hc)hc.textContent=syncSession;
     document.getElementById('sync-modal').classList.add('show');
     if(syncActive)updateParentLinkUI();
   });
