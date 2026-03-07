@@ -881,7 +881,7 @@ body.light-mode .toast-msg{color:#1a1714;}
 .sync-modal{position:fixed;inset:0;z-index:680;background:rgba(0,0,0,.9);display:flex;
   align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
 .sync-modal.show{opacity:1;pointer-events:all;}
-.sync-box{background:var(--sur);border-radius:20px;padding:24px 20px;width:100%;max-width:340px;}
+.sync-box{background:var(--sur);border-radius:20px;padding:24px 20px 20px;width:100%;max-width:340px;position:relative;}
 .sync-box-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--teal);margin-bottom:4px;}
 .sync-box-sub{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
   letter-spacing:2px;color:var(--dimmer);text-transform:uppercase;margin-bottom:18px;}
@@ -900,6 +900,10 @@ body.light-mode .toast-msg{color:#1a1714;}
   color:var(--dimmer);background:transparent;cursor:pointer;text-transform:uppercase;}
 .sync-fb-note{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--dimmer);
   letter-spacing:1px;text-align:center;line-height:1.7;margin-bottom:12px;}
+.sync-close-x{position:absolute;top:12px;right:14px;background:none;border:none;
+  color:var(--dimmer);font-size:22px;cursor:pointer;line-height:1;padding:2px 6px;
+  border-radius:6px;transition:color .15s;}
+.sync-close-x:hover{color:#fff;}
 
 /* Season print/CSV buttons */
 .sact-print{background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.35);color:var(--purple);}
@@ -1603,13 +1607,10 @@ body.light-mode .toast-msg{color:#1a1714;}
 <!-- LIVE PARENT SCOREBOARD MODAL -->
 <div class="sync-modal" id="sync-modal">
   <div class="sync-box">
+    <button type="button" class="sync-close-x" onclick="closeSyncModal()" title="Close">✕</button>
     <div class="sync-box-title">📡 Live Parent Score</div>
     <div class="sync-box-sub">Parents see live scores on their phone · No app needed</div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;">Your game code — share with parents:</div>
-    <div class="sync-code-display" id="sync-host-code">——</div>
-    <button type="button" class="sync-copy-btn" onclick="copySessionCode()">📋 Copy Code</button>
-    <div class="sync-fb-note">Tap Go Live → text parents the link. Scores update automatically every 15 seconds. Works on any phone, no app required.</div>
-    <button type="button" class="sync-join-btn" onclick="hostSession()" style="background:linear-gradient(135deg,var(--teal),#0f766e);color:#fff;">📡 Go Live Now</button>
+    <button type="button" class="sync-join-btn" onclick="hostSession()" style="background:linear-gradient(135deg,var(--teal),#0f766e);color:#fff;margin-bottom:8px;">📡 Go Live Now</button>
     <div id="parent-link-section" style="display:none;margin-top:14px;background:linear-gradient(135deg,rgba(20,184,166,.12),rgba(20,184,166,.06));border:2px solid rgba(20,184,166,.5);border-radius:14px;padding:14px 14px 10px;">
       <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
         <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:pulse 1.2s ease-in-out infinite;"></span>
@@ -1620,7 +1621,6 @@ body.light-mode .toast-msg{color:#1a1714;}
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,.35);text-align:center;letter-spacing:1px;margin-bottom:8px;">Parents open the link on their phone — no app needed · Updates every 15 sec</div>
       <button type="button" onclick="stopLiveSync();closeSyncModal();" style="width:100%;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);border-radius:9px;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:#ef4444;cursor:pointer;">⏹ Stop Live Score</button>
     </div>
-    <button type="button" class="sync-dismiss" onclick="closeSyncModal()">Dismiss</button>
   </div>
 </div>
 
@@ -2427,19 +2427,19 @@ function renderStats(){
         +'<div class="stb qbc" onclick="logStat(\''+esc(name)+'\',\'qbConvs\',event)"><div class="bi">✨</div><div class="bl2">Conv Pass</div><div class="bc">'+st.qbConvs+'</div></div>'
         +'<div class="stat-section-lbl">Receiving / Defense</div>'
         +'<div class="stb" style="'+scStyle+'" onclick="logStat(\''+esc(name)+'\',\'catches\',event)"><div class="bi">🏈</div><div class="bl2">Catch</div><div class="bc" style="color:'+s+'">'+st.catches+'</div></div>'
-        +'<div class="stb st" onclick="logStat(\''+esc(name)+'\',\'tds\',event)"><div class="bi">⭐</div><div class="bl2">TD Rec</div><div class="bc">'+st.tds+'</div></div>'
         +'<div class="stb sf" onclick="logStat(\''+esc(name)+'\',\'flags\',event)"><div class="bi">🏃</div><div class="bl2">Flag Pull</div><div class="bc">'+st.flags+'</div></div>'
         +'<div class="stb si" onclick="logStat(\''+esc(name)+'\',\'ints\',event)"><div class="bi">🎯</div><div class="bl2">INT</div><div class="bc">'+st.ints+'</div></div>'
+        +'<div class="stb st" onclick="logStat(\''+esc(name)+'\',\'tds\',event)"><div class="bi">⭐</div><div class="bl2">TD Rec</div><div class="bc">'+st.tds+'</div></div>'
         +'<div class="stb sfu" onclick="logStat(\''+esc(name)+'\',\'fumbles\',event)"><div class="bi">💨</div><div class="bl2">Fumble</div><div class="bc">'+st.fumbles+'</div></div>';
     } else {
       btns='<div class="stb" style="'+scStyle+'" onclick="logStat(\''+esc(name)+'\',\'catches\',event)"><div class="bi">🏈</div><div class="bl2">Catch</div><div class="bc" style="color:'+s+'">'+st.catches+'</div></div>'
-        +'<div class="stb st" onclick="logStat(\''+esc(name)+'\',\'tds\',event)"><div class="bi">⭐</div><div class="bl2">TD</div><div class="bc">'+st.tds+'</div></div>'
         +'<div class="stb sf" onclick="logStat(\''+esc(name)+'\',\'flags\',event)"><div class="bi">🏃</div><div class="bl2">Flag Pull</div><div class="bc">'+st.flags+'</div></div>'
+        +'<div class="stb sbl" onclick="logStat(\''+esc(name)+'\',\'blocks\',event)"><div class="bi">🛡️</div><div class="bl2">Deflect</div><div class="bc">'+st.blocks+'</div></div>'
         +'<div class="stb si" onclick="logStat(\''+esc(name)+'\',\'ints\',event)"><div class="bi">🎯</div><div class="bl2">INT</div><div class="bc">'+st.ints+'</div></div>'
+        +'<div class="stb st" onclick="logStat(\''+esc(name)+'\',\'tds\',event)"><div class="bi">⭐</div><div class="bl2">TD</div><div class="bc">'+st.tds+'</div></div>'
         +'<div class="stb scv" onclick="logStat(\''+esc(name)+'\',\'conv1\',event)"><div class="bi">1️⃣</div><div class="bl2">1pt Conv</div><div class="bc">'+st.conv1+'</div></div>'
         +'<div class="stb scv" onclick="logStat(\''+esc(name)+'\',\'conv2\',event)"><div class="bi">2️⃣</div><div class="bl2">2pt Conv</div><div class="bc">'+st.conv2+'</div></div>'
-        +'<div class="stb sfu" onclick="logStat(\''+esc(name)+'\',\'fumbles\',event)"><div class="bi">💨</div><div class="bl2">Fumble</div><div class="bc">'+st.fumbles+'</div></div>'
-        +'<div class="stb sbl" onclick="logStat(\''+esc(name)+'\',\'blocks\',event)"><div class="bi">🛡️</div><div class="bl2">Deflect</div><div class="bc">'+st.blocks+'</div></div>';
+        +'<div class="stb sfu" onclick="logStat(\''+esc(name)+'\',\'fumbles\',event)"><div class="bi">💨</div><div class="bl2">Fumble</div><div class="bc">'+st.fumbles+'</div></div>';
     }
 
     var card=document.createElement('div');
@@ -4090,6 +4090,8 @@ var VIBE_PATTERNS={
 var _origLogStat=logStat;
 logStat=function(name,key,ev){
   vibe(VIBE_PATTERNS[key]||[10],ev);
+  // Penalty buzzer for negative stats (Pro)
+  if(isPro()&&(key==='fumbles'||key==='qbInts'||key==='flags')){playPenaltySound();}
   // Flash the button that was tapped
   if(ev&&ev.target){ev.target.classList.remove('stat-btn-flash');void ev.target.offsetWidth;ev.target.classList.add('stat-btn-flash');}
   _origLogStat(name,key,ev);
@@ -4790,9 +4792,16 @@ function syncPush(){
       body:JSON.stringify({game_code:syncSession,game_data:gameData,license_key:licenseKey})
     }).then(function(r){return r.json();}).then(function(data){
       if(!data.success){
-        syncActive=false;
-        if(syncInterval){clearInterval(syncInterval);syncInterval=null;}
-        showSyncBar('Error — check Pro status','','——');
+        // Only permanently stop on license/auth failures — transient errors keep retrying
+        var errMsg=(data.error||'').toLowerCase();
+        var isFatal=errMsg.indexOf('license')>=0||errMsg.indexOf('invalid')>=0||errMsg.indexOf('expired')>=0;
+        if(isFatal){
+          syncActive=false;
+          if(syncInterval){clearInterval(syncInterval);syncInterval=null;}
+          showSyncBar('Error — check Pro status','','——');
+        }else{
+          showSyncBar('Reconnecting…','','——');
+        }
       }
     }).catch(function(){
       showSyncBar('Reconnecting…','','——');
