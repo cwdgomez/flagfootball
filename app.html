@@ -3518,10 +3518,22 @@ async function shareRoster(){
 
 function copyRosterCode(){
   if(!_rosterShareCode)return;
+  var btn=document.getElementById('rsm-copy-btn');
+  function flashBtn(){
+    if(btn){
+      btn.textContent='\u2705 Code Copied!';
+      btn.style.background='linear-gradient(135deg,#16a34a,#15803d)';
+      setTimeout(function(){
+        btn.textContent='\uD83D\uDCCB Copy Code';
+        btn.style.background='';
+      },2500);
+    }
+  }
   if(navigator.clipboard){
-    navigator.clipboard.writeText(_rosterShareCode).then(function(){showToast('Code copied! \u2014 '+_rosterShareCode);});
+    navigator.clipboard.writeText(_rosterShareCode).then(flashBtn);
   }else{
     prompt('Share this code with your assistant coach:',_rosterShareCode);
+    flashBtn();
   }
 }
 
