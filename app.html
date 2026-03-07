@@ -4620,6 +4620,8 @@ window.onload=function(){
   setTimeout(scheduleProRecheck, 3000);
   // Send ToS consent for Pro users who consented before upgrading
   sendConsentToBackend();
+  // Initialize Supabase Auth (sign-in, session restore, cloud sync)
+  initSupabaseAuth();
 };
 
 /* ════════════════════════════════════════════════════════════
