@@ -1228,7 +1228,7 @@ body.light-mode .toast-msg{color:#1a1714;}
     <!-- PRO ACTIVATION STRIP -->
     <div id="setup-pro-strip" style="margin-top:14px;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;display:flex;align-items:center;justify-content:space-between;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.35);">⭐ PRO FEATURES INACTIVE</div>
-      <button type="button" id="setup-pro-btn" onclick="openProModal('setup',null)"
+      <button type="button" id="setup-pro-btn" onclick="showGateForActivation()"
         style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#111;border:none;border-radius:8px;padding:6px 14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:1px;cursor:pointer;">
         UNLOCK PRO
       </button>
@@ -1275,7 +1275,7 @@ body.light-mode .toast-msg{color:#1a1714;}
         <span class="qtimer-play" id="qtimer-play">▶</span>
       </div>
       <button type="button" class="auth-hdr-btn" id="auth-hdr-btn" onclick="authHeaderClick()" title="Sign in / Account">👤</button>
-      <button type="button" class="pro-hdr-btn" id="pro-hdr-btn" onclick="openProModal('header',null)" title="Activate Pro">⭐ PRO</button>
+      <button type="button" class="pro-hdr-btn" id="pro-hdr-btn" onclick="showGateForActivation()" title="Activate Pro">⭐ PRO</button>
       <button type="button" class="mode-toggle" id="mode-toggle" onclick="toggleLightMode()" title="Toggle light/dark mode">☀️</button>
     </div>
   </div>
@@ -4547,6 +4547,24 @@ function initGate(){
   GATE_ACTIVE=true;
 }
 
+/* ── SHOW GATE FOR PRO ACTIVATION (safe to call any time) ── */
+function showGateForActivation(){
+  // Close any open modal that might be in the way
+  var proModal=document.getElementById('pro-upgrade-modal');
+  if(proModal)proModal.classList.remove('show');
+  // Show the gate screen which has the proven license key entry
+  var g=document.getElementById('code-gate');
+  if(g){
+    g.classList.remove('hidden');
+    GATE_ACTIVE=true;
+    // Focus the key input so the user can type right away
+    setTimeout(function(){
+      var inp=document.getElementById('gate-code-input');
+      if(inp)inp.focus();
+    },100);
+  }
+}
+
 function submitGateCode(){
   var inp=document.getElementById('gate-code-input');
   var err=document.getElementById('gate-error');
@@ -4587,7 +4605,14 @@ function submitGateCode(){
       if(err){err.style.color='#22C55E';err.textContent='PRO activated! Welcome, Coach.';}
       vibe([30,15,30,15,50]);
       updateProUI();
-      setTimeout(hideGate,1200);
+      setTimeout(function(){
+        hideGate();
+        // Fire any pending callback (e.g. open Season, Voice, etc.)
+        if(typeof _proCallback==='function'){
+          try{_proCallback();}catch(e){}
+          _proCallback=null;
+        }
+      },1200);
     } else {
       if(btn)btn.textContent='⭐ UNLOCK PRO';
       vibe([20,10,20]);
@@ -4627,14 +4652,9 @@ window.onload=function(){
   sendConsentToBackend();
   // Initialize Supabase Auth (sign-in, session restore, cloud sync)
   initSupabaseAuth();
-  // Auto-open Pro modal if arriving via ?activate=1 (e.g. from index page "Already have a key?" link)
+  // Auto-show license activation screen if arriving via ?activate=1
   if(new URLSearchParams(window.location.search).get('activate')==='1'){
-    setTimeout(function(){
-      openProModal('url',null);
-      // Focus the license key input so the user can type immediately
-      var inp=document.getElementById('pro-code-input');
-      if(inp)inp.focus();
-    },600);
+    setTimeout(showGateForActivation, 400);
   }
 };
 
@@ -4721,7 +4741,9 @@ function proGate(feature,callback){
     if(typeof callback==='function')callback();
     return;
   }
-  openProModal(feature,callback);
+  // Store callback so it fires after successful Pro unlock
+  _proCallback=callback||null;
+  showGateForActivation();
 }
 
 var _proCallback=null;
