@@ -56,19 +56,26 @@ body{display:flex;flex-direction:column;}
 /* ── GAME SCREEN ── */
 .game-screen{display:none;flex-direction:column;flex:1;overflow:hidden;}
 .player-list{flex:1;overflow-y:auto;padding:8px 10px 20px;}
-.player-card{background:var(--sur);border:1px solid var(--dark4);border-radius:14px;padding:10px 12px;margin-bottom:8px;transition:border-color .15s;}
+.player-card{background:var(--sur);border:1px solid var(--dark4);border-radius:14px;overflow:hidden;margin-bottom:8px;transition:border-color .15s;}
 .player-card.on-off{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.04);}
 .player-card.on-def{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.04);}
 .player-card.is-qb{border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.04);}
 .player-card.absent{opacity:.35;}
-.pc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+/* ── collapsed by default — tap header to expand ── */
+.pc-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;}
+.pc-header:active{background:rgba(255,255,255,.03);}
+.pc-body{display:none;padding:0 12px 12px;}
+.player-card.expanded .pc-body{display:block;}
+.pc-chevron{font-size:11px;color:var(--dimmer);transition:transform .2s;flex-shrink:0;margin-left:6px;}
+.player-card.expanded .pc-chevron{transform:rotate(180deg);}
+.pc-top{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
 .pc-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;letter-spacing:.5px;color:var(--txt);}
 .pc-tag{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;padding:2px 7px;border-radius:4px;text-transform:uppercase;}
 .pc-tag.off{background:rgba(34,197,94,.15);color:var(--green);}
 .pc-tag.def{background:rgba(59,130,246,.15);color:#60a5fa;}
 .pc-tag.qb{background:rgba(255,215,0,.15);color:var(--gold);}
 .pc-tag.bench{background:rgba(255,255,255,.06);color:var(--dim);}
-.stat-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.stat-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}.player-card.is-qb .stat-btns{grid-template-columns:repeat(4,1fr);}
 .stb{background:var(--dark3);border:1px solid var(--dark5);border-radius:10px;padding:8px 4px;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent;user-select:none;transition:transform .1s,background .1s;}
 .stb:active{transform:scale(.93);background:var(--dark4);}
 .stb.popped{animation:pop .22s ease;}
@@ -144,22 +151,27 @@ body{display:flex;flex-direction:column;}
   var localStats = {}; // track counts locally for display
 
   /* ── STAT DEFINITIONS ── */
+  /* ── STAT KEYS — icons match app.html renderPlayer exactly ── */
   var STAT_KEYS = [
-    { key:'catches', icon:'🏈', label:'Catch' },
-    { key:'tds',     icon:'🏆', label:'TD' },
-    { key:'flags',   icon:'🚩', label:'Flag Pull' },
-    { key:'ints',    icon:'🔵', label:'INT' },
-    { key:'fumbles', icon:'💨', label:'Fumble' },
-    { key:'blocks',  icon:'🛡', label:'Deflect' }
+    { key:'catches', icon:'🏈', label:'Catch'    },
+    { key:'tds',     icon:'⭐', label:'TD'        },
+    { key:'flags',   icon:'🏃', label:'Flag Pull' },
+    { key:'ints',    icon:'🎯', label:'INT'        },
+    { key:'conv1',   icon:'1️⃣', label:'1pt Conv'  },
+    { key:'conv2',   icon:'2️⃣', label:'2pt Conv'  },
+    { key:'fumbles', icon:'💨', label:'Fumble'     },
+    { key:'blocks',  icon:'🛡️', label:'Deflect'   }
   ];
 
   var QB_STAT_KEYS = [
-    { key:'qbTDs',   icon:'🏆', label:'TD Pass' },
-    { key:'qbInts',  icon:'🔵', label:'INT Thrown' },
-    { key:'qbConvs', icon:'⭐', label:'Conv Pass' },
-    { key:'catches', icon:'🏈', label:'Catch' },
-    { key:'fumbles', icon:'💨', label:'Fumble' },
-    { key:'blocks',  icon:'🛡', label:'Deflect' }
+    { key:'qbTDs',   icon:'🏈', label:'TD Pass'   },
+    { key:'qbInts',  icon:'❌', label:'INT'        },
+    { key:'qbConvs', icon:'✨', label:'Conv Pass'  },
+    { key:'catches', icon:'🏈', label:'Catch'      },
+    { key:'tds',     icon:'⭐', label:'TD Rec'     },
+    { key:'flags',   icon:'🏃', label:'Flag Pull'  },
+    { key:'ints',    icon:'🎯', label:'INT'        },
+    { key:'fumbles', icon:'💨', label:'Fumble'     }
   ];
 
   /* ── INIT ── */
@@ -265,6 +277,16 @@ body{display:flex;flex-direction:column;}
     }
   }
 
+  /* Track which cards are expanded */
+  var expandedCards = {};
+
+  /* Format name as "First L." matching app.html convention */
+  function displayName(name) {
+    var parts = (name || '').trim().split(/\s+/);
+    if (parts.length === 1) return parts[0];
+    return parts[0] + ' ' + parts[parts.length - 1].charAt(0).toUpperCase() + '.';
+  }
+
   function renderPlayers(state) {
     var list = document.getElementById('player-list');
     var roster = state.roster || [];
@@ -282,33 +304,57 @@ body{display:flex;flex-direction:column;}
       var isAbsent = absent.indexOf(name) >= 0;
       var isQB = name === qb;
       var onField = rots[name] || null;
-      var cardClass = 'player-card' + (isAbsent ? ' absent' : '') + (isQB ? ' is-qb' : onField === 'off' ? ' on-off' : onField === 'def' ? ' on-def' : '');
+      var isExp = !!expandedCards[name];
+
+      var cardClass = 'player-card'
+        + (isExp ? ' expanded' : '')
+        + (isAbsent ? ' absent' : '')
+        + (isQB ? ' is-qb' : onField === 'off' ? ' on-off' : onField === 'def' ? ' on-def' : '');
+
       var tagHtml = '';
       if (isQB) tagHtml = '<span class="pc-tag qb">QB</span>';
-      else if (onField === 'off') tagHtml = '<span class="pc-tag off">Offense</span>';
-      else if (onField === 'def') tagHtml = '<span class="pc-tag def">Defense</span>';
+      else if (onField === 'off') tagHtml = '<span class="pc-tag off">OFF</span>';
+      else if (onField === 'def') tagHtml = '<span class="pc-tag def">DEF</span>';
       else tagHtml = '<span class="pc-tag bench">Bench</span>';
 
-      var statKeys = isQB ? QB_STAT_KEYS : STAT_KEYS;
-      var btnHtml = '';
-      statKeys.forEach(function(s) {
-        var count = (localStats[name] && localStats[name][s.key]) ? localStats[name][s.key] : 0;
-        var btnId = 'stb-' + safeid(name) + '-' + s.key;
-        btnHtml += '<button type="button" class="stb" id="'+btnId+'" onclick="sendStatBtn(\''+escq(name)+'\',\''+s.key+'\')">'
-          +'<div class="stb-icon">'+s.icon+'</div>'
-          +'<div class="stb-label">'+s.label+'</div>'
-          +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'
-          +'</button>';
-      });
+      var bodyHtml = '';
 
-      html += '<div class="'+cardClass+'">'
-        +'<div class="pc-top"><div class="pc-name">'+htmlEsc(firstName(name))+'</div>'+tagHtml+'</div>'
-        +'<div class="stat-btns">'+btnHtml+'</div>'
-        +'</div>';
+      if (isQB) {
+        var qbBtnHtml = '';
+        QB_STAT_KEYS.slice(0,3).forEach(function(s) {
+          var count = (localStats[name] && localStats[name][s.key]) ? localStats[name][s.key] : 0;
+          var btnId = 'stb-' + safeid(name) + '-' + s.key;
+          qbBtnHtml += '<button type="button" class="stb" id="'+btnId+'" onclick="sendStatBtn(''+escq(name)+'',''+s.key+'')">'            +'<div class="stb-icon">'+s.icon+'</div>'            +'<div class="stb-label">'+s.label+'</div>'            +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'            +'</button>';
+        });
+        var recBtnHtml = '';
+        QB_STAT_KEYS.slice(3).forEach(function(s) {
+          var count = (localStats[name] && localStats[name][s.key]) ? localStats[name][s.key] : 0;
+          var btnId = 'stb-' + safeid(name) + '-' + s.key;
+          recBtnHtml += '<button type="button" class="stb" id="'+btnId+'" onclick="sendStatBtn(''+escq(name)+'',''+s.key+'')">'            +'<div class="stb-icon">'+s.icon+'</div>'            +'<div class="stb-label">'+s.label+'</div>'            +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'            +'</button>';
+        });
+        bodyHtml = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,215,0,.6);text-transform:uppercase;margin-bottom:6px;">⚡ QB Stats</div>'          +'<div class="stat-btns" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px;">'+qbBtnHtml+'</div>'          +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:6px;">Receiving / Defense</div>'          +'<div class="stat-btns">'+recBtnHtml+'</div>';
+      } else {
+        var btnHtml = '';
+        STAT_KEYS.forEach(function(s) {
+          var count = (localStats[name] && localStats[name][s.key]) ? localStats[name][s.key] : 0;
+          var btnId = 'stb-' + safeid(name) + '-' + s.key;
+          btnHtml += '<button type="button" class="stb" id="'+btnId+'" onclick="sendStatBtn(''+escq(name)+'',''+s.key+'')">'            +'<div class="stb-icon">'+s.icon+'</div>'            +'<div class="stb-label">'+s.label+'</div>'            +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'            +'</button>';
+        });
+        bodyHtml = '<div class="stat-btns">'+btnHtml+'</div>';
+      }
+
+      html += '<div class="'+cardClass+'" id="card-'+safeid(name)+'">'        +'<div class="pc-header" onclick="toggleCard(''+escq(name)+'')">'          +'<div class="pc-top">'            +'<div class="pc-name">'+htmlEsc(displayName(name))+'</div>'            +tagHtml          +'</div>'          +'<div class="pc-chevron">▼</div>'        +'</div>'        +'<div class="pc-body">'+bodyHtml+'</div>'        +'</div>';
     });
     list.innerHTML = html;
   }
 
+  window.toggleCard = function(name) {
+    expandedCards[name] = !expandedCards[name];
+    var card = document.getElementById('card-' + safeid(name));
+    if (!card) return;
+    if (expandedCards[name]) card.classList.add('expanded');
+    else card.classList.remove('expanded');
+  };
   window.sendStatBtn = function(name, key) { sendStat(name, key); };
 
   /* ── HELPERS ── */
