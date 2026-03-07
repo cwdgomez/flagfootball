@@ -326,6 +326,9 @@ body{display:flex;flex-direction:column;}
       else if (onField === 'def') tagHtml = '<span class="pc-tag def">DEF</span>';
       else tagHtml = '<span class="pc-tag bench">Bench</span>';
 
+      // Use htmlEsc for data-* attributes to prevent injection from crafted player names
+      var safeAttr = htmlEsc(name);
+
       var bodyHtml = '';
 
       if (isQB) {
@@ -333,13 +336,21 @@ body{display:flex;flex-direction:column;}
         QB_STAT_KEYS.slice(0,3).forEach(function(s) {
           var count = (localStats[name] && localStats[name][s.key]) ? localStats[name][s.key] : 0;
           var btnId = 'stb-' + safeid(name) + '-' + s.key;
-          qbBtnHtml += '<button type="button" class="stb" id="'+btnId+'" onclick="sendStatBtn(''+escq(name)+'',''+s.key+'')">'            +'<div class="stb-icon">'+s.icon+'</div>'            +'<div class="stb-label">'+s.label+'</div>'            +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'            +'</button>';
+          qbBtnHtml += '<button type="button" class="stb js-stat-btn" id="'+btnId+'" data-player="'+safeAttr+'" data-key="'+s.key+'">'
+            +'<div class="stb-icon">'+s.icon+'</div>'
+            +'<div class="stb-label">'+s.label+'</div>'
+            +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'
+            +'</button>';
         });
         var recBtnHtml = '';
         QB_STAT_KEYS.slice(3).forEach(function(s) {
           var count = (localStats[name] && localStats[name][s.key]) ? localStats[name][s.key] : 0;
           var btnId = 'stb-' + safeid(name) + '-' + s.key;
-          recBtnHtml += '<button type="button" class="stb" id="'+btnId+'" onclick="sendStatBtn(''+escq(name)+'',''+s.key+'')">'            +'<div class="stb-icon">'+s.icon+'</div>'            +'<div class="stb-label">'+s.label+'</div>'            +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'            +'</button>';
+          recBtnHtml += '<button type="button" class="stb js-stat-btn" id="'+btnId+'" data-player="'+safeAttr+'" data-key="'+s.key+'">'
+            +'<div class="stb-icon">'+s.icon+'</div>'
+            +'<div class="stb-label">'+s.label+'</div>'
+            +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'
+            +'</button>';
         });
         bodyHtml = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,215,0,.6);text-transform:uppercase;margin-bottom:6px;">⚡ QB Stats</div>'
           +'<div class="stat-btns" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px;">'+qbBtnHtml+'</div>'
@@ -350,14 +361,36 @@ body{display:flex;flex-direction:column;}
         STAT_KEYS.forEach(function(s) {
           var count = (localStats[name] && localStats[name][s.key]) ? localStats[name][s.key] : 0;
           var btnId = 'stb-' + safeid(name) + '-' + s.key;
-          btnHtml += '<button type="button" class="stb" id="'+btnId+'" onclick="sendStatBtn(''+escq(name)+'',''+s.key+'')">'            +'<div class="stb-icon">'+s.icon+'</div>'            +'<div class="stb-label">'+s.label+'</div>'            +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'            +'</button>';
+          btnHtml += '<button type="button" class="stb js-stat-btn" id="'+btnId+'" data-player="'+safeAttr+'" data-key="'+s.key+'">'
+            +'<div class="stb-icon">'+s.icon+'</div>'
+            +'<div class="stb-label">'+s.label+'</div>'
+            +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'
+            +'</button>';
         });
         bodyHtml = '<div class="stat-btns">'+btnHtml+'</div>';
       }
 
-      html += '<div class="'+cardClass+'" id="card-'+safeid(name)+'">'        +'<div class="pc-header" onclick="toggleCard(''+escq(name)+'')">'          +'<div class="pc-top">'            +'<div class="pc-name">'+htmlEsc(displayName(name))+'</div>'            +tagHtml          +'</div>'          +'<div class="pc-chevron">▼</div>'        +'</div>'        +'<div class="pc-body">'+bodyHtml+'</div>'        +'</div>';
+      // pc-header uses data-player (not onclick) to prevent " injection from player names
+      html += '<div class="'+cardClass+'" id="card-'+safeid(name)+'">'
+        +'<div class="pc-header js-toggle-card" data-player="'+safeAttr+'">'
+          +'<div class="pc-top">'
+            +'<div class="pc-name">'+htmlEsc(displayName(name))+'</div>'
+            +tagHtml
+          +'</div>'
+          +'<div class="pc-chevron">▼</div>'
+        +'</div>'
+        +'<div class="pc-body">'+bodyHtml+'</div>'
+        +'</div>';
     });
     list.innerHTML = html;
+
+    // Attach event listeners — safe against injection, no inline onclick needed
+    list.querySelectorAll('.js-toggle-card').forEach(function(el) {
+      el.addEventListener('click', function() { toggleCard(el.getAttribute('data-player')); });
+    });
+    list.querySelectorAll('.js-stat-btn').forEach(function(el) {
+      el.addEventListener('click', function() { sendStat(el.getAttribute('data-player'), el.getAttribute('data-key')); });
+    });
   }
 
   window.toggleCard = function(name) {
@@ -367,8 +400,6 @@ body{display:flex;flex-direction:column;}
     if (expandedCards[name]) card.classList.add('expanded');
     else card.classList.remove('expanded');
   };
-  window.sendStatBtn = function(name, key) { sendStat(name, key); };
-
   /* ── HELPERS ── */
   function showScreen(name) {
     document.getElementById('join-screen').style.display = name === 'join' ? 'flex' : 'none';
@@ -402,8 +433,6 @@ body{display:flex;flex-direction:column;}
   function firstName(name) { return (name || '').split(' ')[0]; }
 
   function safeid(name) { return (name || '').replace(/[^a-zA-Z0-9]/g, '_'); }
-
-  function escq(name) { return (name || '').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 
   function htmlEsc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
