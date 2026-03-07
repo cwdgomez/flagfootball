@@ -317,6 +317,16 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .notes-ta{width:100%;background:var(--dark3);border:1px solid var(--dark5);border-radius:9px;padding:9px 11px;color:var(--txt);font-family:'Barlow',sans-serif;font-size:14px;resize:none;outline:none;min-height:60px;transition:border-color .2s;line-height:1.4;}
 .notes-ta:focus{border-color:var(--s);}
 .notes-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--dimmer);text-transform:uppercase;margin-bottom:5px;}
+.scout-panel{margin-top:10px;background:var(--sur);border:1px solid rgba(255,215,0,.15);border-radius:12px;padding:14px 16px;display:none;}
+.scout-panel.visible{display:block;}
+.scout-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.scout-hdr-left{display:flex;align-items:center;gap:8px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;color:var(--gold);letter-spacing:.5px;}
+.scout-saved-badge{font-size:10px;background:rgba(255,215,0,.15);color:var(--gold);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px;}
+.scout-ta{width:100%;background:var(--dark3);border:1px solid var(--dark5);border-radius:8px;color:var(--fg);font-family:'Barlow Condensed',sans-serif;font-size:14px;padding:10px 12px;resize:vertical;min-height:80px;box-sizing:border-box;margin-top:2px;transition:border-color .2s;line-height:1.5;}
+.scout-ta:focus{outline:none;border-color:rgba(255,215,0,.35);}
+.scout-meta{font-size:11px;color:var(--dimmer);margin-top:6px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.2px;}
+.scout-hist-btn{background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;opacity:.7;transition:opacity .2s;}
+.scout-hist-btn:hover{opacity:1;}
 .has-note .pname::after{content:" 📝";font-size:10px;}
 
 /* ROTATIONS */
@@ -1178,7 +1188,14 @@ body.light-mode .toast-msg{color:#1a1714;}
 
     <div class="setup-section-lbl">📋 Game Setup</div>
     <div class="fg"><label>Opponent Team</label>
-      <input type="text" id="su-opp" placeholder="e.g. Eagles, Bears..."/>
+      <input type="text" id="su-opp" placeholder="e.g. Eagles, Bears..." oninput="onOppInput()"/>
+      <div class="scout-panel" id="scout-panel">
+        <div class="scout-hdr">
+          <div class="scout-hdr-left">🕵️ Scouting Notes <span class="scout-saved-badge" id="scout-badge" style="display:none">Notes saved</span></div>
+        </div>
+        <textarea class="scout-ta" id="scout-ta" rows="3" placeholder="e.g. Blitz every 3rd down, QB scrambles left, #7 is their go-to WR..." oninput="onScoutInput()"></textarea>
+        <div class="scout-meta" id="scout-meta"></div>
+      </div>
     </div>
     <div class="fg"><label>Game Date</label>
       <input type="date" id="su-date"/>
@@ -2926,6 +2943,60 @@ function doReset(){
   buildQBList();buildAbsentList();
 }
 
+/* ── OPPONENT SCOUTING NOTES ── */
+function normalizeOpp(name){return(name||'').trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');}
+function getScoutKey(opp){var n=normalizeOpp(opp);return n?'ff_scout_'+n:null;}
+function loadScoutData(opp){try{var k=getScoutKey(opp);return k?JSON.parse(localStorage.getItem(k)||'null'):null;}catch(e){return null;}}
+function saveScoutNotes(opp,notes){
+  var key=getScoutKey(opp);
+  if(!key)return;
+  var data=loadScoutData(opp)||{};
+  data.notes=notes;
+  data.lastUpdated=new Date().toISOString().split('T')[0];
+  try{localStorage.setItem(key,JSON.stringify(data));}
+  catch(e){console.warn('[FFTP] saveScoutNotes failed:',e);}
+}
+function renderScoutPanel(){
+  var oppEl=document.getElementById('su-opp');
+  var opp=oppEl?oppEl.value:'';
+  var panel=document.getElementById('scout-panel');
+  var ta=document.getElementById('scout-ta');
+  var badge=document.getElementById('scout-badge');
+  var meta=document.getElementById('scout-meta');
+  if(!panel)return;
+  if(opp.trim().length<2){panel.classList.remove('visible');return;}
+  panel.classList.add('visible');
+  var data=loadScoutData(opp);
+  // Only populate if not currently focused (don't overwrite what coach is typing)
+  if(ta!==document.activeElement){ta.value=data&&data.notes?data.notes:'';}
+  if(data&&data.lastUpdated){
+    badge.style.display='inline-block';
+    var games=loadSeason();
+    var count=games.filter(function(g){return normalizeOpp(g.opp)===normalizeOpp(opp);}).length;
+    meta.textContent='Last updated: '+data.lastUpdated+(count?' · Faced '+count+' time'+(count!==1?'s':''):'');
+  } else {
+    badge.style.display='none';
+    meta.textContent='';
+  }
+}
+var _scoutDebounce=null;
+function onOppInput(){
+  clearTimeout(_scoutDebounce);
+  _scoutDebounce=setTimeout(renderScoutPanel,250);
+}
+function onScoutInput(){
+  var opp=(document.getElementById('su-opp')||{}).value||'';
+  var ta=document.getElementById('scout-ta');
+  if(opp.trim().length>=2&&ta)saveScoutNotes(opp,ta.value);
+  // Update badge immediately
+  var badge=document.getElementById('scout-badge');
+  var meta=document.getElementById('scout-meta');
+  if(badge&&ta.value.trim()){
+    badge.style.display='inline-block';
+    if(meta&&!meta.textContent)meta.textContent='Last updated: '+new Date().toISOString().split('T')[0];
+  }
+}
+
 /* ── COACH NOTES ── */
 function saveNote(name,val){
   G.notes[name]=val;
@@ -3274,9 +3345,11 @@ function renderSeasonScreen(){
     var result=g.us>g.them?'win':g.us<g.them?'loss':'tie';
     var dateStr=g.date?new Date(g.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
     var bc=result==='win'?'rgba(34,197,94,.3)':result==='loss'?'rgba(244,63,94,.2)':'var(--dark5)';
+    var scoutData=loadScoutData(g.opp);
+    var scoutBtn=scoutData&&scoutData.notes?'<button type="button" class="scout-hist-btn" title="View scouting notes" onclick="viewScoutNotes(\''+g.opp.replace(/'/g,'\\\'').replace(/"/g,'&quot;')+'\',event)">🕵️</button>':'';
     return '<div class="game-hist-card" style="border-color:'+bc+'">'
       +'<div class="ghc-top">'
-        +'<div><div class="ghc-opp">vs. '+g.opp+'</div>'
+        +'<div><div class="ghc-opp">vs. '+g.opp+' '+scoutBtn+'</div>'
         +'<div class="ghc-meta">'+dateStr+'</div>'
         +(g.mvp?'<div class="ghc-mvp">⭐ MVP: '+dispName(g.mvp)+'</div>':'')
         +'</div>'
@@ -3294,6 +3367,13 @@ function deleteGame(id,ev){
   if(!confirm('Delete this game?'))return;
   saveSeason(loadSeason().filter(function(g){return g.id!==id;}));
   renderSeasonScreen();
+}
+function viewScoutNotes(opp,ev){
+  if(ev&&ev.stopPropagation)ev.stopPropagation();
+  var data=loadScoutData(opp);
+  if(!data||!data.notes){showToast('No scouting notes for '+opp);return;}
+  var msg='🕵️ '+opp+'\n\n'+data.notes+(data.lastUpdated?'\n\nLast updated: '+data.lastUpdated:'');
+  alert(msg);
 }
 function clearSeason(){if(!confirm('Delete ALL season history?'))return;try{localStorage.removeItem(LS_KEY);}catch(e){}renderSeasonScreen();}
 function exportSeason(){
