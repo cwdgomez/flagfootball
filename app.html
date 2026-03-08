@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.0/dist/umd/supabase.min.js" integrity="sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.0/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
 <style>
 :root{
   --p:#CC0000;--p2:#880000;--s:#FFD700;--s2:#B8860B;
@@ -1046,9 +1046,25 @@ body.light-mode .toast-msg{color:#1a1714;}
 .rsm-import-btn{width:100%;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border:none;border-radius:12px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;cursor:pointer;}
 .rsm-import-btn:active{opacity:.8;}
 .rsm-error{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:#ef4444;text-align:center;min-height:18px;letter-spacing:.5px;}
+
+/* ── PWA Pull-to-Refresh ── */
+.ptr-indicator{
+  position:fixed;top:0;left:0;right:0;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  height:0;overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,215,0,.12),transparent);
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:2px;color:var(--s,#FFD700);
+  transition:height .2s ease;pointer-events:none;
+}
+.ptr-indicator.active{height:48px;}
+.ptr-indicator.releasing{transition:height .3s ease;}
+.ptr-spinner{width:18px;height:18px;border:2px solid rgba(255,215,0,.3);border-top-color:var(--s,#FFD700);border-radius:50%;animation:spin .6s linear infinite;margin-right:8px;}
+@keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
+<div class="ptr-indicator" id="ptr-indicator"><div class="ptr-spinner"></div>REFRESHING…</div>
 <div id="grid-bg"></div>
 
 <!-- TOS / PRIVACY CONSENT -->
@@ -3303,68 +3319,83 @@ function buildCartoonAvatarSVG(name,p,s,isLarge){
   var num=jerseyNum(name)||'';
   var w=isLarge?80:68;var h=isLarge?110:93;
   var leg;try{leg=darken(p,45);}catch(e){leg=p;}
+  var skin='#C68642';var skinSh='#A0693A';var hair='#2C1B0E';
   var r=parseInt(p.slice(1,3)||'0',16);
   var g=parseInt(p.slice(3,5)||'0',16);
   var b=parseInt(p.slice(5,7)||'0',16);
   var nc=(0.299*r+0.587*g+0.114*b)/255>0.55?'#111111':s;
-  var sv='<svg viewBox="0 0 80 110" xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">';
-  // Shadow
-  sv+='<ellipse cx="40" cy="108" rx="24" ry="5" fill="rgba(0,0,0,0.2)"/>';
-  // Legs
-  sv+='<rect x="21" y="77" width="15" height="25" rx="7" fill="'+leg+'"/>';
-  sv+='<rect x="44" y="77" width="15" height="25" rx="7" fill="'+leg+'"/>';
-  // Cleats
-  sv+='<rect x="17" y="97" width="20" height="7" rx="3.5" fill="'+s+'"/>';
-  sv+='<rect x="43" y="97" width="20" height="7" rx="3.5" fill="'+s+'"/>';
+  var pL;try{pL=lighten(p,30);}catch(e){pL=p;}
+  var sv='<svg viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">';
+  // Defs
+  sv+='<defs><linearGradient id="jG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+pL+'" stop-opacity="0.15"/><stop offset="100%" stop-color="'+p+'" stop-opacity="0"/></linearGradient></defs>';
+  // Ground shadow
+  sv+='<ellipse cx="40" cy="117" rx="20" ry="3.5" fill="rgba(0,0,0,0.3)"/>';
+  // Left leg (back, stride)
+  sv+='<path d="M32,82 Q29,94 27,102 Q26,106 25,108" stroke="'+leg+'" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+  sv+='<ellipse cx="23" cy="110" rx="8" ry="4" fill="'+s+'"/><ellipse cx="23" cy="109" rx="7" ry="3" fill="white" opacity="0.15"/>';
+  // Right leg (front, stride)
+  sv+='<path d="M48,82 Q52,93 55,100 Q57,104 57,107" stroke="'+leg+'" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+  sv+='<ellipse cx="59" cy="109" rx="8" ry="4" fill="'+s+'"/><ellipse cx="59" cy="108" rx="7" ry="3" fill="white" opacity="0.15"/>';
   // Flag belt
-  sv+='<rect x="13" y="70" width="54" height="9" rx="4.5" fill="'+s+'"/>';
-  // Flags hanging
-  sv+='<rect x="15" y="77" width="9" height="22" rx="4.5" fill="'+s+'"/>';
-  sv+='<rect x="56" y="77" width="9" height="22" rx="4.5" fill="'+s+'"/>';
-  // Jersey body
-  sv+='<rect x="12" y="37" width="56" height="37" rx="10" fill="'+p+'"/>';
-  sv+='<rect x="12" y="37" width="56" height="13" rx="10" fill="'+s+'" opacity="0.25"/>';
-  sv+='<rect x="12" y="45" width="56" height="6" fill="'+s+'" opacity="0.15"/>';
+  sv+='<rect x="24" y="76" width="32" height="5" rx="2.5" fill="'+s+'"/>';
+  sv+='<path d="M26,81 Q22,90 18,98 Q17,100 19,99 L24,81" fill="'+s+'" opacity="0.9"/>';
+  sv+='<path d="M54,81 Q58,90 62,98 Q63,100 61,99 L56,81" fill="'+s+'" opacity="0.9"/>';
+  // Jersey / torso (athletic V-taper)
+  sv+='<path d="M24,44 Q22,46 21,52 L23,78 Q24,82 30,82 L50,82 Q56,82 57,78 L59,52 Q58,46 56,44 Z" fill="'+p+'"/>';
+  sv+='<path d="M24,44 Q22,46 21,52 L23,78 Q24,82 30,82 L50,82 Q56,82 57,78 L59,52 Q58,46 56,44 Z" fill="url(#jG)"/>';
+  sv+='<path d="M24,44 L24,48" stroke="'+s+'" stroke-width="3" stroke-linecap="round" opacity="0.5"/>';
+  sv+='<path d="M56,44 L56,48" stroke="'+s+'" stroke-width="3" stroke-linecap="round" opacity="0.5"/>';
+  sv+='<path d="M32,43 Q40,46 48,43" fill="none" stroke="'+s+'" stroke-width="1.5" opacity="0.4"/>';
   // Jersey number
-  if(num)sv+='<text x="40" y="58" text-anchor="middle" dominant-baseline="middle" font-family="\'Bebas Neue\',Arial Black,sans-serif" font-size="18" font-weight="900" fill="'+nc+'">'+num+'</text>';
-  // Arms
-  sv+='<rect x="0" y="39" width="14" height="12" rx="6" fill="'+p+'"/>';
-  sv+='<rect x="66" y="39" width="14" height="12" rx="6" fill="'+p+'"/>';
-  // Football (right hand)
-  sv+='<g transform="translate(79,45) rotate(-22)">';
-  sv+='<ellipse cx="0" cy="0" rx="9" ry="6.5" fill="#7D3C0F"/>';
-  sv+='<ellipse cx="0" cy="0" rx="6.5" ry="4.5" fill="#9B5523" opacity="0.35"/>';
-  sv+='<line x1="0" y1="-5.5" x2="0" y2="5.5" stroke="white" stroke-width="1.2"/>';
-  sv+='<line x1="-2.5" y1="-2.5" x2="2.5" y2="-2.5" stroke="white" stroke-width="0.7"/>';
-  sv+='<line x1="-2.5" y1="0" x2="2.5" y2="0" stroke="white" stroke-width="0.7"/>';
-  sv+='<line x1="-2.5" y1="2.5" x2="2.5" y2="2.5" stroke="white" stroke-width="0.7"/>';
+  if(num)sv+='<text x="40" y="66" text-anchor="middle" dominant-baseline="middle" font-family="\'Bebas Neue\',Arial Black,sans-serif" font-size="20" font-weight="900" fill="'+nc+'" opacity="0.85">'+num+'</text>';
+  // Left arm (pumping back)
+  sv+='<path d="M24,46 L14,54 L10,60" stroke="'+p+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+  sv+='<circle cx="10" cy="60" r="4" fill="'+skin+'"/>';
+  // Right arm (carrying football high)
+  sv+='<path d="M56,46 L64,42 L70,36" stroke="'+p+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+  sv+='<circle cx="70" cy="36" r="4" fill="'+skin+'"/>';
+  // Football (tucked high)
+  sv+='<g transform="translate(73,32) rotate(-40)">';
+  sv+='<ellipse cx="0" cy="0" rx="8.5" ry="5" fill="#7D3C0F"/>';
+  sv+='<ellipse cx="-1" cy="-1" rx="5" ry="3" fill="#9B5523" opacity="0.25"/>';
+  sv+='<line x1="0" y1="-4" x2="0" y2="4" stroke="white" stroke-width="0.8" opacity="0.8"/>';
+  sv+='<line x1="-1.8" y1="-1.8" x2="1.8" y2="-1.8" stroke="white" stroke-width="0.5" opacity="0.6"/>';
+  sv+='<line x1="-1.8" y1="0" x2="1.8" y2="0" stroke="white" stroke-width="0.5" opacity="0.6"/>';
+  sv+='<line x1="-1.8" y1="1.8" x2="1.8" y2="1.8" stroke="white" stroke-width="0.5" opacity="0.6"/>';
   sv+='</g>';
   // Neck
-  sv+='<rect x="32" y="31" width="16" height="9" rx="4" fill="'+p+'"/>';
-  // Helmet dome
-  sv+='<ellipse cx="40" cy="19" rx="22" ry="21" fill="'+p+'"/>';
-  // Helmet crown stripe
-  sv+='<path d="M24,8 Q40,-3 56,8" fill="none" stroke="'+s+'" stroke-width="5" stroke-linecap="round" opacity="0.65"/>';
-  // Helmet outline
-  sv+='<ellipse cx="40" cy="19" rx="22" ry="21" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>';
-  // Face guard bg
-  sv+='<rect x="21" y="25" width="38" height="18" rx="7" fill="rgba(0,0,0,0.58)"/>';
-  // Face guard bars
-  sv+='<rect x="22" y="26" width="36" height="5" rx="2.5" fill="'+s+'" opacity="0.72"/>';
-  sv+='<rect x="22" y="34" width="36" height="5" rx="2.5" fill="'+s+'" opacity="0.72"/>';
+  sv+='<rect x="35" y="35" width="10" height="10" rx="4" fill="'+skin+'"/>';
+  // Head — hair back
+  sv+='<ellipse cx="40" cy="20" rx="16" ry="17" fill="'+hair+'"/>';
+  // Face
+  sv+='<ellipse cx="40" cy="22" rx="14" ry="14.5" fill="'+skin+'"/>';
+  sv+='<ellipse cx="40" cy="18" rx="12" ry="5" fill="'+skinSh+'" opacity="0.2"/>';
+  // Hair top
+  sv+='<path d="M26,16 Q28,4 40,3 Q52,4 54,16" fill="'+hair+'"/>';
+  sv+='<path d="M28,17 Q30,7 40,6 Q50,7 52,17" fill="rgba(0,0,0,0.15)"/>';
+  sv+='<path d="M26,18 Q25,22 26,26" fill="none" stroke="'+hair+'" stroke-width="3" stroke-linecap="round"/>';
+  sv+='<path d="M54,18 Q55,22 54,26" fill="none" stroke="'+hair+'" stroke-width="3" stroke-linecap="round"/>';
+  // Headband (team colored)
+  sv+='<path d="M26,16 Q40,13 54,16" fill="none" stroke="'+p+'" stroke-width="4" stroke-linecap="round"/>';
+  sv+='<path d="M27,16 Q40,13.5 53,16" fill="none" stroke="'+s+'" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>';
   // Eyes
-  sv+='<circle cx="31.5" cy="20" r="5" fill="white"/>';
-  sv+='<circle cx="48.5" cy="20" r="5" fill="white"/>';
-  sv+='<circle cx="32" cy="21" r="3" fill="'+s+'"/>';
-  sv+='<circle cx="49" cy="21" r="3" fill="'+s+'"/>';
-  sv+='<circle cx="32.7" cy="20.3" r="1.5" fill="#111"/>';
-  sv+='<circle cx="49.7" cy="20.3" r="1.5" fill="#111"/>';
-  // Eye shine
-  sv+='<circle cx="33.5" cy="19.2" r="1.1" fill="white" opacity="0.85"/>';
-  sv+='<circle cx="50.5" cy="19.2" r="1.1" fill="white" opacity="0.85"/>';
-  // Vent dots
-  sv+='<circle cx="22" cy="14" r="2" fill="rgba(0,0,0,0.22)"/>';
-  sv+='<circle cx="58" cy="14" r="2" fill="rgba(0,0,0,0.22)"/>';
+  sv+='<ellipse cx="34" cy="22" rx="3.2" ry="3.5" fill="white"/>';
+  sv+='<ellipse cx="46" cy="22" rx="3.2" ry="3.5" fill="white"/>';
+  sv+='<circle cx="35" cy="22.5" r="2.2" fill="#1a1a1a"/>';
+  sv+='<circle cx="47" cy="22.5" r="2.2" fill="#1a1a1a"/>';
+  sv+='<circle cx="36" cy="21.5" r="1" fill="white" opacity="0.95"/>';
+  sv+='<circle cx="48" cy="21.5" r="1" fill="white" opacity="0.95"/>';
+  // Eyebrows
+  sv+='<path d="M30,18 L37,19" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/>';
+  sv+='<path d="M43,19 L50,18" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/>';
+  // Nose
+  sv+='<path d="M39,25 Q40,27 41,25" fill="none" stroke="'+skinSh+'" stroke-width="1" stroke-linecap="round" opacity="0.5"/>';
+  // Mouth
+  sv+='<path d="M35,30 Q40,33 45,30" fill="none" stroke="#8B4513" stroke-width="1.3" stroke-linecap="round"/>';
+  sv+='<path d="M36,30.5 Q40,32.5 44,30.5" fill="#5D2E0C" opacity="0.4"/>';
+  // Ears
+  sv+='<ellipse cx="26" cy="24" rx="3" ry="4" fill="'+skin+'"/><ellipse cx="26" cy="24" rx="2" ry="3" fill="'+skinSh+'" opacity="0.25"/>';
+  sv+='<ellipse cx="54" cy="24" rx="3" ry="4" fill="'+skin+'"/><ellipse cx="54" cy="24" rx="2" ry="3" fill="'+skinSh+'" opacity="0.25"/>';
   sv+='</svg>';
   return sv;
 }
@@ -3409,18 +3440,18 @@ function renderTrophyPodium(ranked){
       html+='<div style="width:'+ps+'px;height:'+ps+'px;border-radius:50%;overflow:hidden;border:3px solid '+mc+';box-shadow:0 0 18px '+mg+';flex-shrink:0">'
            +'<img src="'+escHtml(photo)+'" style="width:100%;height:100%;object-fit:cover;filter:saturate(170%) contrast(130%) brightness(107%)" />'
            +'</div>';
-      // Mini jersey body below photo
-      html+='<svg viewBox="0 0 62 42" xmlns="http://www.w3.org/2000/svg" width="'+bw+'" height="'+bh+'" style="display:block;margin:-3px auto 0">'
-           +'<rect x="8" y="0" width="46" height="26" rx="8" fill="'+p+'"/>'
-           +'<rect x="8" y="0" width="46" height="10" rx="8" fill="'+s+'" opacity="0.25"/>'
-           +(num2?'<text x="31" y="14" text-anchor="middle" dominant-baseline="middle" font-family="\'Bebas Neue\',Arial Black,sans-serif" font-size="13" font-weight="900" fill="'+nc2+'">'+num2+'</text>':'')
-           +'<rect x="2" y="1" width="12" height="9" rx="4.5" fill="'+p+'"/>'
-           +'<rect x="48" y="1" width="12" height="9" rx="4.5" fill="'+p+'"/>'
-           +'<rect x="6" y="25" width="50" height="7" rx="3.5" fill="'+s+'"/>'
-           +'<rect x="9" y="30" width="6" height="12" rx="3" fill="'+s+'"/>'
-           +'<rect x="47" y="30" width="6" height="12" rx="3" fill="'+s+'"/>'
-           +'<rect x="10" y="30" width="13" height="12" rx="5" fill="'+leg2+'"/>'
-           +'<rect x="39" y="30" width="13" height="12" rx="5" fill="'+leg2+'"/>'
+      // Mini jersey body below photo (athletic V-shape)
+      html+='<svg viewBox="0 0 62 46" xmlns="http://www.w3.org/2000/svg" width="'+bw+'" height="'+bh+'" style="display:block;margin:-3px auto 0">'
+           +'<path d="M10,0 Q8,2 7,6 L9,28 Q10,30 16,30 L46,30 Q52,30 53,28 L55,6 Q54,2 52,0 Z" fill="'+p+'"/>'
+           +'<path d="M10,0 Q31,6 52,0 L52,7 Q31,13 10,7 Z" fill="'+s+'" opacity="0.18"/>'
+           +(num2?'<text x="31" y="18" text-anchor="middle" dominant-baseline="middle" font-family="\'Bebas Neue\',Arial Black,sans-serif" font-size="14" font-weight="900" fill="'+nc2+'" opacity="0.9">'+num2+'</text>':'')
+           +'<path d="M10,1 L2,5 L0,10" stroke="'+p+'" stroke-width="8" stroke-linecap="round" fill="none"/>'
+           +'<path d="M52,1 L60,5 L62,10" stroke="'+p+'" stroke-width="8" stroke-linecap="round" fill="none"/>'
+           +'<rect x="12" y="27" width="38" height="5" rx="2.5" fill="'+s+'"/>'
+           +'<path d="M14,32 L11,42" stroke="'+s+'" stroke-width="5" stroke-linecap="round" opacity="0.85"/>'
+           +'<path d="M48,32 L51,42" stroke="'+s+'" stroke-width="5" stroke-linecap="round" opacity="0.85"/>'
+           +'<path d="M22,32 L19,44" stroke="'+leg2+'" stroke-width="9" stroke-linecap="round"/>'
+           +'<path d="M40,32 L43,44" stroke="'+leg2+'" stroke-width="9" stroke-linecap="round"/>'
            +'</svg>';
     } else {
       html+=buildCartoonAvatarSVG(player.name,p,s,isFirst);
@@ -3655,7 +3686,7 @@ function renderRosterScreen(){
     var photoLbl=isPro?'photo':'<span style="color:#f59e0b;font-size:8px">PRO</span>';
     var photoCol='<div class="rpr-photo-col">'
       +photoHtml
-      +'<input type="file" accept="image/*" capture="environment" class="rpr-photo-input" id="rpr-photo-'+idx+'" onchange=\'handlePhotoUpload('+idx+',this)\'>'
+      +'<input type="file" accept="image/*" class="rpr-photo-input" id="rpr-photo-'+idx+'" onchange=\'handlePhotoUpload('+idx+',this)\'>'
       +'<div class="rpr-photo-lbl">'+photoLbl+'</div>'
       +'</div>';
 
@@ -3996,6 +4027,55 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('./sw.js').catch(function(){});
   });
 }
+
+/* ════════════════════════════════════════════════════
+   PWA PULL-TO-REFRESH (Home Screen / standalone mode)
+   Works on iOS Safari standalone + Android TWA/Chrome
+════════════════════════════════════════════════════ */
+(function(){
+  var isPWA=window.matchMedia('(display-mode: standalone)').matches
+           ||window.navigator.standalone===true;
+  // Also enable on mobile browsers for consistency
+  if(!('ontouchstart' in window))return;
+
+  var ptr=document.getElementById('ptr-indicator');
+  if(!ptr)return;
+  var startY=0,pulling=false,threshold=80;
+
+  document.addEventListener('touchstart',function(e){
+    // Only trigger at top of page
+    if(window.scrollY>5)return;
+    startY=e.touches[0].clientY;
+    pulling=true;
+  },{passive:true});
+
+  document.addEventListener('touchmove',function(e){
+    if(!pulling)return;
+    var dy=e.touches[0].clientY-startY;
+    if(dy<0){pulling=false;return;}
+    if(dy>10&&dy<threshold){
+      ptr.style.height=Math.min(dy*0.5,48)+'px';
+      ptr.classList.remove('active');
+    }else if(dy>=threshold){
+      ptr.classList.add('active');
+      ptr.style.height='';
+    }
+  },{passive:true});
+
+  document.addEventListener('touchend',function(){
+    if(!pulling)return;
+    pulling=false;
+    if(ptr.classList.contains('active')){
+      // Trigger refresh
+      ptr.classList.add('releasing');
+      setTimeout(function(){
+        window.location.reload();
+      },400);
+    }else{
+      ptr.style.height='0';
+    }
+  },{passive:true});
+})();
 
 /* ════════════════════════════════════════════════════
    INSTALL PROMPT (Android Chrome / Edge)
@@ -5175,9 +5255,25 @@ function copyParentLink(){
    ─ Primary broadcasts game state → stat coach sees roster & field
 ════════════════════════════════════════════════════════════ */
 var cocoachChannel=null;
+var _cocoachPingInterval=null;
+
+function _startCocoachPing(){
+  _stopCocoachPing();
+  // Send coach_ping every 12s so statcoach.html knows the primary is alive
+  // and to keep the WebSocket from being silently dropped on mobile networks
+  _cocoachPingInterval=setInterval(function(){
+    if(!cocoachChannel)return;
+    cocoachChannel.send({type:'broadcast',event:'coach_ping',payload:{}});
+  },12000);
+}
+
+function _stopCocoachPing(){
+  if(_cocoachPingInterval){clearInterval(_cocoachPingInterval);_cocoachPingInterval=null;}
+}
 
 function startCocoachChannel(){
   if(!sbClient||!syncSession)return;
+  _stopCocoachPing();
   if(cocoachChannel){try{sbClient.removeChannel(cocoachChannel);}catch(e){}cocoachChannel=null;}
   cocoachChannel=sbClient.channel('cocoach:'+syncSession,{config:{broadcast:{ack:false}}});
   cocoachChannel
@@ -5201,7 +5297,13 @@ function startCocoachChannel(){
       showToast('🤝 Stat coach connected!');
     })
     .subscribe(function(status){
-      if(status==='SUBSCRIBED') broadcastGameStateToCoach();
+      if(status==='SUBSCRIBED'){
+        broadcastGameStateToCoach();
+        _startCocoachPing();
+      }
+      if(status==='CLOSED'||status==='CHANNEL_ERROR'){
+        _stopCocoachPing();
+      }
     });
 }
 
@@ -5261,6 +5363,7 @@ function activateStatCoach(){
 }
 
 function deactivateStatCoach(){
+  _stopCocoachPing();
   if(cocoachChannel){try{sbClient.removeChannel(cocoachChannel);}catch(e){}cocoachChannel=null;}
   var inactive=document.getElementById('statcoach-bar-inactive');
   var active=document.getElementById('statcoach-bar-active');
@@ -6106,6 +6209,37 @@ function initSupabaseAuth(){
         updateAuthUI();
       }
     });
+
+    // ── PWA visibility-change auto-sync ──
+    // When the user returns to the app (e.g. after completing OAuth in Safari,
+    // or switching back from another app), re-check auth and pull cloud data.
+    var _lastVisCheck=0;
+    document.addEventListener('visibilitychange',function(){
+      if(document.hidden||!sbClient)return;
+      var now=Date.now();
+      if(now-_lastVisCheck<3000)return; // debounce 3s
+      _lastVisCheck=now;
+      sbClient.auth.getSession().then(function(result){
+        var sess=result.data&&result.data.session;
+        if(sess&&!CURRENT_USER){
+          // User just signed in via external flow (OAuth redirect)
+          AUTH_SESSION=sess;
+          CURRENT_USER=sess.user;
+          updateAuthUI();
+          showToast('✅ Signed in as '+(CURRENT_USER.email||'').split('@')[0]);
+          setTimeout(function(){
+            checkAndLinkLicense();
+            SYNC_ENGINE.downloadAll();
+          },500);
+        } else if(sess&&CURRENT_USER){
+          // Already signed in — just refresh data quietly
+          if(typeof SYNC_ENGINE!=='undefined'&&SYNC_ENGINE.downloadAll){
+            SYNC_ENGINE.downloadAll();
+          }
+        }
+      });
+    });
+
   }catch(e){
     console.error('Supabase init error:',e);
   }
