@@ -218,7 +218,7 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
     function h(v){return Math.max(0,parseInt(v,16)-amt).toString(16).padStart(2,'0');}
     return '#'+h(hex.substr(0,2))+h(hex.substr(2,2))+h(hex.substr(4,2));
   }
-  function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
   /* ── Apply team colors ── */
   function setColors(primary,secondary){

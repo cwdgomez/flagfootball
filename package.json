@@ -1,0 +1,19 @@
+{
+  "name": "cgmax-fftp",
+  "version": "1.0.0",
+  "description": "CGMax FFTP — Flag Football Tracker Pro",
+  "private": true,
+  "scripts": {
+    "test":          "playwright test",
+    "test:ui":       "playwright test --ui",
+    "test:security": "node scripts/security-check.js",
+    "test:qa":       "node scripts/qa-check.js",
+    "test:all":      "node scripts/security-check.js && node scripts/qa-check.js && playwright test",
+    "test:report":   "playwright show-report",
+    "serve":         "npx serve . -p 3333 --no-clipboard"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.41.0",
+    "serve": "^14.2.0"
+  }
+}

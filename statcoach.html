@@ -460,7 +460,7 @@ body{display:flex;flex-direction:column;}
 
   function safeid(name) { return (name || '').replace(/[^a-zA-Z0-9]/g, '_'); }
 
-  function htmlEsc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function htmlEsc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   /* ── WEB AUDIO — STAT BUTTON SOUNDS ── */
   var _scAudioCtx = null;
