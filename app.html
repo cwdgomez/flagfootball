@@ -492,6 +492,25 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .sact-import{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.35);color:var(--blue);}
 .sact-clear{background:rgba(244,63,94,.08);border-color:rgba(244,63,94,.25);color:var(--rose);}
 
+/* TROPHY PODIUM */
+.podium-stage{display:flex;align-items:flex-end;justify-content:center;gap:6px;padding:4px 2px 0;}
+.podium-slot{display:flex;flex-direction:column;align-items:center;flex:1;max-width:136px;}
+.podium-slot.first-place{max-width:148px;}
+.podium-figure{position:relative;display:flex;flex-direction:column;align-items:center;}
+.podium-rank-badge{position:absolute;top:-6px;right:-10px;font-size:18px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.75));z-index:3;pointer-events:none;}
+.podium-player-name{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:rgba(255,255,255,.9);text-align:center;margin:5px 0 2px;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.podium-slot.first-place .podium-player-name{font-size:15px;}
+.podium-player-pts{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.45);text-align:center;margin-bottom:6px;}
+.podium-block{width:100%;border-radius:10px 10px 4px 4px;display:flex;align-items:center;justify-content:center;}
+.podium-block.first{height:76px;background:linear-gradient(180deg,rgba(255,215,0,.2) 0%,rgba(255,215,0,.07) 100%);border:1px solid rgba(255,215,0,.4);}
+.podium-block.second{height:56px;background:linear-gradient(180deg,rgba(192,192,192,.17) 0%,rgba(192,192,192,.06) 100%);border:1px solid rgba(192,192,192,.28);}
+.podium-block.third{height:40px;background:linear-gradient(180deg,rgba(205,127,50,.15) 0%,rgba(205,127,50,.05) 100%);border:1px solid rgba(205,127,50,.24);}
+.podium-block-lbl{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;line-height:1;}
+.podium-block-lbl.first{color:rgba(255,215,0,.78);}
+.podium-block-lbl.second{color:rgba(192,192,192,.66);}
+.podium-block-lbl.third{color:rgba(205,127,50,.62);}
+.podium-stars{font-size:15px;margin-bottom:3px;animation:podStars 2s ease-in-out infinite alternate;}
+@keyframes podStars{0%{opacity:.5;transform:scale(.85);}100%{opacity:1;transform:scale(1.1);}}
 /* HALFTIME MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;}
 .modal-overlay.show{opacity:1;pointer-events:all;}
@@ -1460,8 +1479,9 @@ body.light-mode .toast-msg{color:#1a1714;}
   <div class="season-content">
     <div class="season-sec">Record</div>
     <div class="wl-bar" id="sl-record"></div>
-    <div class="season-sec">All-Season Leaderboard</div>
-    <div class="slb"><table class="slbt">
+    <div class="season-sec">🏆 Season Leaderboard</div>
+    <div id="sl-trophy-podium"></div>
+    <div class="slb" id="sl-table-wrap"><table class="slbt">
       <thead><tr><th>#</th><th>Player</th><th>TDs</th><th>INT</th><th>Flags</th><th>Def</th><th>Pts</th></tr></thead>
       <tbody id="sl-table"></tbody>
     </table></div>
@@ -3276,6 +3296,147 @@ function buildRecapCanvas(us,them,mvps,games){
   ctx.fillText('CGMax FFTP \u2022 Flag Football Tracker Pro',W/2,footY+16);
 }
 
+/* ════════════════════════════════════════════════════════════
+   TROPHY PODIUM — cartoon avatars + 1st/2nd/3rd stand
+════════════════════════════════════════════════════════════ */
+function buildCartoonAvatarSVG(name,p,s,isLarge){
+  var num=jerseyNum(name)||'';
+  var w=isLarge?80:68;var h=isLarge?110:93;
+  var leg;try{leg=darken(p,45);}catch(e){leg=p;}
+  var r=parseInt(p.slice(1,3)||'0',16);
+  var g=parseInt(p.slice(3,5)||'0',16);
+  var b=parseInt(p.slice(5,7)||'0',16);
+  var nc=(0.299*r+0.587*g+0.114*b)/255>0.55?'#111111':s;
+  var sv='<svg viewBox="0 0 80 110" xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">';
+  // Shadow
+  sv+='<ellipse cx="40" cy="108" rx="24" ry="5" fill="rgba(0,0,0,0.2)"/>';
+  // Legs
+  sv+='<rect x="21" y="77" width="15" height="25" rx="7" fill="'+leg+'"/>';
+  sv+='<rect x="44" y="77" width="15" height="25" rx="7" fill="'+leg+'"/>';
+  // Cleats
+  sv+='<rect x="17" y="97" width="20" height="7" rx="3.5" fill="'+s+'"/>';
+  sv+='<rect x="43" y="97" width="20" height="7" rx="3.5" fill="'+s+'"/>';
+  // Flag belt
+  sv+='<rect x="13" y="70" width="54" height="9" rx="4.5" fill="'+s+'"/>';
+  // Flags hanging
+  sv+='<rect x="15" y="77" width="9" height="22" rx="4.5" fill="'+s+'"/>';
+  sv+='<rect x="56" y="77" width="9" height="22" rx="4.5" fill="'+s+'"/>';
+  // Jersey body
+  sv+='<rect x="12" y="37" width="56" height="37" rx="10" fill="'+p+'"/>';
+  sv+='<rect x="12" y="37" width="56" height="13" rx="10" fill="'+s+'" opacity="0.25"/>';
+  sv+='<rect x="12" y="45" width="56" height="6" fill="'+s+'" opacity="0.15"/>';
+  // Jersey number
+  if(num)sv+='<text x="40" y="58" text-anchor="middle" dominant-baseline="middle" font-family="\'Bebas Neue\',Arial Black,sans-serif" font-size="18" font-weight="900" fill="'+nc+'">'+num+'</text>';
+  // Arms
+  sv+='<rect x="0" y="39" width="14" height="12" rx="6" fill="'+p+'"/>';
+  sv+='<rect x="66" y="39" width="14" height="12" rx="6" fill="'+p+'"/>';
+  // Football (right hand)
+  sv+='<g transform="translate(79,45) rotate(-22)">';
+  sv+='<ellipse cx="0" cy="0" rx="9" ry="6.5" fill="#7D3C0F"/>';
+  sv+='<ellipse cx="0" cy="0" rx="6.5" ry="4.5" fill="#9B5523" opacity="0.35"/>';
+  sv+='<line x1="0" y1="-5.5" x2="0" y2="5.5" stroke="white" stroke-width="1.2"/>';
+  sv+='<line x1="-2.5" y1="-2.5" x2="2.5" y2="-2.5" stroke="white" stroke-width="0.7"/>';
+  sv+='<line x1="-2.5" y1="0" x2="2.5" y2="0" stroke="white" stroke-width="0.7"/>';
+  sv+='<line x1="-2.5" y1="2.5" x2="2.5" y2="2.5" stroke="white" stroke-width="0.7"/>';
+  sv+='</g>';
+  // Neck
+  sv+='<rect x="32" y="31" width="16" height="9" rx="4" fill="'+p+'"/>';
+  // Helmet dome
+  sv+='<ellipse cx="40" cy="19" rx="22" ry="21" fill="'+p+'"/>';
+  // Helmet crown stripe
+  sv+='<path d="M24,8 Q40,-3 56,8" fill="none" stroke="'+s+'" stroke-width="5" stroke-linecap="round" opacity="0.65"/>';
+  // Helmet outline
+  sv+='<ellipse cx="40" cy="19" rx="22" ry="21" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>';
+  // Face guard bg
+  sv+='<rect x="21" y="25" width="38" height="18" rx="7" fill="rgba(0,0,0,0.58)"/>';
+  // Face guard bars
+  sv+='<rect x="22" y="26" width="36" height="5" rx="2.5" fill="'+s+'" opacity="0.72"/>';
+  sv+='<rect x="22" y="34" width="36" height="5" rx="2.5" fill="'+s+'" opacity="0.72"/>';
+  // Eyes
+  sv+='<circle cx="31.5" cy="20" r="5" fill="white"/>';
+  sv+='<circle cx="48.5" cy="20" r="5" fill="white"/>';
+  sv+='<circle cx="32" cy="21" r="3" fill="'+s+'"/>';
+  sv+='<circle cx="49" cy="21" r="3" fill="'+s+'"/>';
+  sv+='<circle cx="32.7" cy="20.3" r="1.5" fill="#111"/>';
+  sv+='<circle cx="49.7" cy="20.3" r="1.5" fill="#111"/>';
+  // Eye shine
+  sv+='<circle cx="33.5" cy="19.2" r="1.1" fill="white" opacity="0.85"/>';
+  sv+='<circle cx="50.5" cy="19.2" r="1.1" fill="white" opacity="0.85"/>';
+  // Vent dots
+  sv+='<circle cx="22" cy="14" r="2" fill="rgba(0,0,0,0.22)"/>';
+  sv+='<circle cx="58" cy="14" r="2" fill="rgba(0,0,0,0.22)"/>';
+  sv+='</svg>';
+  return sv;
+}
+
+function renderTrophyPodium(ranked){
+  var el=document.getElementById('sl-trophy-podium');
+  if(!el)return;
+  if(!ranked||ranked.length===0){el.innerHTML='';return;}
+  var top=ranked.slice(0,3);
+  var p=TC.primary||'#CC0000';var s=TC.secondary||'#FFD700';
+  var medalColor=['#FFD700','#C0C0C0','#CD7F32'];
+  var medalGlow=['rgba(255,215,0,.55)','rgba(192,192,192,.38)','rgba(205,127,50,.32)'];
+  var medalEmoji=['🥇','🥈','🎖️'];
+  var blockCls=['first','second','third'];
+  var rankLbl=['1ST','2ND','3RD'];
+  // Display order: 2nd, 1st, 3rd
+  var order=[1,0,2];
+  var html='<div class="podium-stage">';
+  order.forEach(function(rank){
+    if(rank>=top.length){html+='<div style="flex:1;max-width:136px"></div>';return;}
+    var player=top[rank];
+    var isFirst=(rank===0);
+    var photo=getPlayerPhoto(player.name);
+    var mc=medalColor[rank];
+    var mg=medalGlow[rank];
+    var bcls=blockCls[rank];
+    html+='<div class="podium-slot'+(isFirst?' first-place':'')+'">';
+    if(isFirst)html+='<div class="podium-stars">✨ ⭐ ✨</div>';
+    html+='<div class="podium-figure">';
+    if(photo){
+      // Photo circle with cartoon CSS filter
+      var ps=isFirst?80:68;
+      var bw=isFirst?72:60;
+      var bh=isFirst?48:40;
+      var r2=parseInt(p.slice(1,3)||'0',16);
+      var g2=parseInt(p.slice(3,5)||'0',16);
+      var b2=parseInt(p.slice(5,7)||'0',16);
+      var lum2=(0.299*r2+0.587*g2+0.114*b2)/255;
+      var nc2=lum2>0.55?'#111111':s;
+      var leg2;try{leg2=darken(p,45);}catch(e){leg2=p;}
+      var num2=jerseyNum(player.name)||'';
+      html+='<div style="width:'+ps+'px;height:'+ps+'px;border-radius:50%;overflow:hidden;border:3px solid '+mc+';box-shadow:0 0 18px '+mg+';flex-shrink:0">'
+           +'<img src="'+escHtml(photo)+'" style="width:100%;height:100%;object-fit:cover;filter:saturate(170%) contrast(130%) brightness(107%)" />'
+           +'</div>';
+      // Mini jersey body below photo
+      html+='<svg viewBox="0 0 62 42" xmlns="http://www.w3.org/2000/svg" width="'+bw+'" height="'+bh+'" style="display:block;margin:-3px auto 0">'
+           +'<rect x="8" y="0" width="46" height="26" rx="8" fill="'+p+'"/>'
+           +'<rect x="8" y="0" width="46" height="10" rx="8" fill="'+s+'" opacity="0.25"/>'
+           +(num2?'<text x="31" y="14" text-anchor="middle" dominant-baseline="middle" font-family="\'Bebas Neue\',Arial Black,sans-serif" font-size="13" font-weight="900" fill="'+nc2+'">'+num2+'</text>':'')
+           +'<rect x="2" y="1" width="12" height="9" rx="4.5" fill="'+p+'"/>'
+           +'<rect x="48" y="1" width="12" height="9" rx="4.5" fill="'+p+'"/>'
+           +'<rect x="6" y="25" width="50" height="7" rx="3.5" fill="'+s+'"/>'
+           +'<rect x="9" y="30" width="6" height="12" rx="3" fill="'+s+'"/>'
+           +'<rect x="47" y="30" width="6" height="12" rx="3" fill="'+s+'"/>'
+           +'<rect x="10" y="30" width="13" height="12" rx="5" fill="'+leg2+'"/>'
+           +'<rect x="39" y="30" width="13" height="12" rx="5" fill="'+leg2+'"/>'
+           +'</svg>';
+    } else {
+      html+=buildCartoonAvatarSVG(player.name,p,s,isFirst);
+    }
+    // Medal badge
+    html+='<span class="podium-rank-badge">'+medalEmoji[rank]+'</span>';
+    html+='</div>';// .podium-figure
+    html+='<div class="podium-player-name">'+esc(dispName(player.name))+'</div>';
+    html+='<div class="podium-player-pts"><span style="color:'+mc+'">'+player.score+'</span> pts · '+player.tds+' TDs</div>';
+    html+='<div class="podium-block '+bcls+'"><div class="podium-block-lbl '+bcls+'">'+rankLbl[rank]+'</div></div>';
+    html+='</div>';// .podium-slot
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
 function renderSeasonScreen(){
   var games=loadSeason();
   if(!games.length){
@@ -3283,6 +3444,8 @@ function renderSeasonScreen(){
     document.getElementById('sl-table').innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--dimmer)">No games saved yet</td></tr>';
     document.getElementById('sl-games').innerHTML='<div class="no-games">No games saved yet.<br>Finish a game and tap Save to Season!</div>';
     document.getElementById('sl-mvp-awards').innerHTML='<div style="text-align:center;padding:16px;color:var(--dimmer);font-family:\'Barlow Condensed\',sans-serif;font-size:13px">No MVP awards yet</div>';
+    renderTrophyPodium([]);
+    var slbW=document.getElementById('sl-table-wrap');if(slbW)slbW.style.display='none';
     return;
   }
   var wins=0,losses=0,ties=0,totalPts=0;
@@ -3304,13 +3467,17 @@ function renderSeasonScreen(){
     });
   });
   var ranked=ALL_PLAYERS.map(function(n){return Object.assign({name:n},cumStats[n]);}).filter(function(x){return x.games>0;}).sort(function(a,b){return b.score-a.score;});
-  var rankIcons=['🥇','🥈','🎖️'];
-  var rankClasses=['rank-gold','rank-silver','rank-bronze'];
-  var tableRows=ranked.map(function(p,i){
-    var rankDisp=i<3?'<span class="'+rankClasses[i]+'">'+rankIcons[i]+'</span>':''+(i+1);
-    return '<tr><td>'+rankDisp+'</td><td><span style="cursor:pointer;text-decoration:underline;text-decoration-color:rgba(255,215,0,.3);text-underline-offset:3px" onclick="openTrendFromSeason(\''+esc(p.name)+'\')">'+esc(dispName(p.name))+'</span></td><td class="'+(p.tds?'hi':'')+'">'+p.tds+'</td><td>'+p.ints+'</td><td>'+p.flags+'</td><td>'+p.blocks+'</td><td class="hi">'+p.score+'</td></tr>';
+  // Trophy podium (top 3)
+  renderTrophyPodium(ranked);
+  // Table shows players ranked 4th and below
+  var rest=ranked.slice(3);
+  var slbWrap=document.getElementById('sl-table-wrap');
+  if(slbWrap)slbWrap.style.display=rest.length?'':'none';
+  var tableRows=rest.map(function(pl,i){
+    var idx=i+4;
+    return '<tr><td>'+idx+'</td><td><span style="cursor:pointer;text-decoration:underline;text-decoration-color:rgba(255,215,0,.3);text-underline-offset:3px" onclick="openTrendFromSeason(\''+esc(pl.name)+'\')">'+esc(dispName(pl.name))+'</span></td><td class="'+(pl.tds?'hi':'')+'">'+pl.tds+'</td><td>'+pl.ints+'</td><td>'+pl.flags+'</td><td>'+pl.blocks+'</td><td class="hi">'+pl.score+'</td></tr>';
   }).join('');
-  document.getElementById('sl-table').innerHTML=tableRows||'<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--dimmer)">No stats yet</td></tr>';
+  document.getElementById('sl-table').innerHTML=tableRows;
 
   // MVP Awards podium
   var mvpCounts={};
