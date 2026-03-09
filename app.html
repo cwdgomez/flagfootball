@@ -1774,7 +1774,7 @@ body.light-mode .toast-msg{color:#1a1714;}
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 /* ── COLOR HELPERS ── */
 function hexToRgb(hex){
   if(!hex) return {r:0,g:0,b:0};
@@ -3739,7 +3739,7 @@ function renderRosterScreen(){
     var nameInput=document.createElement('input');
     nameInput.type='text';
     nameInput.value=player.name||'';  // safe: value property, not innerHTML
-    nameInput.placeholder='Grayson G.';
+    nameInput.placeholder='Player name (e.g. Grayson G.)';
     nameInput.setAttribute('oninput','enforcePlayerName(this,'+idx+')');
     nameInput.setAttribute('onblur','finalizePlayerName(this,'+idx+')');
     namesCol.appendChild(nameInput);

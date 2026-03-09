@@ -27,32 +27,38 @@
 // =============================================================
 
 const { test, expect } = require('@playwright/test');
-const { checkA11y }    = require('@axe-core/playwright');
+const { AxeBuilder }   = require('@axe-core/playwright');
 
 // ─── axe configuration ────────────────────────────────────────
 // Run WCAG 2.1 Level A and AA rules only.
 // Critical violations (contrast, ARIA, labels) are in these tags.
-const AXE_OPTIONS = {
-  axeOptions: {
-    runOnly: {
-      type  : 'tag',
-      values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'],
-    },
-    // Exclude external CDN scripts from analysis — we don't control them
-    exclude: [
-      ['script[src*="cdn.jsdelivr.net"]'],
-      ['script[src*="googletagmanager"]'],
-    ],
-  },
-  detailedReport       : true,
-  detailedReportOptions: { html: true },
-};
+const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 
 // ─── Helper — run axe and log a summary ──────────────────────
 // skipFailures = true → violations are WARNINGS, not test failures.
 // Flip to false per-page once violations are resolved.
 async function runA11y(page, pageLabel, skipFailures = true) {
-  await checkA11y(page, null, AXE_OPTIONS, skipFailures);
+  const results = await new AxeBuilder({ page })
+    .withTags(WCAG_TAGS)
+    .exclude('script[src*="cdn.jsdelivr.net"]')
+    .exclude('script[src*="googletagmanager"]')
+    .analyze();
+
+  if (results.violations.length > 0) {
+    // Log a summary — rule ID, impact, and first affected node
+    console.log(`[${pageLabel}] axe found ${results.violations.length} violation(s):`);
+    results.violations.forEach(function(v) {
+      console.log(`  [${v.impact}] ${v.id}: ${v.nodes[0] && v.nodes[0].html}`);
+    });
+  }
+
+  if (!skipFailures) {
+    // Strict mode — violations fail the test
+    expect(results.violations,
+      `${pageLabel} has axe violations:\n` +
+      results.violations.map(v => `  ${v.id} (${v.impact})`).join('\n')
+    ).toEqual([]);
+  }
   // Note: @axe-core/playwright logs a violation summary to stdout
   // automatically. Each entry shows: rule ID, impact, affected element,
   // and a help URL to understand and fix the issue.
