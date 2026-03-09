@@ -3678,33 +3678,87 @@ function renderRosterScreen(){
     var pkey=(player.name||((player.first||'')+' '+(player.last||''))).trim();
     var photoSrc=photos[pkey]||'';
 
-    var photoHtml=photoSrc
-      ?'<img class="rpr-photo" src="'+escHtml(photoSrc)+'" onclick=\'triggerPhotoUpload('+idx+')\'>'
-      :'<div class="rpr-photo-placeholder" onclick=\'triggerPhotoUpload('+idx+')\'>📷</div>';
+    // ── Photo column (DOM-built — no innerHTML) ───────────────
+    var photoCol=document.createElement('div');
+    photoCol.className='rpr-photo-col';
+
+    var photoEl;
+    if(photoSrc){
+      photoEl=document.createElement('img');
+      photoEl.className='rpr-photo';
+      photoEl.src=photoSrc;  // safe: src property, not innerHTML
+      photoEl.setAttribute('onclick','triggerPhotoUpload('+idx+')');
+    }else{
+      photoEl=document.createElement('div');
+      photoEl.className='rpr-photo-placeholder';
+      photoEl.setAttribute('onclick','triggerPhotoUpload('+idx+')');
+      photoEl.textContent='📷';
+    }
+    photoCol.appendChild(photoEl);
+
+    var fileInput=document.createElement('input');
+    fileInput.type='file';
+    fileInput.accept='image/*';
+    fileInput.className='rpr-photo-input';
+    fileInput.id='rpr-photo-'+idx;
+    fileInput.setAttribute('onchange','handlePhotoUpload('+idx+',this)');
+    photoCol.appendChild(fileInput);
 
     var isPro=!!localStorage.getItem('ff_pro');
-    var photoLbl=isPro?'photo':'<span style="color:#f59e0b;font-size:8px">PRO</span>';
-    var photoCol='<div class="rpr-photo-col">'
-      +photoHtml
-      +'<input type="file" accept="image/*" class="rpr-photo-input" id="rpr-photo-'+idx+'" onchange=\'handlePhotoUpload('+idx+',this)\'>'
-      +'<div class="rpr-photo-lbl">'+photoLbl+'</div>'
-      +'</div>';
+    var photoLblEl=document.createElement('div');
+    photoLblEl.className='rpr-photo-lbl';
+    if(isPro){
+      photoLblEl.textContent='photo';
+    }else{
+      var proSpan=document.createElement('span');
+      proSpan.style.cssText='color:#f59e0b;font-size:8px';
+      proSpan.textContent='PRO';
+      photoLblEl.appendChild(proSpan);
+    }
+    photoCol.appendChild(photoLblEl);
 
-    var numCol='<div class="rpr-num">'
-      +'<div class="rpr-num-lbl">#</div>'
-      +'<input type="number" min="0" max="99" value="'+(player.num||0)+'" placeholder="0"'
-      +' oninput=\'updateRosterField('+idx+',&quot;num&quot;,this.value)\'>'
-      +'</div>';
+    // ── Number column ─────────────────────────────────────────
+    var numCol=document.createElement('div');
+    numCol.className='rpr-num';
+    var numLbl=document.createElement('div');
+    numLbl.className='rpr-num-lbl';
+    numLbl.textContent='#';
+    numCol.appendChild(numLbl);
+    var numInput=document.createElement('input');
+    numInput.type='number';
+    numInput.min='0';
+    numInput.max='99';
+    numInput.value=player.num||0;  // safe: value property, not innerHTML
+    numInput.placeholder='0';
+    numInput.setAttribute('oninput','updateRosterField('+idx+',"num",this.value)');
+    numCol.appendChild(numInput);
 
-    var namesCol='<div class="rpr-names">'
-      +'<input type="text" value="'+escHtml(player.name||'')+'" placeholder="Grayson G."'
-      +' oninput=\'enforcePlayerName(this,'+idx+')\'  onblur=\'finalizePlayerName(this,'+idx+')\'>'
-      +'<div class="rpr-name-hint">First name + last initial (e.g. Grayson G.)</div>'
-      +'</div>';
+    // ── Names column ──────────────────────────────────────────
+    var namesCol=document.createElement('div');
+    namesCol.className='rpr-names';
+    var nameInput=document.createElement('input');
+    nameInput.type='text';
+    nameInput.value=player.name||'';  // safe: value property, not innerHTML
+    nameInput.placeholder='Grayson G.';
+    nameInput.setAttribute('oninput','enforcePlayerName(this,'+idx+')');
+    nameInput.setAttribute('onblur','finalizePlayerName(this,'+idx+')');
+    namesCol.appendChild(nameInput);
+    var nameHint=document.createElement('div');
+    nameHint.className='rpr-name-hint';
+    nameHint.textContent='First name + last initial (e.g. Grayson G.)';
+    namesCol.appendChild(nameHint);
 
-    var delBtn='<button type="button" class="rpr-del" onclick=\'removeRosterPlayer('+idx+')\'> ✕</button>';
+    // ── Delete button ─────────────────────────────────────────
+    var delBtn=document.createElement('button');
+    delBtn.type='button';
+    delBtn.className='rpr-del';
+    delBtn.setAttribute('onclick','removeRosterPlayer('+idx+')');
+    delBtn.textContent=' ✕';
 
-    row.innerHTML=photoCol+numCol+namesCol+delBtn;
+    row.appendChild(photoCol);
+    row.appendChild(numCol);
+    row.appendChild(namesCol);
+    row.appendChild(delBtn);
     list.appendChild(row);
   });
 }
