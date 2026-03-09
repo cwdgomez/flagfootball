@@ -59,10 +59,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Audit npm dependencies for CVEs
         # Fails on any high or critical severity vulnerability.
@@ -84,6 +83,7 @@ jobs:
           name: security-qa-reports-${{ github.run_number }}
           path: reports/
           retention-days: 30
+          if-no-files-found: ignore
 
   # ─── Job 2: Backend API Health Check ─────────────────────────
   # Hits all 8 Vercel backend endpoints with clearly invalid inputs
@@ -167,10 +167,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Install Playwright browsers
         # Install all three engines: Chromium, Firefox, and WebKit (Safari).
@@ -189,6 +188,7 @@ jobs:
           name: playwright-report-${{ github.run_number }}
           path: playwright-report/
           retention-days: 30
+          if-no-files-found: ignore
 
       - name: Upload screenshots & traces (on failure)
         uses: actions/upload-artifact@v4
@@ -197,3 +197,4 @@ jobs:
           name: test-results-${{ github.run_number }}
           path: test-results/
           retention-days: 14
+          if-no-files-found: ignore
