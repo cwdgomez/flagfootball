@@ -25,7 +25,7 @@
 
 const https = require('https');
 
-const BASE_URL   = 'https://cgmax-fftp-backend.vercel.app';
+const BASE_URL   = 'https://api.cgmaxfftp.com';
 const TIMEOUT_MS = 20000;  // Vercel cold starts can take ~10s
 
 // Each check: HTTP method, path, body to send (JSON string or null)

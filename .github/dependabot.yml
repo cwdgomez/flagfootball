@@ -27,6 +27,11 @@ updates:
       - "automated"
     commit-message:
       prefix: "chore(deps)"
+    # Only open PRs for patch and minor updates automatically.
+    # Major version bumps require manual review.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   # ── GitHub Actions (workflow files) ──────────────────────────
   # Keeps actions/checkout, actions/setup-node, gitleaks-action,
@@ -45,3 +50,6 @@ updates:
       - "automated"
     commit-message:
       prefix: "chore(actions)"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

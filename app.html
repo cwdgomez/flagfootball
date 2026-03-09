@@ -3600,7 +3600,7 @@ function importSeason(event){
 }
 
 /* ── Cloud Backup / Restore (Pro) ── */
-var BACKUP_URL='https://cgmax-fftp-backend.vercel.app/api/backup-season';
+var BACKUP_URL='https://api.cgmaxfftp.com/api/backup-season';
 
 function cloudBackup(){
   var key=localStorage.getItem('ff_license_key');
@@ -3765,7 +3765,7 @@ function resetToDefault(){
   renderRosterScreen();
   showToast('Reset to default roster');
 }
-var ROSTER_SHARE_URL='https://cgmax-fftp-backend.vercel.app/api/roster-share';
+var ROSTER_SHARE_URL='https://api.cgmaxfftp.com/api/roster-share';
 var _rosterShareCode='';
 
 async function shareRoster(){
@@ -5079,7 +5079,7 @@ var syncSession=null;
 var syncActive=false;
 var syncInterval=null;
 var syncPushPending=false;
-var LIVE_GAME_URL='https://cgmax-fftp-backend.vercel.app/api/live-game';
+var LIVE_GAME_URL='https://api.cgmaxfftp.com/api/live-game';
 
 function genSessionCode(){
   var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -5427,7 +5427,7 @@ function sendConsentToBackend(){
     var key=localStorage.getItem('ff_license_key');
     if(!key)return; // Only send for Pro users
     var consent=JSON.parse(localStorage.getItem(LS_TOS_CONSENT)||'{}');
-    fetch('https://cgmax-fftp-backend.vercel.app/api/save-consent',{
+    fetch('https://api.cgmaxfftp.com/api/save-consent',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -5576,7 +5576,7 @@ var LS_PRO_LAST_CHECK='ff_pro_last_check';  // timestamp of last successful vali
 var LS_PRO_FAIL_SINCE='ff_pro_fail_since';  // timestamp of first failed recheck (grace period)
 var PRO_RECHECK_INTERVAL=3*24*60*60*1000;   // 3 days in ms
 var PRO_GRACE_PERIOD=7*24*60*60*1000;       // 7-day offline grace period
-var VALIDATE_URL='https://cgmax-fftp-backend.vercel.app/api/validate-license';
+var VALIDATE_URL='https://api.cgmaxfftp.com/api/validate-license';
 
 function isPro(){
   return localStorage.getItem(LS_PRO)==='unlocked';
@@ -6159,7 +6159,7 @@ function generateSeasonReport(){
 /* ── CONFIG (anon key is safe to expose — RLS enforces security) ── */
 var SUPABASE_URL='https://auth.cgmaxfftp.com';
 var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndiZ3plbXVraHlmbmRxdnNxYXNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTkxNDMsImV4cCI6MjA4ODEzNTE0M30.7--HyU0wH4yPTgFsi90yecSPrNng59QVL8Rv0VARETk';
-var SYNC_API_BASE='https://cgmax-fftp-backend.vercel.app/api';
+var SYNC_API_BASE='https://api.cgmaxfftp.com/api';
 
 var sbClient=null;
 var CURRENT_USER=null;
