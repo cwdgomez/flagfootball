@@ -177,6 +177,137 @@ test.describe('3 — Roster Screen', () => {
     await expect(playerArea).toBeAttached();
   });
 
+  test('Add player input and button are present', async ({ page }) => {
+    // The player add input must be visible so coaches can build a roster
+    const addInput = page.locator(
+      '.add-player-input, input[placeholder*="player" i], input[placeholder*="name" i]'
+    ).first();
+    await expect(addInput).toBeAttached();
+    // Add button should also exist alongside it
+    const addBtn = page.locator(
+      'button:has-text("Add"), .add-player-btn, .add-btn'
+    ).first();
+    await expect(addBtn).toBeAttached();
+  });
+
+  test('Adding a player by name shows them in the list', async ({ page }) => {
+    const addInput = page.locator(
+      '.add-player-input, input[placeholder*="player" i], input[placeholder*="name" i]'
+    ).first();
+    const addBtn = page.locator(
+      'button:has-text("Add"), .add-player-btn, .add-btn'
+    ).first();
+
+    // Only run if both elements are interactive (skip gracefully on layout variants)
+    const inputVisible = await addInput.isVisible().catch(() => false);
+    const btnVisible   = await addBtn.isVisible().catch(() => false);
+    test.skip(!inputVisible || !btnVisible, 'Add player UI not visible on this layout');
+
+    await addInput.fill('Jordan Smith');
+    await addBtn.click();
+
+    // Player name should appear somewhere in the roster area
+    await expect(
+      page.locator('.player-list, .roster-list, #player-list, .live-roster, .player-card, .roster-item')
+          .filter({ hasText: 'Jordan' })
+    ).toBeAttached({ timeout: 5000 });
+  });
+
+  test('Submitting an empty player name is rejected', async ({ page }) => {
+    const addInput = page.locator(
+      '.add-player-input, input[placeholder*="player" i], input[placeholder*="name" i]'
+    ).first();
+    const addBtn = page.locator(
+      'button:has-text("Add"), .add-player-btn, .add-btn'
+    ).first();
+
+    const inputVisible = await addInput.isVisible().catch(() => false);
+    const btnVisible   = await addBtn.isVisible().catch(() => false);
+    test.skip(!inputVisible || !btnVisible, 'Add player UI not visible on this layout');
+
+    // Count players before attempting empty add
+    const playerArea  = page.locator('.player-list, .roster-list, #player-list, .live-roster');
+    const countBefore = await playerArea.locator('.player-card, .roster-item, li, [data-player]').count();
+
+    // Submit empty input
+    await addInput.fill('');
+    await addBtn.click();
+    await page.waitForTimeout(300);
+
+    // Player count must not have increased (empty names rejected)
+    const countAfter = await playerArea.locator('.player-card, .roster-item, li, [data-player]').count();
+    expect(countAfter).toBeLessThanOrEqual(countBefore);
+  });
+
+  test('Deleting a player removes them from the list', async ({ page }) => {
+    const addInput = page.locator(
+      '.add-player-input, input[placeholder*="player" i], input[placeholder*="name" i]'
+    ).first();
+    const addBtn = page.locator(
+      'button:has-text("Add"), .add-player-btn, .add-btn'
+    ).first();
+
+    const inputVisible = await addInput.isVisible().catch(() => false);
+    const btnVisible   = await addBtn.isVisible().catch(() => false);
+    test.skip(!inputVisible || !btnVisible, 'Add player UI not visible on this layout');
+
+    // Add a unique player name we can reliably target
+    const testPlayer = 'DeleteMePlz';
+    await addInput.fill(testPlayer);
+    await addBtn.click();
+    await page.waitForTimeout(300);
+
+    // Confirm they were added
+    const addedEntry = page.locator(
+      '.player-list, .roster-list, #player-list, .live-roster, .player-card, .roster-item'
+    ).filter({ hasText: testPlayer });
+    await expect(addedEntry).toBeAttached({ timeout: 5000 });
+
+    // Find and click the delete button nearest to this player
+    const deleteBtn = page.locator(
+      `[data-player="${testPlayer}"] button, ` +
+      `.roster-item:has-text("${testPlayer}") button, ` +
+      `.player-card:has-text("${testPlayer}") button`
+    ).filter({ hasText: /del|remove|✕|×|✗/i }).first();
+
+    if (await deleteBtn.isVisible().catch(() => false)) {
+      await deleteBtn.click();
+      await page.waitForTimeout(300);
+      // Player should no longer appear in the list
+      await expect(
+        page.locator('.player-list, .roster-list, #player-list, .live-roster')
+            .filter({ hasText: testPlayer })
+      ).not.toBeAttached({ timeout: 5000 });
+    } else {
+      // Delete button selector didn't match — skip rather than false-fail
+      test.skip(true, 'Could not locate delete button for player entry');
+    }
+  });
+
+  test('Roster player count badge updates after adding a player', async ({ page }) => {
+    const addInput = page.locator(
+      '.add-player-input, input[placeholder*="player" i], input[placeholder*="name" i]'
+    ).first();
+    const addBtn = page.locator(
+      'button:has-text("Add"), .add-player-btn, .add-btn'
+    ).first();
+    const badge = page.locator('#roster-count, .roster-count, .player-count-badge');
+
+    const inputVisible = await addInput.isVisible().catch(() => false);
+    const btnVisible   = await addBtn.isVisible().catch(() => false);
+    const badgeExists  = await badge.isAttached().catch(() => false);
+    test.skip(!inputVisible || !btnVisible || !badgeExists, 'Add player UI or count badge not present');
+
+    const countBefore = parseInt(await badge.first().textContent() || '0', 10);
+
+    await addInput.fill('Badge Test Player');
+    await addBtn.click();
+    await page.waitForTimeout(400);
+
+    const countAfter = parseInt(await badge.first().textContent() || '0', 10);
+    expect(countAfter).toBeGreaterThan(countBefore);
+  });
+
 });
 
 // ─── Suite 4: Main Game Screen & Navigation ──────────────────

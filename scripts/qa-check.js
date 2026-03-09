@@ -249,12 +249,48 @@ function checkServiceWorker() {
   const content = readFile(path.join(ROOT, 'sw.js'));
   if (!content) { warn('sw.js not found'); return; }
 
-  // Cache version
+  // Cache version present
   const verMatch = content.match(/['"]([a-zA-Z0-9_:.-]+-v\d+[^'"]*)['"]/);
   if (verMatch) {
     pass(`Cache version key found: ${verMatch[1]}`);
   } else {
     warn('No versioned cache key found in sw.js — hard to bust cache on updates');
+  }
+
+  // C11 — Cache version staleness: compare version date to last app.html git commit.
+  // If app.html was committed after the date in CACHE_VERSION, the version is stale.
+  // Coaches with cached versions will keep running old code until sw.js ships a new key.
+  if (verMatch) {
+    const dateInVersion = verMatch[1].match(/(\d{4}-\d{2}-\d{2})$/);
+    if (dateInVersion) {
+      try {
+        const { execSync } = require('child_process');
+        const lastAppCommitRaw = execSync(
+          'git log -1 --format=%ci -- app.html',
+          { cwd: ROOT, timeout: 5000 }
+        ).toString().trim();
+
+        if (lastAppCommitRaw) {
+          const lastAppDate  = new Date(lastAppCommitRaw);
+          const versionDate  = new Date(dateInVersion[1]);
+          const daysBehind   = Math.floor((lastAppDate - versionDate) / (1000 * 60 * 60 * 24));
+
+          if (daysBehind > 0) {
+            warn(
+              `Cache version date (${dateInVersion[1]}) is ${daysBehind} day(s) behind last app.html commit`,
+              'CI auto-bumps sw.js on every push via scripts/bump-sw-version.js. ' +
+              'If running locally, run: node scripts/bump-sw-version.js'
+            );
+          } else {
+            pass(`Cache version date (${dateInVersion[1]}) is current vs last app.html commit`);
+          }
+        } else {
+          info('No git history for app.html — skipping version staleness check');
+        }
+      } catch (_) {
+        info('git unavailable in this environment — skipping version staleness check');
+      }
+    }
   }
 
   // fetch event handler

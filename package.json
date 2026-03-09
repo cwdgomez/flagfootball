@@ -13,6 +13,7 @@
     "serve":         "npx serve . -p 3333 --no-clipboard"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
     "@playwright/test": "^1.41.0",
     "serve": "^14.2.0"
   }

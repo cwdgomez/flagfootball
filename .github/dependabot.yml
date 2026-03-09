@@ -1,0 +1,47 @@
+# =============================================================
+#  Dependabot — Automated Dependency Updates
+#
+#  Dependabot watches your package.json and GitHub Actions
+#  workflow files and opens automated PRs whenever a newer
+#  version is available or a CVE is found in a pinned version.
+#
+#  PRs land on main for review — nothing auto-merges.
+#  Check them in GitHub → Pull Requests (Dependabot label).
+# =============================================================
+
+version: 2
+
+updates:
+
+  # ── npm (root package.json: @playwright/test, serve) ─────────
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Chicago"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "chore(deps)"
+
+  # ── GitHub Actions (workflow files) ──────────────────────────
+  # Keeps actions/checkout, actions/setup-node, gitleaks-action,
+  # actions/upload-artifact pinned to their latest safe versions.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Chicago"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "automated"
+    commit-message:
+      prefix: "chore(actions)"

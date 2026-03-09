@@ -1,10 +1,17 @@
 # =============================================================
 #  CGMax FFTP — CI Pipeline
 #  Runs on every push to main:
+#    0. Secrets scan (gitleaks)       — blocks all other jobs if secrets found
 #    1. Security scan (OWASP Top 10) — saves security-report.html
 #    2. Code quality / QA checks    — saves qa-report.html
-#    3. Playwright E2E UX tests      — saves playwright-report/
+#    3. npm dependency audit (CVEs) — fails on high/critical
+#    4. API health check             — all 8 Vercel endpoints, assert no 500s
+#    5. Playwright E2E UX tests      — Chrome, Firefox, Safari (WebKit)
+#                                      saves playwright-report/
 #
+#    6. SW cache version auto-bump — bumps date in sw.js, commits back [skip ci]
+#
+#  Jobs 1–5 run in parallel after Job 0. All require secrets-scan to pass.
 #  Reports are uploaded as downloadable artifacts after every run.
 #  Find them in GitHub → Actions → click the run → Artifacts section.
 # =============================================================
@@ -17,10 +24,32 @@ on:
   workflow_dispatch:       # allow manual trigger from GitHub UI
 
 jobs:
+  # ─── Job 0: Secrets Scan — runs FIRST, blocks everything ─────
+  # Uses gitleaks to scan every file in the repo for accidentally
+  # committed API keys, tokens, or secrets. If anything is found,
+  # the entire pipeline fails immediately before any other job runs.
+  secrets-scan:
+    name: 🔑 Secrets Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0     # full history so gitleaks can scan all commits
+
+      - name: Run gitleaks secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # gitleaks exits non-zero if secrets are found → job fails → blocks
+        # security-qa and ux-tests (both declare needs: [secrets-scan])
+
   # ─── Job 1: Security & Code Quality ──────────────────────────
   security-qa:
     name: 🔐 Security & QA
     runs-on: ubuntu-latest
+    needs: [secrets-scan]   # only runs if secrets scan passes
 
     steps:
       - name: Checkout code
@@ -30,6 +59,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit npm dependencies for CVEs
+        # Fails on any high or critical severity vulnerability.
+        # NOTE: This audits the root package.json (Playwright / serve devDeps).
+        # For the Vercel backend, add the same step in your backend repo's CI.
+        run: npm audit --audit-level=high
 
       - name: Run security scanner (OWASP Top 10)
         run: node scripts/security-check.js
@@ -46,10 +85,79 @@ jobs:
           path: reports/
           retention-days: 30
 
-  # ─── Job 2: E2E UX Tests ─────────────────────────────────────
+  # ─── Job 2: Backend API Health Check ─────────────────────────
+  # Hits all 8 Vercel backend endpoints with clearly invalid inputs
+  # and asserts none of them return a 500 Internal Server Error.
+  # A 400/401/403 = handler is loaded and running correctly.
+  # A 500         = handler is crashing on the deployed build.
+  # Runs in parallel with security-qa — both need secrets-scan to pass.
+  api-health:
+    name: 🩺 API Health Check
+    runs-on: ubuntu-latest
+    needs: [secrets-scan]   # only runs if secrets scan passes
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run API health check
+        # Uses only Node.js built-ins (https module) — no npm install needed.
+        # Contacts the live Vercel backend with invalid inputs to confirm
+        # every handler is deployed and not crashing. Exits 1 on any 500.
+        run: node scripts/api-health-check.js
+
+  # ─── Job 3: Service Worker Cache Version Auto-Bump ───────────
+  # Reads sw.js, replaces the date in CACHE_VERSION with today,
+  # and commits back to the repo if the file changed.
+  # WHY: Returning coaches are served stale cached app.html until
+  # their service worker detects a new CACHE_VERSION string in sw.js.
+  # This job ensures every push to main ships a fresh version key.
+  # Uses [skip ci] in the commit message to prevent a loop.
+  sw-version-bump:
+    name: 🔄 SW Cache Version Bump
+    runs-on: ubuntu-latest
+    needs: [secrets-scan]   # only runs if secrets scan passes
+    permissions:
+      contents: write        # required to push the bumped sw.js back
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Use a PAT or the default GITHUB_TOKEN — must have contents: write
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Bump cache version date to today
+        run: node scripts/bump-sw-version.js
+
+      - name: Commit bumped sw.js (if date changed)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet sw.js; then
+            echo "sw.js already has today's date — no commit needed."
+          else
+            git add sw.js
+            git commit -m "chore: auto-bump service worker cache version [skip ci]"
+            git push
+            echo "✅ Bumped and pushed sw.js"
+          fi
+
+  # ─── Job 4: E2E UX Tests ─────────────────────────────────────
   ux-tests:
     name: 🎭 UX / E2E Tests
     runs-on: ubuntu-latest
+    needs: [secrets-scan]   # only runs if secrets scan passes
 
     steps:
       - name: Checkout code
@@ -65,7 +173,10 @@ jobs:
         run: npm ci
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        # Install all three engines: Chromium, Firefox, and WebKit (Safari).
+        # Tests now run on Desktop Chrome, Desktop Firefox, Desktop Safari,
+        # Mobile Chrome, and Mobile Safari — 5 browser/device combos.
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Run E2E tests
         run: npx playwright test
