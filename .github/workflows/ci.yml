@@ -1,0 +1,88 @@
+# =============================================================
+#  CGMax FFTP — CI Pipeline
+#  Runs on every push to main:
+#    1. Security scan (OWASP Top 10) — saves security-report.html
+#    2. Code quality / QA checks    — saves qa-report.html
+#    3. Playwright E2E UX tests      — saves playwright-report/
+#
+#  Reports are uploaded as downloadable artifacts after every run.
+#  Find them in GitHub → Actions → click the run → Artifacts section.
+# =============================================================
+
+name: CI — Security, QA & UX Tests
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:       # allow manual trigger from GitHub UI
+
+jobs:
+  # ─── Job 1: Security & Code Quality ──────────────────────────
+  security-qa:
+    name: 🔐 Security & QA
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run security scanner (OWASP Top 10)
+        run: node scripts/security-check.js
+
+      - name: Run QA checker
+        run: node scripts/qa-check.js
+
+      # Upload both HTML reports — always, even if checks found warnings
+      - name: Upload security & QA reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-qa-reports-${{ github.run_number }}
+          path: reports/
+          retention-days: 30
+
+  # ─── Job 2: E2E UX Tests ─────────────────────────────────────
+  ux-tests:
+    name: 🎭 UX / E2E Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: npx playwright test
+
+      # Upload Playwright HTML report — always (shows pass/fail detail)
+      - name: Upload Playwright test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ github.run_number }}
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload screenshots & traces (on failure)
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results-${{ github.run_number }}
+          path: test-results/
+          retention-days: 14
