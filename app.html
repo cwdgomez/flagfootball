@@ -1846,7 +1846,7 @@ function loadRosterData(){
       if(Array.isArray(decoded)&&decoded.length>0){
         // Sanitize names from URL param to prevent XSS — strip any HTML tags, limit length
         return decoded.map(migratePlayer).map(function(p){
-          p.name=String(p.name||'').replace(/<[^>]*>/g,'').replace(/['"&]/g,'').slice(0,40);
+          p.name=escHtml(String(p.name||'')).slice(0,40);
           return p;
         });
       }
@@ -3544,7 +3544,7 @@ function renderSeasonScreen(){
     var dateStr=g.date?new Date(g.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
     var bc=result==='win'?'rgba(34,197,94,.3)':result==='loss'?'rgba(244,63,94,.2)':'var(--dark5)';
     var scoutData=loadScoutData(g.opp);
-    var scoutBtn=scoutData&&scoutData.notes?'<button type="button" class="scout-hist-btn" title="View scouting notes" onclick="viewScoutNotes(\''+g.opp.replace(/'/g,'\\\'').replace(/"/g,'&quot;')+'\',event)">🕵️</button>':'';
+    var scoutBtn=scoutData&&scoutData.notes?'<button type="button" class="scout-hist-btn" title="View scouting notes" data-opp="'+escHtml(g.opp)+'" onclick="viewScoutNotes(this.dataset.opp,event)">🕵️</button>':'';
     return '<div class="game-hist-card" style="border-color:'+bc+'">'
       +'<div class="ghc-top">'
         +'<div><div class="ghc-opp">vs. '+g.opp+' '+scoutBtn+'</div>'

@@ -23,6 +23,11 @@ on:
     branches: [main]
   workflow_dispatch:       # allow manual trigger from GitHub UI
 
+# Default all jobs to read-only. The sw-version-bump job overrides
+# this with contents: write because it commits back to the repo.
+permissions:
+  contents: read
+
 jobs:
   # ─── Job 0: Secrets Scan — runs FIRST, blocks everything ─────
   # Uses gitleaks to scan every file in the repo for accidentally
