@@ -6575,7 +6575,7 @@ function authSignInMicrosoft(){
   var redirectUrl=window.location.origin+'/auth-callback.html';
   sbClient.auth.signInWithOAuth({
     provider:'azure',
-    options:{redirectTo:redirectUrl,scopes:'email profile openid'}
+    options:{redirectTo:redirectUrl}
   });
 }
 
