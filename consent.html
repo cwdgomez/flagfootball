@@ -150,7 +150,7 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;
     <ul>
       <li>Displaying the player's profile image within the CGMax FFTP coaching app on the coach's personal device</li>
       <li>Appearing on digitally generated game scorecards and stat summaries viewable only by the coaching staff</li>
-      <li>If uploaded through this form, securely transmitting the photo to the coaching staff via email</li>
+      <li>If uploaded through this form, securely submitted via HTTPS to ITCC LLC's backend, stored in an access-controlled database, and a confirmation notification sent to the coaching staff</li>
     </ul>
     <div class="legal-box">
       <p><strong>Photos will NOT be:</strong> shared on social media, used for advertising or marketing, sold to third parties, or made publicly accessible in any way. If you upload a photo through this form, it is stored in a secure, access-controlled database linked exclusively to the team's licensed coach — no other coaches, users, or third parties can access it.</p>
@@ -160,7 +160,7 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;
   <!-- SECTION 3: DATA STORAGE & SECURITY -->
   <div class="sec">
     <div class="sec-title">3. Data Storage &amp; Security</div>
-    <p>Player photos added directly through the app are stored in the web browser's local storage on the coach's personal device. Photos uploaded through this consent form are resized to a maximum of 800 pixels, transmitted via encrypted email to the coaching staff, and stored in a secure cloud database (Supabase) protected by Row Level Security — meaning only the licensed Pro coach linked to this team can access the photo. No other users, coaches, or third parties have access.</p>
+    <p>Player photos added directly through the app are stored in the web browser's local storage on the coach's personal device. Photos uploaded through this consent form are resized to a maximum of 800 pixels, then submitted via encrypted HTTPS to ITCC LLC's secure serverless backend and stored in a cloud database (Supabase) protected by Row Level Security — meaning only the licensed Pro coach linked to this team can access the photo. No other users, coaches, or third parties have access. An email notification is simultaneously sent to the coaching staff as a backup record of the consent submission.</p>
     <p>The coach is responsible for maintaining the physical security of their device. Photos can be deleted at any time by removing the player from the roster within the app, by clearing the browser's local storage, or by contacting <a href="mailto:cgmaxfftp@itcc.llc" style="color:var(--gold);text-decoration:none;">cgmaxfftp@itcc.llc</a> to request permanent deletion from the database.</p>
   </div>
 
