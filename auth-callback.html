@@ -53,6 +53,16 @@ html,body{height:100%;background:#080808;color:#f2f2f2;font-family:'Helvetica Ne
   }
 
   try {
+    // Check for error params in the URL (query string or hash) before doing anything.
+    var urlParams = new URLSearchParams(window.location.search);
+    var hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    var urlError = urlParams.get('error') || hashParams.get('error');
+    var urlErrorDesc = urlParams.get('error_description') || hashParams.get('error_description');
+    if (urlError) {
+      showError('Sign-in failed: ' + (urlErrorDesc ? decodeURIComponent(urlErrorDesc).split(':')[0] : urlError));
+      return;
+    }
+
     // Supabase JS v2 handles the hash fragment automatically on page load
     // when the client is initialized. The auth token exchange happens via
     // supabase.auth.getSession() after the URL fragment is parsed.
