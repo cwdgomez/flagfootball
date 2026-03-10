@@ -653,6 +653,26 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .share-close{flex:1;background:var(--dark3);border:1px solid var(--dark5);border-radius:10px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--dim);cursor:pointer;text-transform:uppercase;}
 .share-copy{flex:2;border:none;border-radius:10px;padding:11px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;}
 
+/* ── PLAYER STAT CARD GENERATOR ── */
+.statcard-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:710;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:16px 16px 100px;opacity:0;pointer-events:none;transition:opacity .3s;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.statcard-overlay.show{opacity:1;pointer-events:all;}
+.statcard-picker{width:100%;max-width:400px;margin-bottom:14px;}
+.statcard-picker-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.35);text-transform:uppercase;margin-bottom:8px;text-align:center;}
+.statcard-player-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+.statcard-player-btn{background:var(--sur);border:1px solid var(--dark5);border-radius:10px;padding:8px 14px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--txt);letter-spacing:.5px;transition:border-color .15s,background .15s;}
+.statcard-player-btn:hover,.statcard-player-btn.sel{border-color:var(--s);background:rgba(255,215,0,.08);}
+.statcard-player-btn.sel{box-shadow:0 0 12px rgba(255,215,0,.2);}
+.statcard-canvas-wrap{position:relative;width:100%;max-width:400px;margin-bottom:14px;}
+.statcard-canvas-wrap canvas{width:100%;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.06);}
+.statcard-actions{display:flex;gap:8px;width:100%;max-width:400px;}
+.statcard-actions button{flex:1;border:none;border-radius:10px;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;cursor:pointer;transition:transform .1s;}
+.statcard-actions button:active{transform:scale(.97);}
+.statcard-dl-btn{background:linear-gradient(135deg,var(--p),var(--p2));color:var(--s);}
+.statcard-share-btn{background:linear-gradient(135deg,var(--s),#B8860B);color:#111;}
+.statcard-close-btn{background:var(--dark3);border:1px solid var(--dark5) !important;color:var(--dim);font-family:'Barlow Condensed',sans-serif !important;font-size:13px !important;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.statcard-all-btn{width:100%;max-width:400px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.35);border-radius:10px;padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;color:#c084fc;cursor:pointer;margin-bottom:10px;text-align:center;transition:background .15s;}
+.statcard-all-btn:hover{background:rgba(168,85,247,.2);}
+
 /* ── PLAYER TREND SCREEN ── */
 #screen-trend{align-items:center;justify-content:flex-start;padding:20px 14px 80px;overflow-y:auto;}
 .trend-header{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
@@ -1615,6 +1635,23 @@ body.light-mode .toast-msg{color:#1a1714;}
       <button type="button" class="share-close" onclick="closeShareCard()">Close</button>
       <button type="button" class="share-copy" id="share-copy-btn" onclick="copyShareText()" style="background:linear-gradient(135deg,var(--p),var(--p2));color:var(--s)">📋 Copy Recap</button>
     </div>
+  </div>
+</div>
+
+<!-- PLAYER STAT CARD GENERATOR -->
+<div class="statcard-overlay" id="statcard-overlay">
+  <div class="statcard-picker">
+    <div class="statcard-picker-lbl">Select Player</div>
+    <div class="statcard-player-grid" id="statcard-player-grid"></div>
+  </div>
+  <div class="statcard-canvas-wrap">
+    <canvas id="statcard-canvas" width="1080" height="1350"></canvas>
+  </div>
+  <button type="button" class="statcard-all-btn" id="statcard-all-btn" onclick="downloadAllStatCards()">📦 Download All Player Cards</button>
+  <div class="statcard-actions">
+    <button type="button" class="statcard-close-btn" onclick="closeStatCards()">Close</button>
+    <button type="button" class="statcard-dl-btn" onclick="downloadStatCard()">⬇ Save</button>
+    <button type="button" class="statcard-share-btn" onclick="shareStatCard()">📤 Share</button>
   </div>
 </div>
 
@@ -2937,6 +2974,7 @@ function renderSummary(){
     +'</div>'
     +'<div class="pt-section">'+ptRows+'</div>'
     +'<button type="button" class="share-recap-btn" onclick="proGate(\'share\',openShareCard)">📤 Share Game Recap <span class=\'pro-badge\'>PRO</span></button>'
+    +'<button type="button" class="share-recap-btn" style="background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(168,85,247,.06));border-color:rgba(168,85,247,.4);color:#c084fc;margin-top:6px;" onclick="proGate(\'statcards\',openStatCards)">🎴 Generate Player Stat Cards <span class=\'pro-badge\'>PRO</span></button>'
     +'<button type="button" class="end-game-btn" onclick="endAndSave()">💾 End Game &amp; Save to Season</button>'
     +'<button type="button" class="reset-btn" onclick="doReset()">⚠️ New Game (don\'t save)</button>';
 }
@@ -4086,6 +4124,472 @@ function copyShareText(){
     '\n\nTracked with Flag Football Tracker';
   if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){showToast('Recap copied!');});}
   else{prompt('Copy:',text);}
+}
+
+/* ════════════════════════════════════════════════════
+   PLAYER STAT CARD GENERATOR — Canvas-based PNG
+   Produces broadcast-quality individual player cards
+   styled with team colors, shareable to social media.
+════════════════════════════════════════════════════ */
+var _statCardPlayer=null;
+var _statCardFontsLoaded=false;
+
+function openStatCards(){
+  var overlay=document.getElementById('statcard-overlay');
+  var grid=document.getElementById('statcard-player-grid');
+  grid.innerHTML='';
+  var players=ALL_PLAYERS.filter(function(n){return !isAbsent(n);});
+  players.forEach(function(name,i){
+    var btn=document.createElement('button');
+    btn.className='statcard-player-btn';
+    btn.textContent=firstName(name)+(name===G.qb?' ⚡':'');
+    btn.onclick=function(){
+      grid.querySelectorAll('.statcard-player-btn').forEach(function(b){b.classList.remove('sel');});
+      btn.classList.add('sel');
+      _statCardPlayer=name;
+      renderStatCard(name);
+    };
+    grid.appendChild(btn);
+  });
+  // Auto-select MVP
+  var mvps=mvpCalc();
+  if(mvps.length){
+    _statCardPlayer=mvps[0].name;
+    var idx=players.indexOf(mvps[0].name);
+    if(idx>=0) grid.children[idx].classList.add('sel');
+    renderStatCard(mvps[0].name);
+  }
+  overlay.classList.add('show');
+}
+function closeStatCards(){document.getElementById('statcard-overlay').classList.remove('show');}
+
+function renderStatCard(name){
+  var canvas=document.getElementById('statcard-canvas');
+  var ctx=canvas.getContext('2d');
+  var W=1080,H=1350;
+  canvas.width=W;canvas.height=H;
+
+  var p=TC.primary,s=TC.secondary;
+  var pRgb=hexToRgb(p),sRgb=hexToRgb(s);
+  var p2=darken(p,60);
+  var isQB=(name===G.qb);
+  var num=jerseyNum(name);
+  var us=G.scores.us.reduce(function(a,b){return a+b;},0);
+  var them=G.scores.them.reduce(function(a,b){return a+b;},0);
+  var result=us>them?'WIN':us<them?'LOSS':'TIE';
+  var mvps=mvpCalc();
+  var rank=-1;
+  mvps.forEach(function(m,i){if(m.name===name)rank=i;});
+
+  // Collect stats
+  var c=0,t=0,f=0,ii=0,cv=0,qbt=0,qbi=0,qbc=0,fu=0,bl=0;
+  for(var q=1;q<=G.quarters;q++){
+    var st=G.stats[name][q];
+    c+=st.catches;t+=st.tds;f+=st.flags;ii+=st.ints;
+    cv+=st.conv1+st.conv2;qbt+=st.qbTDs;qbi+=st.qbInts;qbc+=st.qbConvs;
+    fu+=st.fumbles||0;bl+=st.blocks||0;
+  }
+  var score=qbt*10+t*10+ii*8+c*3+f*2+cv*4+qbc*4-qbi*3+bl*3-fu*4;
+
+  // Snap count
+  var offSnaps=0,defSnaps=0;
+  for(var q2=1;q2<=G.quarters;q2++){
+    var r=G.rots[name][q2];
+    offSnaps+=r.offSnaps+(r.onField==='off'?1:0);
+    defSnaps+=r.defSnaps+(r.onField==='def'?1:0);
+  }
+
+  // ── BACKGROUND ──
+  // Deep gradient from team primary
+  var bgGrad=ctx.createLinearGradient(0,0,0,H);
+  bgGrad.addColorStop(0,p);
+  bgGrad.addColorStop(0.35,p2);
+  bgGrad.addColorStop(0.7,'#0a0a0a');
+  bgGrad.addColorStop(1,'#050505');
+  ctx.fillStyle=bgGrad;
+  ctx.fillRect(0,0,W,H);
+
+  // Subtle diagonal stripe texture
+  ctx.save();
+  ctx.globalAlpha=0.04;
+  ctx.strokeStyle='#fff';
+  ctx.lineWidth=1;
+  for(var si=-H;si<W+H;si+=28){
+    ctx.beginPath();ctx.moveTo(si,0);ctx.lineTo(si+H,H);ctx.stroke();
+  }
+  ctx.restore();
+
+  // Grid overlay on top half
+  ctx.save();
+  ctx.globalAlpha=0.035;
+  ctx.strokeStyle='rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',1)';
+  ctx.lineWidth=0.5;
+  for(var gx=0;gx<W;gx+=44){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,580);ctx.stroke();}
+  for(var gy=0;gy<580;gy+=44){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();}
+  ctx.restore();
+
+  // Radial glow from top center
+  var glowGrad=ctx.createRadialGradient(W/2,0,0,W/2,0,600);
+  glowGrad.addColorStop(0,'rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',.12)');
+  glowGrad.addColorStop(1,'transparent');
+  ctx.fillStyle=glowGrad;
+  ctx.fillRect(0,0,W,600);
+
+  // (Jersey number badge is rendered in top-left — no ghost watermark needed)
+
+  // ── TOP BAR — CGMAX FFTP branding ──
+  ctx.fillStyle='rgba(0,0,0,.45)';
+  ctx.fillRect(0,0,W,68);
+  // Brand line
+  ctx.font='700 14px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',.55)';
+  ctx.letterSpacing='6px';
+  ctx.textAlign='left';
+  ctx.fillText('CGMAX FFTP',42,43);
+  // Game info right
+  ctx.textAlign='right';
+  ctx.fillStyle='rgba(255,255,255,.35)';
+  ctx.letterSpacing='3px';
+  var dateStr2=G.date?new Date(G.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).toUpperCase():'';
+  ctx.fillText(dateStr2,W-42,43);
+  ctx.letterSpacing='0px';
+
+  // ── RANK BADGE (if top 3) ──
+  if(rank>=0&&rank<3){
+    var badgeColors=['#FFD700','#C0C0C0','#CD7F32'];
+    var badgeLabels=['MVP','2ND','3RD'];
+    var bx=W-42,by=98;
+    // Badge background
+    ctx.save();
+    var bw=120,bh=44;
+    ctx.fillStyle=badgeColors[rank];
+    ctx.shadowColor=badgeColors[rank];
+    ctx.shadowBlur=24;
+    _roundRect(ctx,bx-bw,by,bw,bh,10);
+    ctx.fill();
+    ctx.restore();
+    // Badge text
+    ctx.font='900 22px "Bebas Neue",sans-serif';
+    ctx.fillStyle=rank===0?'#111':'#111';
+    ctx.textAlign='center';
+    ctx.fillText(badgeLabels[rank],bx-bw/2,by+30);
+  }
+
+  // ── PLAYER NAME ──
+  ctx.textAlign='center';
+  // Position tag above name
+  ctx.font='700 22px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',.7)';
+  ctx.letterSpacing='8px';
+  ctx.fillText(isQB?'QUARTERBACK':'PLAYER',W/2,142);
+  ctx.letterSpacing='0px';
+
+  // First name (smaller)
+  var parts=(name||'').split(' ');
+  var fName=parts[0]||'';
+  var lName=parts.slice(1).join(' ')||'';
+  ctx.font='700 64px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.65)';
+  ctx.fillText(fName.toUpperCase(),W/2,210);
+
+  // Last name / initial (huge, bold — the hero text)
+  ctx.font='900 130px "Bebas Neue",sans-serif';
+  ctx.fillStyle='#ffffff';
+  ctx.shadowColor='rgba(0,0,0,.6)';
+  ctx.shadowBlur=20;
+  ctx.fillText((lName||fName).toUpperCase(),W/2,330);
+  ctx.shadowBlur=0;
+
+  // Jersey number badge (left side)
+  if(num){
+    ctx.save();
+    var nx=42,ny=170;
+    ctx.fillStyle='rgba(0,0,0,.5)';
+    _roundRect(ctx,nx,ny,80,90,12);
+    ctx.fill();
+    ctx.strokeStyle='rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',.35)';
+    ctx.lineWidth=2;
+    _roundRect(ctx,nx,ny,80,90,12);
+    ctx.stroke();
+    ctx.font='700 12px "Barlow Condensed",sans-serif';
+    ctx.fillStyle='rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',.6)';
+    ctx.textAlign='center';
+    ctx.letterSpacing='3px';
+    ctx.fillText('NO.',nx+40,ny+22);
+    ctx.letterSpacing='0px';
+    ctx.font='900 52px "Bebas Neue",sans-serif';
+    ctx.fillStyle=s;
+    ctx.fillText(num,nx+40,ny+72);
+    ctx.restore();
+  }
+
+  // ── DIVIDER LINE — metallic gold ──
+  var divY=380;
+  var divGrad=ctx.createLinearGradient(80,0,W-80,0);
+  divGrad.addColorStop(0,'transparent');
+  divGrad.addColorStop(0.15,s);
+  divGrad.addColorStop(0.5,lighten(s,60));
+  divGrad.addColorStop(0.85,s);
+  divGrad.addColorStop(1,'transparent');
+  ctx.fillStyle=divGrad;
+  ctx.fillRect(80,divY,W-160,3);
+
+  // Glow under divider
+  ctx.save();
+  var divGlow=ctx.createLinearGradient(80,0,W-80,0);
+  divGlow.addColorStop(0,'transparent');
+  divGlow.addColorStop(0.3,'rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',.15)');
+  divGlow.addColorStop(0.7,'rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',.15)');
+  divGlow.addColorStop(1,'transparent');
+  ctx.fillStyle=divGlow;
+  ctx.fillRect(80,divY+3,W-160,30);
+  ctx.restore();
+
+  // ── MATCHUP BAR ──
+  ctx.textAlign='center';
+  ctx.font='700 20px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.35)';
+  ctx.letterSpacing='4px';
+  ctx.fillText('GAME STATS',W/2,divY+56);
+  ctx.letterSpacing='0px';
+
+  // Score line
+  var scoreY=divY+108;
+  ctx.font='900 56px "Bebas Neue",sans-serif';
+  ctx.fillStyle=s;
+  ctx.textAlign='right';
+  ctx.fillText(String(us),W/2-30,scoreY);
+  ctx.fillStyle='rgba(255,255,255,.2)';
+  ctx.textAlign='center';
+  ctx.font='900 34px "Bebas Neue",sans-serif';
+  ctx.fillText('–',W/2,scoreY-4);
+  ctx.font='900 56px "Bebas Neue",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.45)';
+  ctx.textAlign='left';
+  ctx.fillText(String(them),W/2+30,scoreY);
+
+  // Team names
+  ctx.font='700 16px "Barlow Condensed",sans-serif';
+  ctx.letterSpacing='2px';
+  ctx.fillStyle='rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',.6)';
+  ctx.textAlign='right';
+  ctx.fillText((G.team||'US').toUpperCase(),W/2-30,scoreY+26);
+  ctx.fillStyle='rgba(255,255,255,.3)';
+  ctx.textAlign='left';
+  ctx.fillText((G.opp||'OPP').toUpperCase(),W/2+30,scoreY+26);
+  ctx.letterSpacing='0px';
+
+  // Result badge
+  ctx.textAlign='center';
+  var rColors={WIN:'#22C55E',LOSS:'#F43F5E',TIE:'#888'};
+  ctx.fillStyle=rColors[result]||'#888';
+  ctx.font='900 24px "Bebas Neue",sans-serif';
+  ctx.letterSpacing='4px';
+  ctx.fillText(result,W/2,scoreY+60);
+  ctx.letterSpacing='0px';
+
+  // ── STAT TILES ──
+  var tileY=scoreY+100;
+  var statList;
+  if(isQB){
+    statList=[
+      {val:qbt,lbl:'TD PASSES',color:'#22C55E'},
+      {val:qbc,lbl:'CONVERSIONS',color:'#14B8A6'},
+      {val:qbi,lbl:'INTS THROWN',color:'#F43F5E'},
+      {val:t,lbl:'RUSH TDs',color:'#22C55E'},
+      {val:c,lbl:'CATCHES',color:'#A855F7'},
+      {val:f,lbl:'FLAG PULLS',color:'#3B82F6'}
+    ];
+  }else{
+    statList=[
+      {val:t,lbl:'TOUCHDOWNS',color:'#22C55E'},
+      {val:f,lbl:'FLAG PULLS',color:'#3B82F6'},
+      {val:c,lbl:'CATCHES',color:'#A855F7'},
+      {val:ii,lbl:'INTERCEPTIONS',color:'#F97316'},
+      {val:cv,lbl:'CONVERSIONS',color:'#14B8A6'},
+      {val:bl,lbl:'DEFLECTIONS',color:'#3B82F6'}
+    ];
+  }
+
+  var cols=3,tileW=280,tileH=140,tileGap=28;
+  var gridW=cols*tileW+(cols-1)*tileGap;
+  var startX=(W-gridW)/2;
+
+  statList.forEach(function(stat,i){
+    var col=i%cols,row=Math.floor(i/cols);
+    var tx=startX+col*(tileW+tileGap);
+    var ty=tileY+row*(tileH+tileGap);
+
+    // Tile background
+    ctx.save();
+    ctx.fillStyle='rgba(255,255,255,.04)';
+    _roundRect(ctx,tx,ty,tileW,tileH,14);
+    ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.08)';
+    ctx.lineWidth=1;
+    _roundRect(ctx,tx,ty,tileW,tileH,14);
+    ctx.stroke();
+
+    // Color accent line on top of tile
+    var accentGrad=ctx.createLinearGradient(tx,0,tx+tileW,0);
+    accentGrad.addColorStop(0,stat.color);
+    accentGrad.addColorStop(1,'rgba(255,255,255,.05)');
+    ctx.fillStyle=accentGrad;
+    _roundRect(ctx,tx,ty,tileW,4,{tl:14,tr:14,bl:0,br:0});
+    ctx.fill();
+    ctx.restore();
+
+    // Stat value
+    ctx.textAlign='center';
+    ctx.font='900 64px "Bebas Neue",sans-serif';
+    ctx.fillStyle=stat.val>0?stat.color:'rgba(255,255,255,.15)';
+    ctx.fillText(String(stat.val),tx+tileW/2,ty+78);
+
+    // Stat label
+    ctx.font='700 14px "Barlow Condensed",sans-serif';
+    ctx.fillStyle='rgba(255,255,255,.35)';
+    ctx.letterSpacing='3px';
+    ctx.fillText(stat.lbl,tx+tileW/2,ty+110);
+    ctx.letterSpacing='0px';
+  });
+
+  // ── PERFORMANCE RATING BAR ──
+  var barY=tileY+2*(tileH+tileGap)+30;
+  ctx.fillStyle='rgba(255,255,255,.04)';
+  _roundRect(ctx,startX,barY,gridW,100,14);
+  ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.08)';
+  ctx.lineWidth=1;
+  _roundRect(ctx,startX,barY,gridW,100,14);
+  ctx.stroke();
+
+  // Rating label
+  ctx.textAlign='left';
+  ctx.font='700 14px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.35)';
+  ctx.letterSpacing='3px';
+  ctx.fillText('PERFORMANCE RATING',startX+24,barY+28);
+  ctx.letterSpacing='0px';
+
+  // Score number
+  ctx.font='900 48px "Bebas Neue",sans-serif';
+  ctx.fillStyle=s;
+  ctx.fillText(String(score),startX+24,barY+80);
+
+  // PTS label
+  ctx.font='700 18px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',.5)';
+  var ptsX=startX+24+ctx.measureText(String(score)).width+10;
+  ctx.fillText('PTS',ptsX,barY+80);
+
+  // Progress bar
+  var maxScore=Math.max(score,50);
+  var barW2=380,barH2=12;
+  var bx2=startX+gridW-barW2-24,by2=barY+58;
+  ctx.fillStyle='rgba(255,255,255,.06)';
+  _roundRect(ctx,bx2,by2,barW2,barH2,6);
+  ctx.fill();
+  var fillW=Math.min(barW2,barW2*(score/maxScore));
+  if(fillW>0){
+    var barFillGrad=ctx.createLinearGradient(bx2,0,bx2+fillW,0);
+    barFillGrad.addColorStop(0,s);
+    barFillGrad.addColorStop(1,lighten(s,50));
+    ctx.fillStyle=barFillGrad;
+    _roundRect(ctx,bx2,by2,Math.max(fillW,12),barH2,6);
+    ctx.fill();
+  }
+
+  // Snap counts
+  ctx.textAlign='right';
+  ctx.font='700 13px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.25)';
+  ctx.letterSpacing='1px';
+  ctx.fillText('OFF '+offSnaps+'  •  DEF '+defSnaps+'  SNAPS',startX+gridW-24,barY+30);
+  ctx.letterSpacing='0px';
+
+  // ── FOOTER ──
+  var footY=H-80;
+  ctx.fillStyle='rgba(0,0,0,.5)';
+  ctx.fillRect(0,footY,W,80);
+  // Divider line above footer
+  var footDiv=ctx.createLinearGradient(0,0,W,0);
+  footDiv.addColorStop(0,'transparent');
+  footDiv.addColorStop(0.2,s);
+  footDiv.addColorStop(0.8,s);
+  footDiv.addColorStop(1,'transparent');
+  ctx.fillStyle=footDiv;
+  ctx.fillRect(0,footY,W,2);
+
+  ctx.textAlign='center';
+  ctx.font='700 14px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.2)';
+  ctx.letterSpacing='5px';
+  ctx.fillText('CGMAX FFTP  •  FLAG FOOTBALL TRACKER PRO',W/2,footY+36);
+  ctx.fillStyle='rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',.25)';
+  ctx.font='700 12px "Barlow Condensed",sans-serif';
+  ctx.fillText('CGMAXFFTP.COM',W/2,footY+58);
+  ctx.letterSpacing='0px';
+}
+
+// Rounded rect helper — supports uniform or per-corner radii
+function _roundRect(ctx,x,y,w,h,r){
+  if(typeof r==='number'){
+    var tl=r,tr=r,bl=r,br=r;
+  }else{tl=r.tl||0;tr=r.tr||0;bl=r.bl||0;br=r.br||0;}
+  ctx.beginPath();
+  ctx.moveTo(x+tl,y);
+  ctx.lineTo(x+w-tr,y);ctx.quadraticCurveTo(x+w,y,x+w,y+tr);
+  ctx.lineTo(x+w,y+h-br);ctx.quadraticCurveTo(x+w,y+h,x+w-br,y+h);
+  ctx.lineTo(x+bl,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-bl);
+  ctx.lineTo(x,y+tl);ctx.quadraticCurveTo(x,y,x+tl,y);
+  ctx.closePath();
+}
+
+function downloadStatCard(){
+  var canvas=document.getElementById('statcard-canvas');
+  var name=_statCardPlayer||'player';
+  var link=document.createElement('a');
+  link.download=firstName(name).toLowerCase()+'_statcard.png';
+  link.href=canvas.toDataURL('image/png');
+  link.click();
+  showToast('Stat card saved!');
+}
+
+function shareStatCard(){
+  var canvas=document.getElementById('statcard-canvas');
+  canvas.toBlob(function(blob){
+    if(navigator.share&&navigator.canShare){
+      var file=new File([blob],firstName(_statCardPlayer).toLowerCase()+'_statcard.png',{type:'image/png'});
+      var shareData={files:[file],title:firstName(_statCardPlayer)+' — Game Stats',text:G.team+' vs '+G.opp+' | Tracked with CGMax FFTP'};
+      if(navigator.canShare(shareData)){
+        navigator.share(shareData).catch(function(){downloadStatCard();});
+        return;
+      }
+    }
+    // Fallback to download
+    downloadStatCard();
+  },'image/png');
+}
+
+function downloadAllStatCards(){
+  var players=ALL_PLAYERS.filter(function(n){return !isAbsent(n);});
+  var delay=0;
+  players.forEach(function(name){
+    setTimeout(function(){
+      renderStatCard(name);
+      var canvas=document.getElementById('statcard-canvas');
+      var link=document.createElement('a');
+      link.download=firstName(name).toLowerCase()+'_statcard.png';
+      link.href=canvas.toDataURL('image/png');
+      link.click();
+    },delay);
+    delay+=400;
+  });
+  // Restore selected player card
+  setTimeout(function(){
+    if(_statCardPlayer) renderStatCard(_statCardPlayer);
+    showToast('All stat cards saved!');
+  },delay+200);
 }
 
 </script>
