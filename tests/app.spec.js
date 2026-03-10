@@ -662,3 +662,42 @@ test.describe('8 — PWA & Static Assets', () => {
   });
 
 });
+
+// ─── Suite 9: Auth Providers ──────────────────────────────────
+test.describe('9 — Auth Providers', () => {
+
+  test('Google sign-in button is present and attached', async ({ page }) => {
+    await page.goto('/app.html');
+    const btn = page.locator('#auth-google-btn, button:has-text("Google"), .auth-btn-google').first();
+    await expect(btn).toBeAttached();
+  });
+
+  test('Microsoft sign-in button is present and attached', async ({ page }) => {
+    await page.goto('/app.html');
+    const btn = page.locator('#auth-microsoft-btn, button:has-text("Microsoft"), .auth-btn-microsoft').first();
+    await expect(btn).toBeAttached();
+  });
+
+  test('Magic link email input and button are present', async ({ page }) => {
+    await page.goto('/app.html');
+    await expect(page.locator('#auth-email')).toBeAttached();
+    await expect(page.locator('#auth-magic-btn')).toBeAttached();
+  });
+
+  test('Auth buttons do not throw JS errors when rendered', async ({ page }) => {
+    const jsErrors = [];
+    page.on('pageerror', e => jsErrors.push(e.message));
+
+    await page.goto('/app.html');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+
+    const critical = jsErrors.filter(e =>
+      !e.includes('supabase') && !e.includes('net::ERR_') &&
+      !e.includes('Failed to fetch') && !e.includes('api.cgmaxfftp.com') &&
+      !e.includes('microsoftonline') && !e.includes('login.microsoft')
+    );
+    expect(critical).toHaveLength(0);
+  });
+
+});
