@@ -87,7 +87,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
 
   <div class="doc-meta">
     <div class="doc-meta-item"><strong>Effective Date:</strong> January 1, 2026</div>
-    <div class="doc-meta-item"><strong>Last Updated:</strong> March 10, 2026</div>
+    <div class="doc-meta-item"><strong>Last Updated:</strong> March 10, 2026 (rev. 2)</div>
     <div class="doc-meta-item"><strong>Operator:</strong> ITCC LLC</div>
     <div class="doc-meta-item"><strong>Contact:</strong> <a href="mailto:cgmaxfftp@itcc.llc">cgmaxfftp@itcc.llc</a></div>
   </div>
@@ -129,7 +129,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
       <li>Cloud Backup &amp; Restore — optional Pro feature to back up season history to ITCC LLC's secure cloud and restore it on any device</li>
       <li>Configurable Field Size — set the number of players per side (4, 5, 6, 7, or 8) to match your league rules</li>
     </ul>
-    <p>The App operates primarily via client-side local storage on your device. ITCC LLC does not store your coaching data, rosters, or game statistics on its servers, with the exception of: the optional Live Parent Scoreboard feature (which temporarily stores live game data expiring after 12 hours), the optional Cloud Backup feature (which stores season history data persistently), the optional Coach Account &amp; Cloud Sync feature (which stores your roster and season history persistently linked to your account), and the optional Parent Media Consent Form (which transmits consent records — including player name, age, guardian name, guardian email, and signature — to ITCC LLC's secure Vercel/Supabase backend for COPPA compliance, with an email notification also sent to ITCC LLC's team inbox as a backup record). The optional Stat Coach feature transmits game state data via Supabase Realtime Broadcast — this data is ephemeral and is never written to any database. See our Privacy Policy for full details.</p>
+    <p>The App operates primarily via client-side local storage on your device. ITCC LLC does not store your coaching data, rosters, or game statistics on its servers, with the exception of: the optional Live Parent Scoreboard feature (which temporarily stores live game data expiring after 12 hours), the optional Cloud Backup feature (which stores season history data persistently), the optional Coach Account &amp; Cloud Sync feature (which stores your roster and season history persistently linked to your account), Terms of Service and Privacy Policy consent acknowledgement records (stored for all users at first launch, including tier, timestamp, user agent, and optionally a self-reported or account-linked email address), player photo upload consent confirmations (logged for Pro coaches each time they confirm parent/guardian consent has been obtained before uploading a player photo), and the optional Parent Media Consent Form (which transmits consent records — including player name, age, guardian name, guardian email, and signature — to ITCC LLC's secure Vercel/Supabase backend for COPPA compliance, with an email notification also sent to ITCC LLC's team inbox as a backup record). The optional Stat Coach feature transmits game state data via Supabase Realtime Broadcast — this data is ephemeral and is never written to any database. See our Privacy Policy for full details.</p>
 
     <p><strong>Service Tiers — Lite and Pro:</strong> CGMax FFTP is offered in two tiers. The <strong>Lite tier</strong> is available at no cost to any coach — no account, no code, and no payment is required. The Lite tier includes core game-day features: live scoring, player stats, smart rotations, in-game MVP rankings, roster management (single team), attendance tracking, quarter timer, penalty tracker, full offline functionality, and the ability to create a free optional coach account to sync your roster, team colors, notes, and settings across devices. The <strong>Pro tier</strong> unlocks advanced features including full cross-device sync of season history and all team data, player photos with parent consent logging, voice-activated stat logging with audio feedback, season history and leaderboard, season summary report, Live Parent Scoreboard, Stat Coach co-coaching on a second device, multiple team management, Tournament Mode, Play Designer, Player Development Trends, cloud backup and restore, game export, share card generation, print summaries, touchdown fanfare, and penalty sound effects. Pro access is granted through a license key (format: CGMAX-XXXX-XXXX-XXXX) emailed after payment and validated by ITCC LLC's backend. ITCC LLC reserves the right to modify the features included in each tier at any time.</p>
 
@@ -160,6 +160,21 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(255,215,0,.07);pad
       <li><strong>Revocation:</strong> ITCC LLC reserves the right to revoke a license key at any time in cases of suspected misuse, sharing, or violation of these Terms.</li>
       <li>All payments are processed by Stripe, Inc. ITCC LLC does not store your credit card or payment information. Use of Stripe is subject to <a href="https://stripe.com/legal" target="_blank" rel="noopener">Stripe's Terms of Service</a> and <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</li>
     </ul>
+  </div>
+  <div class="doc-divider"></div>
+
+  <!-- 3B -->
+  <div class="doc-section">
+    <div class="doc-section-num">Section 03B</div>
+    <h2>Player Photos and Parent Consent Obligations</h2>
+    <p>The Pro tier includes the ability to upload and store player photos on your device and within your account. Because the App is designed for youth sports programs, <strong>player photos may depict minors</strong>. By using the photo feature, you represent and warrant the following:</p>
+    <ul>
+      <li><strong>You have obtained parental or guardian consent</strong> for each player whose photo you upload. ITCC LLC provides a Parent Media Consent Form (accessible via the Roster screen → "Send Parent Consent Form" button and at <a href="./consent.html" target="_blank">cgmaxfftp.com/flagfootball/consent.html</a>) to assist coaches in collecting and documenting this consent.</li>
+      <li><strong>In-app confirmation:</strong> Each time you initiate a player photo upload, the App will prompt you to confirm that parent or guardian consent has been obtained for that specific player. This confirmation is logged with your coach account and timestamp in ITCC LLC's backend for compliance purposes. Tapping "I Have Consent — Upload Photo" constitutes your attestation that consent has been duly obtained.</li>
+      <li><strong>Photos are stored locally</strong> on your device's browser storage. They are not transmitted to ITCC LLC's servers unless you use the Cloud Sync feature, in which case photos may be included in synced data protected by your account's Row Level Security.</li>
+      <li><strong>Your responsibility:</strong> ITCC LLC does not independently verify that parental consent has been obtained. The in-app confirmation and consent logging are compliance tools to help you maintain proper records — ultimate responsibility for obtaining and retaining valid parental consent rests with you, the coach.</li>
+    </ul>
+    <p>We strongly recommend using the provided Parent Media Consent Form and retaining signed copies for the duration of the season.</p>
   </div>
   <div class="doc-divider"></div>
 

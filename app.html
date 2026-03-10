@@ -84,13 +84,18 @@ body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--txt);-we
   position:fixed;inset:0;z-index:960;
   background:radial-gradient(ellipse 120% 80% at 50% 0%,rgba(170,0,0,.25) 0%,transparent 60%),#060606;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:32px 20px;
+  padding:32px 20px;overflow-y:auto;
 }
 .tos-overlay.hidden{display:none;}
 .tos-box{max-width:380px;text-align:center;}
 .tos-box h2{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#fff;margin:0 0 12px;}
 .tos-box p{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;margin:0 0 20px;}
 .tos-box a{color:#FFD700;text-decoration:underline;}
+.tos-email-wrap{margin-bottom:18px;text-align:left;}
+.tos-email-wrap label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px;}
+.tos-email-wrap input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 14px;font-family:'Barlow',sans-serif;font-size:14px;color:#fff;outline:none;box-sizing:border-box;}
+.tos-email-wrap input:focus{border-color:rgba(255,215,0,.5);background:rgba(255,215,0,.05);}
+.tos-email-wrap .tos-email-hint{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:rgba(255,255,255,.25);margin-top:5px;letter-spacing:.5px;}
 .tos-check-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;text-align:left;}
 .tos-check-row input[type="checkbox"]{width:20px;height:20px;accent-color:#CC2200;flex-shrink:0;margin-top:2px;}
 .tos-check-row label{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:rgba(255,255,255,.6);line-height:1.5;cursor:pointer;}
@@ -99,6 +104,18 @@ body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--txt);-we
   background:linear-gradient(135deg,#FFD700,#FFF5B0 50%,#CC9900);color:#0a0a0a;
   opacity:.4;pointer-events:none;transition:opacity .2s;}
 .tos-agree-btn.enabled{opacity:1;pointer-events:auto;}
+/* ── PHOTO CONSENT CONFIRMATION MODAL ── */
+.photo-consent-overlay{position:fixed;inset:0;z-index:970;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:24px;}
+.photo-consent-overlay.hidden{display:none;}
+.photo-consent-box{background:#121214;border:1px solid rgba(255,165,0,.35);border-radius:20px;padding:28px 24px;max-width:340px;width:100%;text-align:center;}
+.photo-consent-icon{font-size:44px;margin-bottom:12px;}
+.photo-consent-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#FFD700;margin-bottom:10px;}
+.photo-consent-body{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:rgba(255,255,255,.65);line-height:1.6;margin-bottom:20px;}
+.photo-consent-body strong{color:rgba(255,255,255,.9);}
+.photo-consent-confirm{width:100%;border:none;border-radius:12px;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;margin-bottom:10px;}
+.photo-consent-cancel{width:100%;background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);cursor:pointer;}
+.photo-consent-form-link{margin-top:14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;color:rgba(255,255,255,.35);}
+.photo-consent-form-link a{color:rgba(168,85,247,.8);text-decoration:underline;cursor:pointer;}
 
 .gate-screen{
   position:fixed;inset:0;z-index:970;
@@ -1072,15 +1089,37 @@ body.light-mode .toast-msg{color:#1a1714;}
   <div class="tos-box">
     <h2>WELCOME TO CGMAX FFTP</h2>
     <p>Before you get started, please review and accept our Terms&nbsp;of&nbsp;Service and Privacy&nbsp;Policy.</p>
-    <p style="margin-bottom:24px;">
+    <p style="margin-bottom:20px;">
       <a href="./terms.html" target="_blank">Terms of Service</a> &nbsp;·&nbsp;
       <a href="./privacy.html" target="_blank">Privacy Policy</a>
     </p>
+    <div class="tos-email-wrap">
+      <label for="tos-email-input">Your Email (optional)</label>
+      <input type="email" id="tos-email-input" placeholder="coach@example.com" autocomplete="email" autocapitalize="none">
+      <div class="tos-email-hint">Used only to record your consent. Never shared or used for marketing.</div>
+    </div>
     <div class="tos-check-row">
       <input type="checkbox" id="tos-check" onchange="document.getElementById('tos-agree-btn').classList.toggle('enabled',this.checked)">
       <label for="tos-check">I have read and agree to the Terms&nbsp;of&nbsp;Service and Privacy&nbsp;Policy.</label>
     </div>
     <button type="button" class="tos-agree-btn" id="tos-agree-btn" onclick="acceptTos()">CONTINUE</button>
+  </div>
+</div>
+
+<!-- PHOTO CONSENT CONFIRMATION MODAL -->
+<div class="photo-consent-overlay hidden" id="photo-consent-overlay">
+  <div class="photo-consent-box">
+    <div class="photo-consent-icon">📋</div>
+    <div class="photo-consent-title">PARENT CONSENT REQUIRED</div>
+    <div class="photo-consent-body">
+      Before uploading a photo for <strong id="photo-consent-player-name">this player</strong>,
+      please confirm that you have obtained written or verbal consent from the player's parent or guardian.
+    </div>
+    <button type="button" class="photo-consent-confirm" onclick="confirmPhotoConsent()">✅ I HAVE CONSENT — UPLOAD PHOTO</button>
+    <button type="button" class="photo-consent-cancel" onclick="cancelPhotoConsent()">Cancel</button>
+    <div class="photo-consent-form-link">
+      Need a consent form? <a onclick="openConsentFormFromModal();return false;">Send parent consent form →</a>
+    </div>
   </div>
 </div>
 
@@ -1544,6 +1583,7 @@ body.light-mode .toast-msg{color:#1a1714;}
       <button type="button" class="ract-btn ract-share" onclick="shareRoster()">&#128279; Share Roster</button>
       <button type="button" class="ract-btn ract-import-roster" onclick="openRosterImportModal()">&#128229; Import Roster</button>
       <button type="button" class="ract-btn ract-reset" onclick="resetToDefault()">&#8617; Reset to Default</button>
+      <button type="button" class="ract-btn" style="background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.4);color:rgba(168,85,247,.9);" onclick="openConsentForm()">&#128203; Send Parent Consent Form</button>
     </div>
   </div>
 </div>
@@ -4704,11 +4744,58 @@ function savePhotos(p){
     }
   }
 }
+/* ── PHOTO CONSENT FLOW ── */
+var _pendingPhotoIdx=null; // roster index waiting for consent confirmation
+
 function triggerPhotoUpload(idx){
   proGate('photos',function(){
-    var inp=document.getElementById('rpr-photo-'+idx);
-    if(inp)inp.click();
+    // Show parent consent confirmation before opening file picker
+    _pendingPhotoIdx=idx;
+    var player=LIVE_ROSTER[idx];
+    var playerName=player?(player.name||(player.first+' '+player.last)||'this player').trim():'this player';
+    var nameEl=document.getElementById('photo-consent-player-name');
+    if(nameEl)nameEl.textContent=playerName;
+    var overlay=document.getElementById('photo-consent-overlay');
+    if(overlay)overlay.classList.remove('hidden');
   });
+}
+
+function confirmPhotoConsent(){
+  var overlay=document.getElementById('photo-consent-overlay');
+  if(overlay)overlay.classList.add('hidden');
+  var idx=_pendingPhotoIdx;
+  _pendingPhotoIdx=null;
+  if(idx===null||idx===undefined)return;
+  // Log confirmation to backend (fire-and-forget)
+  logPhotoConsentToBackend(idx);
+  // Now trigger the actual file input
+  var inp=document.getElementById('rpr-photo-'+idx);
+  if(inp)inp.click();
+}
+
+function cancelPhotoConsent(){
+  _pendingPhotoIdx=null;
+  var overlay=document.getElementById('photo-consent-overlay');
+  if(overlay)overlay.classList.add('hidden');
+}
+
+function openConsentFormFromModal(){
+  cancelPhotoConsent();
+  setTimeout(openConsentForm,300);
+}
+
+function logPhotoConsentToBackend(idx){
+  try{
+    var token=getAuthToken?getAuthToken():null;
+    if(!token)return; // only log for signed-in Pro users
+    var player=LIVE_ROSTER[idx];
+    var playerName=player?(player.name||(player.first+' '+player.last)||'Unknown').trim():'Unknown';
+    fetch(SYNC_API_BASE+'/save-photo-consent',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({player_name:playerName,team_id:ACTIVE_TEAM_ID||null})
+    }).catch(function(){});
+  }catch(e){}
 }
 function handlePhotoUpload(idx,input){
   var file=input.files[0];if(!file)return;
@@ -5448,7 +5535,7 @@ async function openConsentForm(){
    TOS / PRIVACY CONSENT
 ════════════════════════════════════════════════════════════ */
 var LS_TOS_CONSENT='ff_tos_consent';
-var TOS_VERSION='1.0';
+var TOS_VERSION='1.1'; // bumped: now tracks email + all tiers
 
 function checkTosConsent(){
   // If user has already consented, skip overlay and proceed to gate
@@ -5464,7 +5551,15 @@ function checkTosConsent(){
 function acceptTos(){
   var cb=document.getElementById('tos-check');
   if(!cb||!cb.checked)return;
-  var consent={version:TOS_VERSION,timestamp:new Date().toISOString(),userAgent:navigator.userAgent};
+  var emailEl=document.getElementById('tos-email-input');
+  var email=(emailEl&&emailEl.value.trim())||'';
+  // Basic email format check if provided
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    if(emailEl){emailEl.style.borderColor='rgba(249,115,22,.7)';}
+    showToast('⚠️ Please enter a valid email or leave it blank.');
+    return;
+  }
+  var consent={version:TOS_VERSION,timestamp:new Date().toISOString(),userAgent:navigator.userAgent,email:email||null};
   try{localStorage.setItem(LS_TOS_CONSENT,JSON.stringify(consent));}
   catch(e){console.warn('[FFTP] acceptTos — consent save failed:',e);}
   // Hide overlay
@@ -5472,22 +5567,28 @@ function acceptTos(){
   if(overlay)overlay.classList.add('hidden');
   // Proceed to gate
   initGate();
-  // If Pro, send consent record to backend
-  sendConsentToBackend();
+  // Send consent record to backend for ALL users (Lite and Pro)
+  sendConsentToBackend(email||null);
 }
 
-function sendConsentToBackend(){
+function sendConsentToBackend(emailOverride){
   try{
-    var key=localStorage.getItem('ff_license_key');
-    if(!key)return; // Only send for Pro users
     var consent=JSON.parse(localStorage.getItem(LS_TOS_CONSENT)||'{}');
-    fetch('https://api.cgmaxfftp.com/api/save-consent',{
+    var key=localStorage.getItem('ff_license_key')||null;
+    var tier=localStorage.getItem('ff_pro_v1')==='unlocked'?'pro':'lite';
+    var resolvedEmail=emailOverride||consent.email||null;
+    var token=getAuthToken?getAuthToken():null;
+    var headers={'Content-Type':'application/json'};
+    if(token)headers['Authorization']='Bearer '+token;
+    fetch(SYNC_API_BASE+'/save-consent',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:headers,
       body:JSON.stringify({
-        license_key:key,
         consent_version:consent.version||TOS_VERSION,
-        consented_at:consent.timestamp||new Date().toISOString()
+        consented_at:consent.timestamp||new Date().toISOString(),
+        tier:tier,
+        ...(key?{license_key:key}:{}),
+        ...(resolvedEmail?{email:resolvedEmail}:{})
       })
     }).catch(function(){});
   }catch(e){}
@@ -6319,6 +6420,8 @@ function initSupabaseAuth(){
         setTimeout(function(){
           checkAndLinkLicense();
           SYNC_ENGINE.downloadAll();
+          // Re-send consent record now that we have a user_id to link it to
+          sendConsentToBackend(null);
         },500);
       }
       if(event==='SIGNED_OUT'){
