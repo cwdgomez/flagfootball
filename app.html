@@ -5546,17 +5546,25 @@ function submitGateCode(){
     setTimeout(function(){if(inp)inp.classList.remove('shake');},500);
     return;
   }
-  // Validate against backend
+  // Must be signed in — Pro keys are now tied to the purchase email account
+  if(!CURRENT_USER){
+    if(err)err.innerHTML='🔐 Sign in with your purchase email first — '
+      +'<a href="#" onclick="openAuthModal();return false;" '
+      +'style="color:#FFD700;font-weight:800;text-decoration:underline;">Sign In Now</a>';
+    return;
+  }
+  // Signed in — link the key to this account (backend enforces email match)
   if(btn)btn.textContent='🔍 Validating…';
   if(err)err.textContent='';
-  fetch(VALIDATE_URL,{
+  var gateToken=getAuthToken();
+  fetch(SYNC_API_BASE+'/link-license-to-user',{
     method:'POST',
-    headers:{'Content-Type':'application/json'},
+    headers:{'Authorization':'Bearer '+gateToken,'Content-Type':'application/json'},
     body:JSON.stringify({license_key:code})
   })
-  .then(function(r){return r.json();})
-  .then(function(data){
-    if(data.valid){
+  .then(function(r){var s=r.status;return r.json().then(function(d){return{status:s,data:d};});})
+  .then(function(res){
+    if(res.status===200&&res.data.success){
       try{
         localStorage.setItem('ff_pro_v1','unlocked');
         localStorage.setItem('ff_license_key',code);
@@ -5576,11 +5584,20 @@ function submitGateCode(){
           _proCallback=null;
         }
       },1200);
+    } else if(res.status===403&&res.data&&res.data.code==='email_mismatch'){
+      if(btn)btn.textContent='⭐ UNLOCK PRO';
+      vibe([20,10,20]);
+      if(inp){inp.classList.remove('shake');void inp.offsetWidth;inp.classList.add('shake');}
+      if(err)err.textContent='❌ This key was purchased with a different email. Sign in with your purchase email.';
+      setTimeout(function(){if(inp)inp.classList.remove('shake');},500);
+    } else if(res.status===409){
+      if(btn)btn.textContent='⭐ UNLOCK PRO';
+      if(err)err.textContent='❌ This key is already linked to another account. Contact cgmaxfftp@itcc.llc';
     } else {
       if(btn)btn.textContent='⭐ UNLOCK PRO';
       vibe([20,10,20]);
       if(inp){inp.classList.remove('shake');void inp.offsetWidth;inp.classList.add('shake');}
-      if(err)err.textContent='❌ Invalid or already-used license key. Contact cgmaxfftp@itcc.llc';
+      if(err)err.textContent='❌ '+(res.data&&res.data.error?res.data.error:'Invalid or expired license key. Contact cgmaxfftp@itcc.llc');
       if(inp)inp.value='';
       setTimeout(function(){if(inp)inp.classList.remove('shake');},500);
     }
@@ -5639,21 +5656,27 @@ function isPro(){
 /* ── Background Pro re-validation (runs silently on app load) ── */
 function scheduleProRecheck(){
   if(!isPro())return;
-  var key=localStorage.getItem(LS_LICENSE);
-  if(!key)return;
   var lastCheck=parseInt(localStorage.getItem(LS_PRO_LAST_CHECK)||'0',10);
   var now=Date.now();
   if(now-lastCheck<PRO_RECHECK_INTERVAL)return; // checked recently — skip
-  // Attempt silent revalidation
-  fetch(VALIDATE_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({license_key:key})})
+
+  var recheckToken=getAuthToken();
+
+  if(recheckToken){
+    // ── PRIMARY PATH: signed-in user — verify via account (authoritative) ──
+    fetch(SYNC_API_BASE+'/check-license-link',{
+      method:'GET',
+      headers:{'Authorization':'Bearer '+recheckToken}
+    })
     .then(function(r){return r.json();})
     .then(function(data){
-      if(data.valid){
-        // Successful — reset fail timer, store check time
+      if(data.has_active_license){
         localStorage.setItem(LS_PRO_LAST_CHECK,String(Date.now()));
         localStorage.removeItem(LS_PRO_FAIL_SINCE);
+        // Keep local key fresh in case it changed (e.g. re-issued key)
+        if(data.license_key)try{localStorage.setItem(LS_LICENSE,data.license_key);}catch(e){}
       } else {
-        // Key is invalid/cancelled — revoke Pro immediately
+        // Account has no active license — revoke Pro
         localStorage.removeItem(LS_PRO);
         localStorage.removeItem(LS_LICENSE);
         localStorage.removeItem(LS_PRO_LAST_CHECK);
@@ -5662,12 +5685,11 @@ function scheduleProRecheck(){
       }
     })
     .catch(function(){
-      // Network failure — start or check grace period
+      // Network failure — grace period logic (same for both paths)
       var failSince=parseInt(localStorage.getItem(LS_PRO_FAIL_SINCE)||'0',10);
       if(!failSince){
         localStorage.setItem(LS_PRO_FAIL_SINCE,String(Date.now()));
       } else if(Date.now()-failSince>PRO_GRACE_PERIOD){
-        // Grace period expired — suspend Pro features until next successful check
         localStorage.removeItem(LS_PRO);
         localStorage.removeItem(LS_LICENSE);
         localStorage.removeItem(LS_PRO_LAST_CHECK);
@@ -5677,6 +5699,41 @@ function scheduleProRecheck(){
         showToast('🔄 Pro working offline — will verify when connected.','',2200);
       }
     });
+
+  } else {
+    // ── FALLBACK PATH: not signed in — anonymous key check (migration/legacy path) ──
+    // Keeps existing Pro users working while they transition to account-based auth.
+    var key=localStorage.getItem(LS_LICENSE);
+    if(!key)return;
+    fetch(VALIDATE_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({license_key:key})})
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(data.valid){
+        localStorage.setItem(LS_PRO_LAST_CHECK,String(Date.now()));
+        localStorage.removeItem(LS_PRO_FAIL_SINCE);
+      } else {
+        localStorage.removeItem(LS_PRO);
+        localStorage.removeItem(LS_LICENSE);
+        localStorage.removeItem(LS_PRO_LAST_CHECK);
+        localStorage.removeItem(LS_PRO_FAIL_SINCE);
+        showToast('⚠️ Pro subscription inactive. Reverted to Lite.');
+      }
+    })
+    .catch(function(){
+      var failSince=parseInt(localStorage.getItem(LS_PRO_FAIL_SINCE)||'0',10);
+      if(!failSince){
+        localStorage.setItem(LS_PRO_FAIL_SINCE,String(Date.now()));
+      } else if(Date.now()-failSince>PRO_GRACE_PERIOD){
+        localStorage.removeItem(LS_PRO);
+        localStorage.removeItem(LS_LICENSE);
+        localStorage.removeItem(LS_PRO_LAST_CHECK);
+        localStorage.removeItem(LS_PRO_FAIL_SINCE);
+        showToast('⚠️ Could not verify Pro license after 7 days offline. Reverted to Lite.');
+      } else {
+        showToast('🔄 Pro working offline — will verify when connected.','',2200);
+      }
+    });
+  }
 }
 
 // Central function — updates ALL pro-related UI in one place.
@@ -5724,7 +5781,7 @@ function proUpgradeMonthly(){
 function proUpgradeAnnual(){
   window.open('https://buy.stripe.com/aFa5kC9hg53D4m48BV24001','_blank');
 }
-// Validate license key against live backend
+// Validate license key against live backend — requires an active signed-in session
 function proUnlockWithCode(code){
   if(!code)return;
   code=code.toUpperCase().trim();
@@ -5732,15 +5789,23 @@ function proUnlockWithCode(code){
     showToast('❌ Format: CGMAX-XXXX-XXXX-XXXX');
     return;
   }
+  // Must be signed in to link a key to an account
+  if(!CURRENT_USER){
+    showToast('🔐 Sign in with your purchase email first to activate Pro.');
+    closeProModal();
+    setTimeout(openAuthModal,350);
+    return;
+  }
+  var unlockToken=getAuthToken();
   showToast('🔍 Validating license…');
-  fetch(VALIDATE_URL,{
+  fetch(SYNC_API_BASE+'/link-license-to-user',{
     method:'POST',
-    headers:{'Content-Type':'application/json'},
+    headers:{'Authorization':'Bearer '+unlockToken,'Content-Type':'application/json'},
     body:JSON.stringify({license_key:code})
   })
-  .then(function(r){return r.json();})
-  .then(function(data){
-    if(data.valid){
+  .then(function(r){var s=r.status;return r.json().then(function(d){return{status:s,data:d};});})
+  .then(function(res){
+    if(res.status===200&&res.data.success){
       try{localStorage.setItem(LS_PRO,'unlocked');localStorage.setItem(LS_LICENSE,code);}
       catch(e){console.warn('[FFTP] Pro key save failed:',e);}
       closeProModal();
@@ -5748,8 +5813,14 @@ function proUnlockWithCode(code){
       vibe([30,15,30,15,50]);
       updateProUI();
       if(typeof _proCallback==='function'){_proCallback();_proCallback=null;}
+    } else if(res.status===403&&res.data&&res.data.code==='email_mismatch'){
+      showToast('❌ Sign in with your purchase email to activate this key.');
+      closeProModal();
+      setTimeout(openAuthModal,350);
+    } else if(res.status===409){
+      showToast('❌ This key is already linked to another account.');
     } else {
-      showToast('❌ Invalid or expired license key');
+      showToast('❌ '+(res.data&&res.data.error?res.data.error:'Invalid or expired license key'));
     }
   })
   .catch(function(){
@@ -6478,9 +6549,23 @@ function linkLocalLicenseToAccount(key){
     headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
     body:JSON.stringify({license_key:key})
   })
-  .then(function(r){return r.json();})
-  .then(function(data){
-    if(data.success)showToast('🔗 License linked to your account!');
+  .then(function(r){var s=r.status;return r.json().then(function(d){return{status:s,data:d};});})
+  .then(function(res){
+    if(res.status===200&&res.data.success){
+      showToast('🔗 License linked to your account!');
+    } else if(res.status===403&&res.data&&res.data.code==='email_mismatch'){
+      // The stored key was purchased under a different email — warn and clear it
+      // so the user knows to sign in with their purchase email instead.
+      showToast('⚠️ Pro key mismatch: sign in with the email you used at checkout to activate Pro.');
+      try{
+        localStorage.removeItem(LS_PRO);
+        localStorage.removeItem(LS_LICENSE);
+        localStorage.removeItem(LS_PRO_LAST_CHECK);
+        localStorage.removeItem(LS_PRO_FAIL_SINCE);
+      }catch(e){}
+      updateProUI();
+    }
+    // 409 = already linked to this user or another — silent, not an error for background linking
   })
   .catch(function(e){console.error('License link error:',e);});
 }
