@@ -20,6 +20,13 @@ async function clearStorage(page) {
 async function loadFreshApp(page) {
   await page.goto('/app.html');
   await clearStorage(page);
+  // Re-inject bypass values after clearing storage so the reload starts
+  // past the ToS and gate overlays (addInitScript also runs on reload,
+  // but this explicit set is a belt-and-suspenders safety net).
+  await page.evaluate(() => {
+    localStorage.setItem('ff_tos_consent', JSON.stringify({ version: '1.0', timestamp: new Date().toISOString(), email: null }));
+    localStorage.setItem('ff_access_v1', 'lite');
+  });
   await page.reload({ waitUntil: 'domcontentloaded' });
 }
 
@@ -52,6 +59,18 @@ async function startGame(page, { team = 'Test Bears', opp = 'Test Lions', player
   }
 }
 
+// ─── Global Setup ─────────────────────────────────────────────
+// Inject ToS consent and Lite access bypass into localStorage before
+// every test navigation so no test is ever blocked by the ToS overlay
+// or code-gate screen. Tests that specifically cover those flows should
+// override this in their own beforeEach.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('ff_tos_consent', JSON.stringify({ version: '1.0', timestamp: new Date().toISOString(), email: null }));
+    localStorage.setItem('ff_access_v1', 'lite');
+  });
+});
+
 // ─── Suite 1: Page Load & No Errors ──────────────────────────
 test.describe('1 — Page Load & Stability', () => {
 
@@ -71,13 +90,15 @@ test.describe('1 — Page Load & Stability', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1500); // allow async init
 
-    // Filter expected/acceptable errors (Supabase auth, network offline, etc.)
+    // Filter expected/acceptable errors (Supabase auth, network offline,
+    // backend API calls that are irrelevant in a local UI test, etc.)
     const critical = jsErrors.filter(e =>
       !e.includes('supabase') &&
       !e.includes('ERR_NAME_NOT_RESOLVED') &&
       !e.includes('Failed to fetch') &&
       !e.includes('NetworkError') &&
-      !e.includes('net::ERR_')
+      !e.includes('net::ERR_') &&
+      !e.includes('api.cgmaxfftp.com')   // backend CORS/network errors are not UI bugs
     );
     expect(critical, `Unexpected JS errors: ${critical.join('\n')}`).toHaveLength(0);
   });
@@ -549,7 +570,8 @@ test.describe('6 — Button & UI Interaction', () => {
     }
 
     const critical = jsErrors.filter(e =>
-      !e.includes('supabase') && !e.includes('net::ERR_') && !e.includes('Failed to fetch')
+      !e.includes('supabase') && !e.includes('net::ERR_') && !e.includes('Failed to fetch') &&
+      !e.includes('api.cgmaxfftp.com')   // backend CORS/network errors are not UI bugs
     );
     expect(critical).toHaveLength(0);
   });
@@ -596,8 +618,11 @@ test.describe('7 — Mobile Layout', () => {
 // ─── Suite 8: PWA & Assets ────────────────────────────────────
 test.describe('8 — PWA & Static Assets', () => {
 
-  test('manifest.json is accessible', async ({ page }) => {
-    const res = await page.goto('/manifest.json');
+  test('manifest.json is accessible', async ({ request }) => {
+    // Use the API request context instead of page.goto() — page.goto() on
+    // Firefox triggers a Playwright protocol error (NS_ERROR_FAILURE) when
+    // reading the response body of application/manifest+json resources.
+    const res = await request.get('/manifest.json');
     expect(res.status()).toBe(200);
     const body = await res.text();
     const json = JSON.parse(body);
