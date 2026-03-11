@@ -78,32 +78,7 @@ body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--txt);-we
 /* Button press flash */
 .stat-btn-flash{animation:btnFlash .2s ease-out;}
 @keyframes btnFlash{0%{filter:brightness(2.5);}100%{filter:brightness(1);}}
-/* Code gate screen */
-/* ── ToS Consent Overlay ── */
-.tos-overlay{
-  position:fixed;inset:0;z-index:960;
-  background:radial-gradient(ellipse 120% 80% at 50% 0%,rgba(170,0,0,.25) 0%,transparent 60%),#060606;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:32px 20px;overflow-y:auto;
-}
-.tos-overlay.hidden{display:none;}
-.tos-box{max-width:380px;text-align:center;}
-.tos-box h2{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#fff;margin:0 0 12px;}
-.tos-box p{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;margin:0 0 20px;}
-.tos-box a{color:#FFD700;text-decoration:underline;}
-.tos-email-wrap{margin-bottom:18px;text-align:left;}
-.tos-email-wrap label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px;}
-.tos-email-wrap input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 14px;font-family:'Barlow',sans-serif;font-size:14px;color:#fff;outline:none;box-sizing:border-box;}
-.tos-email-wrap input:focus{border-color:rgba(255,215,0,.5);background:rgba(255,215,0,.05);}
-.tos-email-wrap .tos-email-hint{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:rgba(255,255,255,.25);margin-top:5px;letter-spacing:.5px;}
-.tos-check-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;text-align:left;}
-.tos-check-row input[type="checkbox"]{width:20px;height:20px;accent-color:#CC2200;flex-shrink:0;margin-top:2px;}
-.tos-check-row label{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:rgba(255,255,255,.6);line-height:1.5;cursor:pointer;}
-.tos-agree-btn{width:100%;border:none;border-radius:50px;padding:14px 24px;
-  font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;
-  background:linear-gradient(135deg,#FFD700,#FFF5B0 50%,#CC9900);color:#0a0a0a;
-  opacity:.4;pointer-events:none;transition:opacity .2s;}
-.tos-agree-btn.enabled{opacity:1;pointer-events:auto;}
+/* ── WELCOME GATE — 2-panel auth-first onboarding ── */
 /* ── PHOTO CONSENT CONFIRMATION MODAL ── */
 .photo-consent-overlay{position:fixed;inset:0;z-index:970;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:24px;}
 .photo-consent-overlay.hidden{display:none;}
@@ -141,8 +116,40 @@ body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--txt);-we
 .gate-input:focus{border-color:rgba(255,215,0,.6);}
 .gate-input.shake{animation:gateShake .4s ease;}
 @keyframes gateShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-8px);}75%{transform:translateX(8px);}}
-@keyframes tosEmailShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
-.tos-email-shake{animation:tosEmailShake .4s ease;}
+/* welcome-gate panel switching */
+.wg-panel{width:100%;max-width:390px;display:flex;flex-direction:column;align-items:center;}
+.wg-panel.hidden{display:none;}
+/* ToS card */
+.wg-tos-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:20px 20px 18px;width:100%;margin-bottom:14px;box-shadow:0 8px 40px rgba(0,0,0,.6);}
+.wg-tos-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;text-align:left;}
+.wg-tos-check{width:22px;height:22px;accent-color:#CC2200;flex-shrink:0;margin-top:1px;cursor:pointer;}
+.wg-tos-label{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:rgba(255,255,255,.58);line-height:1.55;cursor:pointer;}
+.wg-tos-label a{color:rgba(255,215,0,.8);text-decoration:none;font-weight:700;}
+.wg-tos-label a:hover{text-decoration:underline;}
+/* Auth buttons */
+.wg-auth-group{display:flex;flex-direction:column;gap:9px;transition:opacity .3s,filter .3s;}
+.wg-auth-group.locked{opacity:.22;pointer-events:none;filter:grayscale(.4);}
+.wg-oauth-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:1.5px solid rgba(255,255,255,.18);border-radius:12px;padding:13px 18px;background:rgba(255,255,255,.055);color:rgba(255,255,255,.88);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.8px;cursor:pointer;transition:background .2s,border-color .2s,transform .15s;}
+.wg-oauth-btn:hover{background:rgba(255,255,255,.11);border-color:rgba(255,255,255,.38);}
+.wg-oauth-btn:active{transform:scale(.97);}
+.wg-oauth-btn svg{width:19px;height:19px;flex-shrink:0;}
+.wg-divider{display:flex;align-items:center;gap:10px;margin:4px 0;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.2);text-transform:uppercase;}
+.wg-divider::before,.wg-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07);}
+.wg-email-row{display:flex;gap:8px;width:100%;}
+.wg-email-input{flex:1;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.14);border-radius:10px;padding:12px 14px;color:#fff;font-family:'Barlow',sans-serif;font-size:14px;outline:none;transition:border-color .2s;min-width:0;}
+.wg-email-input:focus{border-color:rgba(255,215,0,.55);}
+.wg-email-input::placeholder{color:rgba(255,255,255,.22);}
+.wg-magic-btn{border:none;border-radius:10px;padding:12px 15px;background:linear-gradient(135deg,#BB0000,#790000);color:#FFD700;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;white-space:nowrap;box-shadow:0 4px 16px rgba(150,0,0,.45);transition:transform .15s,opacity .2s;}
+.wg-magic-btn:hover{transform:translateY(-1px);}
+.wg-magic-btn:active{transform:scale(.97);}
+.wg-status{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.4px;text-align:center;min-height:18px;margin-top:8px;line-height:1.4;}
+.wg-status.ok{color:#22c55e;}
+.wg-status.err{color:#f97316;}
+.wg-status.info{color:rgba(255,215,0,.85);}
+/* License panel card */
+.wg-license-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:26px 22px;width:100%;margin-bottom:16px;box-shadow:0 8px 40px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.05);}
+.wg-lite-btn{background:transparent;border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.62);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:10px 28px;border-radius:8px;cursor:pointer;width:100%;transition:all .2s;margin-top:2px;}
+.wg-lite-btn:hover{border-color:rgba(255,215,0,.5);color:#FFD700;}
 .gate-btn{
   width:100%;border:none;border-radius:12px;padding:15px;
   font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;
@@ -1110,28 +1117,6 @@ body.light-mode .toast-msg{color:#1a1714;}
 <div class="ptr-indicator" id="ptr-indicator"><div class="ptr-spinner"></div>REFRESHING…</div>
 <div id="grid-bg"></div>
 
-<!-- TOS / PRIVACY CONSENT -->
-<div class="tos-overlay hidden" id="tos-overlay">
-  <div class="tos-box">
-    <h2>WELCOME TO CGMAX FFTP</h2>
-    <p>Before you get started, please review and accept our Terms&nbsp;of&nbsp;Service and Privacy&nbsp;Policy.</p>
-    <p style="margin-bottom:20px;">
-      <a href="./terms.html" target="_blank">Terms of Service</a> &nbsp;·&nbsp;
-      <a href="./privacy.html" target="_blank">Privacy Policy</a>
-    </p>
-    <div class="tos-email-wrap">
-      <label for="tos-email-input">Your Email (optional)</label>
-      <input type="email" id="tos-email-input" placeholder="coach@example.com" autocomplete="email" autocapitalize="none">
-      <div class="tos-email-hint">Used only to record your consent. Never shared or used for marketing.</div>
-    </div>
-    <div class="tos-check-row">
-      <input type="checkbox" id="tos-check" onchange="document.getElementById('tos-agree-btn').classList.toggle('enabled',this.checked)">
-      <label for="tos-check">I have read and agree to the Terms&nbsp;of&nbsp;Service and Privacy&nbsp;Policy.</label>
-    </div>
-    <button type="button" class="tos-agree-btn" id="tos-agree-btn" onclick="acceptTos()">CONTINUE</button>
-  </div>
-</div>
-
 <!-- PHOTO CONSENT CONFIRMATION MODAL -->
 <div class="photo-consent-overlay hidden" id="photo-consent-overlay" onclick="cancelPhotoConsent()">
   <div class="photo-consent-box" onclick="event.stopPropagation()">
@@ -1149,8 +1134,10 @@ body.light-mode .toast-msg{color:#1a1714;}
   </div>
 </div>
 
-<!-- CODE GATE -->
+<!-- WELCOME GATE — Auth-first onboarding (2 panels) -->
 <div class="gate-screen hidden" id="code-gate">
+
+  <!-- ── Shared logo header ── -->
   <div class="gate-logo-wrap">
     <div class="gate-shield" id="gate-logo-div">
       <svg class="app-shield-poles" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1170,42 +1157,114 @@ body.light-mode .toast-msg{color:#1a1714;}
       </div>
     </div>
     <div class="gate-brand">CGMax FFTP · Flag Football Tracker Pro</div>
-    <div class="gate-title">COACH ACCESS</div>
-    <div class="gate-sub">CGMax FFTP · Powered by ITCC LLC</div>
-    <div style="margin-top:12px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.2);text-transform:uppercase;text-align:center;">
-      <a href="./privacy.html" style="color:rgba(255,215,0,.3);text-decoration:none;">Privacy Policy</a>
-      &nbsp;·&nbsp;
-      <a href="./terms.html" style="color:rgba(255,215,0,.3);text-decoration:none;">Terms of Service</a>
+    <div class="gate-title" id="gate-title-text">COACH ACCESS</div>
+    <div class="gate-sub">Powered by ITCC LLC</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       PANEL 1 — Sign In / Create Account
+       ═══════════════════════════════════ -->
+  <div id="welcome-panel" class="wg-panel">
+    <div class="wg-tos-card">
+
+      <!-- ToS agreement — must check before auth unlocks -->
+      <div class="wg-tos-row">
+        <input type="checkbox" id="wg-tos-check" class="wg-tos-check"
+          onchange="wgTosToggle(this.checked)">
+        <label for="wg-tos-check" class="wg-tos-label">
+          I agree to the <a href="./terms.html" target="_blank">Terms of Service</a>
+          and <a href="./privacy.html" target="_blank">Privacy Policy</a>.<br>
+          <span style="font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.3px;">
+            Required to create your free coach account.
+          </span>
+        </label>
+      </div>
+
+      <!-- Auth buttons — locked until ToS checked -->
+      <div class="wg-auth-group locked" id="wg-auth-group">
+
+        <!-- Google -->
+        <button type="button" class="wg-oauth-btn" onclick="wgSignInGoogle()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Sign in with Google
+        </button>
+
+        <!-- Microsoft -->
+        <button type="button" class="wg-oauth-btn" onclick="wgSignInMicrosoft()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="1" width="10.5" height="10.5" fill="#F25022"/>
+            <rect x="12.5" y="1" width="10.5" height="10.5" fill="#7FBA00"/>
+            <rect x="1" y="12.5" width="10.5" height="10.5" fill="#00A4EF"/>
+            <rect x="12.5" y="12.5" width="10.5" height="10.5" fill="#FFB900"/>
+          </svg>
+          Sign in with Microsoft
+        </button>
+
+        <!-- Magic Link divider -->
+        <div class="wg-divider">or send a magic link</div>
+
+        <!-- Email + send button -->
+        <div class="wg-email-row">
+          <input type="email" class="wg-email-input" id="wg-email"
+            placeholder="coach@example.com" autocomplete="email" autocapitalize="none"
+            onkeydown="if(event.key==='Enter')wgSendMagicLink()">
+          <button type="button" class="wg-magic-btn" onclick="wgSendMagicLink()">Send →</button>
+        </div>
+
+        <div class="wg-status" id="wg-status"></div>
+      </div><!-- /wg-auth-group -->
+    </div><!-- /wg-tos-card -->
+
+    <div class="gate-contact">
+      <span style="opacity:.5;font-size:10px;letter-spacing:1px;">
+        © 2026 ITCC LLC · Youth Sports Technology
+      </span>
     </div>
-  </div>
-  <div class="gate-card">
-    <div class="gate-lock" style="font-size:32px;margin-bottom:8px;display:block;filter:drop-shadow(0 0 8px rgba(255,215,0,.5));">⭐</div>
-    <div class="gate-label" style="margin-bottom:12px;">Enter PRO License Key</div>
-    <input type="text" class="gate-input" id="gate-code-input" maxlength="24"
-      aria-label="PRO License Key" placeholder="CGMAX-XXXX-XXXX-XXXX" autocomplete="off" autocorrect="off" spellcheck="false"
-      oninput="this.value=this.value.toUpperCase()"
-      onkeydown="if(event.key==='Enter')submitGateCode()">
-    <button type="button" class="gate-btn" id="gate-btn" onclick="submitGateCode()">⭐ UNLOCK PRO</button>
-    <div class="gate-error" id="gate-error"></div>
-    <div style="margin:16px 0 4px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:3px;color:rgba(255,255,255,.2);text-transform:uppercase;">— or —</div>
-    <button type="button" onclick="enterFree()"
-      style="background:transparent;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.7);
-             font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:2px;
-             text-transform:uppercase;padding:10px 28px;border-radius:8px;cursor:pointer;
-             transition:all .2s;width:100%;"
-      onmouseover="this.style.borderColor='rgba(255,215,0,.5)';this.style.color='#FFD700';"
-      onmouseout="this.style.borderColor='rgba(255,255,255,.25)';this.style.color='rgba(255,255,255,.7)';">
-      ▶ Continue Free (Lite)
-    </button>
-  </div>
-  <div class="gate-contact">
-    Need access or want to purchase?<br>
-    Contact: <a href="mailto:cgmaxfftp@itcc.llc" style="color:rgba(255,215,0,.6);text-decoration:none;">cgmaxfftp@itcc.llc</a><br>
-    <span style="opacity:.5;font-size:10px;letter-spacing:1px;margin-top:4px;display:block;">
-      © ITCC LLC · All Rights Reserved · Youth Sports Technology
-    </span>
-  </div>
-</div>
+  </div><!-- /welcome-panel -->
+
+  <!-- ═══════════════════════════════════
+       PANEL 2 — Pro License Entry
+       (shown after sign-in if no license found)
+       ═══════════════════════════════════ -->
+  <div id="license-panel" class="wg-panel hidden">
+    <div class="wg-license-card">
+      <div class="gate-lock" style="font-size:30px;margin-bottom:8px;filter:drop-shadow(0 0 10px rgba(255,215,0,.55));">⭐</div>
+      <div class="gate-label" style="margin-bottom:4px;">Got a Pro License Key?</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:rgba(255,255,255,.3);letter-spacing:.5px;text-align:center;margin-bottom:14px;">
+        Enter the key from your confirmation email
+      </div>
+      <input type="text" class="gate-input" id="gate-code-input" maxlength="24"
+        aria-label="PRO License Key" placeholder="CGMAX-XXXX-XXXX-XXXX"
+        autocomplete="off" autocorrect="off" spellcheck="false"
+        oninput="this.value=this.value.toUpperCase()"
+        onkeydown="if(event.key==='Enter')submitGateCode()">
+      <button type="button" class="gate-btn" id="gate-btn" onclick="submitGateCode()">⭐ UNLOCK PRO</button>
+      <div class="gate-error" id="gate-error"></div>
+      <div class="wg-divider" style="margin:14px 0 10px;">or</div>
+      <button type="button" class="wg-lite-btn" onclick="enterFree()">
+        ▶ Continue as Lite — Free Forever
+      </button>
+      <div style="margin-top:12px;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:rgba(255,255,255,.22);text-align:center;letter-spacing:.4px;line-height:1.6;">
+        Lite saves your team &amp; season to the cloud.<br>
+        Upgrade to Pro anytime for full features.
+      </div>
+    </div>
+
+    <div class="gate-contact">
+      Need to purchase Pro?<br>
+      <a href="mailto:cgmaxfftp@itcc.llc">cgmaxfftp@itcc.llc</a><br>
+      <span style="opacity:.5;font-size:10px;letter-spacing:1px;margin-top:4px;display:block;">
+        © 2026 ITCC LLC · All Rights Reserved
+      </span>
+    </div>
+  </div><!-- /license-panel -->
+
+</div><!-- /code-gate -->
 
 <!-- ONBOARDING -->
 <div class="onboard-overlay hidden" id="onboard-overlay">
@@ -2418,7 +2477,19 @@ function switchToTeam(id){
   showToast('🏈 Switched to '+getActiveTeamName());
 }
 
-function showNewTeamForm(){document.getElementById('new-team-form').classList.remove('hidden');setTimeout(function(){document.getElementById('new-team-name-input').focus();},80);}
+function showNewTeamForm(){
+  // Lite users are limited to 1 team — soft gate with upgrade prompt
+  if(!isPro()){
+    var teams=getTeams();
+    if(teams.length>=1){
+      showToast('⭐ Multiple teams require Pro. Upgrade to manage unlimited teams!');
+      setTimeout(function(){openProModal('multi-team',null);},400);
+      return;
+    }
+  }
+  document.getElementById('new-team-form').classList.remove('hidden');
+  setTimeout(function(){document.getElementById('new-team-name-input').focus();},80);
+}
 function hideNewTeamForm(){document.getElementById('new-team-form').classList.add('hidden');}
 
 function createTeam(){
@@ -4200,12 +4271,12 @@ function renderStatCard(name){
   }
 
   // ── BACKGROUND ──
-  // Deep gradient from team primary
+  // Gradient from team primary — slower, more breathable fade
   var bgGrad=ctx.createLinearGradient(0,0,0,H);
   bgGrad.addColorStop(0,p);
-  bgGrad.addColorStop(0.35,p2);
-  bgGrad.addColorStop(0.7,'#0a0a0a');
-  bgGrad.addColorStop(1,'#050505');
+  bgGrad.addColorStop(0.28,p2);
+  bgGrad.addColorStop(0.58,'#181818');
+  bgGrad.addColorStop(1,'#111111');
   ctx.fillStyle=bgGrad;
   ctx.fillRect(0,0,W,H);
 
@@ -4254,25 +4325,33 @@ function renderStatCard(name){
   ctx.fillText(dateStr2,W-42,43);
   ctx.letterSpacing='0px';
 
-  // ── RANK BADGE (if top 3) ──
+  // ── RANK BADGE (if top 3) — refined pill style ──
   if(rank>=0&&rank<3){
     var badgeColors=['#FFD700','#C0C0C0','#CD7F32'];
+    var badgeEmoji=['🥇','🥈','🎖️'];
     var badgeLabels=['MVP','2ND','3RD'];
-    var bx=W-42,by=98;
-    // Badge background
+    var bx=W-42,by=96;
+    var bw=130,bh=42;
     ctx.save();
-    var bw=120,bh=44;
-    ctx.fillStyle=badgeColors[rank];
-    ctx.shadowColor=badgeColors[rank];
-    ctx.shadowBlur=24;
-    _roundRect(ctx,bx-bw,by,bw,bh,10);
+    // Subtle tinted fill
+    var bc=badgeColors[rank];
+    var bcRgb=hexToRgb(bc);
+    ctx.fillStyle='rgba('+bcRgb.r+','+bcRgb.g+','+bcRgb.b+',.12)';
+    _roundRect(ctx,bx-bw,by,bw,bh,21);
     ctx.fill();
+    // Border
+    ctx.strokeStyle='rgba('+bcRgb.r+','+bcRgb.g+','+bcRgb.b+',.55)';
+    ctx.lineWidth=1.5;
+    _roundRect(ctx,bx-bw,by,bw,bh,21);
+    ctx.stroke();
     ctx.restore();
-    // Badge text
-    ctx.font='900 22px "Bebas Neue",sans-serif';
-    ctx.fillStyle=rank===0?'#111':'#111';
+    // Text — medal color, lighter weight
+    ctx.font='700 18px "Barlow Condensed",sans-serif';
+    ctx.fillStyle=bc;
+    ctx.letterSpacing='3px';
     ctx.textAlign='center';
-    ctx.fillText(badgeLabels[rank],bx-bw/2,by+30);
+    ctx.fillText(badgeLabels[rank],bx-bw/2,by+27);
+    ctx.letterSpacing='0px';
   }
 
   // ── PLAYER NAME ──
@@ -4295,9 +4374,10 @@ function renderStatCard(name){
   // Last name / initial (huge, bold — the hero text)
   ctx.font='900 130px "Bebas Neue",sans-serif';
   ctx.fillStyle='#ffffff';
-  ctx.shadowColor='rgba(0,0,0,.6)';
-  ctx.shadowBlur=20;
+  ctx.shadowColor='rgba(0,0,0,.28)';
+  ctx.shadowBlur=8;
   ctx.fillText((lName||fName).toUpperCase(),W/2,330);
+  ctx.shadowColor='transparent';
   ctx.shadowBlur=0;
 
   // Jersey number badge (left side)
@@ -4509,7 +4589,10 @@ function renderStatCard(name){
 
   // ── FOOTER ──
   var footY=H-80;
-  ctx.fillStyle='rgba(0,0,0,.5)';
+  // Faint team-color tinted footer bg instead of pure black
+  ctx.fillStyle='rgba('+pRgb.r+','+pRgb.g+','+pRgb.b+',.18)';
+  ctx.fillRect(0,footY,W,80);
+  ctx.fillStyle='rgba(0,0,0,.3)';
   ctx.fillRect(0,footY,W,80);
   // Divider line above footer
   var footDiv=ctx.createLinearGradient(0,0,W,0);
@@ -4522,10 +4605,10 @@ function renderStatCard(name){
 
   ctx.textAlign='center';
   ctx.font='700 14px "Barlow Condensed",sans-serif';
-  ctx.fillStyle='rgba(255,255,255,.2)';
+  ctx.fillStyle='rgba(255,255,255,.5)';
   ctx.letterSpacing='5px';
   ctx.fillText('CGMAX FFTP  •  FLAG FOOTBALL TRACKER PRO',W/2,footY+36);
-  ctx.fillStyle='rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',.25)';
+  ctx.fillStyle='rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',.55)';
   ctx.font='700 12px "Barlow Condensed",sans-serif';
   ctx.fillText('CGMAXFFTP.COM',W/2,footY+58);
   ctx.letterSpacing='0px';
@@ -6055,43 +6138,90 @@ async function openConsentForm(){
 </script>
 <script>
 /* ════════════════════════════════════════════════════════════
-   TOS / PRIVACY CONSENT
+   WELCOME GATE — Auth-first onboarding
+   Flow: Welcome/Auth panel → post-auth → License panel (if no Pro)
+         → app loads
 ════════════════════════════════════════════════════════════ */
 var LS_TOS_CONSENT='ff_tos_consent';
-var TOS_VERSION='1.1'; // bumped: now tracks email + all tiers
+var TOS_VERSION='1.2'; // bumped: auth-first, user_id always captured
 
-function checkTosConsent(){
-  // If user has already consented, skip overlay and proceed to gate
-  if(localStorage.getItem(LS_TOS_CONSENT)){
-    initGate();
-    return;
-  }
-  // Show consent overlay
-  var overlay=document.getElementById('tos-overlay');
-  if(overlay)overlay.classList.remove('hidden');
+/* ── ToS checkbox toggle — unlocks auth buttons ── */
+function wgTosToggle(checked){
+  var grp=document.getElementById('wg-auth-group');
+  if(grp)grp.classList.toggle('locked',!checked);
 }
 
-function acceptTos(){
-  var cb=document.getElementById('tos-check');
-  if(!cb||!cb.checked)return;
-  var emailEl=document.getElementById('tos-email-input');
-  var email=(emailEl&&emailEl.value.trim())||'';
-  // Basic email format check if provided
-  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    if(emailEl){emailEl.style.borderColor='rgba(249,115,22,.7)';emailEl.classList.remove('tos-email-shake');void emailEl.offsetWidth;emailEl.classList.add('tos-email-shake');setTimeout(function(){emailEl.classList.remove('tos-email-shake');},400);}
-    showToast('⚠️ Please enter a valid email or leave it blank.');
+/* ── Sign-in helpers (mirror existing authSign* functions) ── */
+function wgSignInGoogle(){
+  if(!sbClient){showWgStatus('err','Auth not ready. Try a magic link.');return;}
+  var redirectUrl=window.location.origin+'/auth-callback.html';
+  sbClient.auth.signInWithOAuth({
+    provider:'google',
+    options:{redirectTo:redirectUrl,queryParams:{prompt:'select_account'}}
+  }).catch(function(e){showWgStatus('err','Google sign-in failed. Try a magic link.');});
+}
+
+function wgSignInMicrosoft(){
+  if(!sbClient){showWgStatus('err','Auth not ready. Try a magic link.');return;}
+  var redirectUrl=window.location.origin+'/auth-callback.html';
+  sbClient.auth.signInWithOAuth({
+    provider:'azure',
+    options:{redirectTo:redirectUrl,scopes:'email profile'}
+  }).catch(function(e){showWgStatus('err','Microsoft sign-in failed. Try a magic link.');});
+}
+
+function wgSendMagicLink(){
+  if(!sbClient){showWgStatus('err','Auth not ready — please refresh and try again.');return;}
+  var email=(document.getElementById('wg-email').value||'').trim();
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    showWgStatus('err','Enter a valid email address first.');
+    document.getElementById('wg-email').focus();
     return;
   }
-  var consent={version:TOS_VERSION,timestamp:new Date().toISOString(),userAgent:navigator.userAgent,email:email||null};
+  showWgStatus('info','Sending magic link…');
+  var redirectUrl=window.location.origin+'/auth-callback.html';
+  sbClient.auth.signInWithOtp({
+    email:email,
+    options:{shouldCreateUser:true,emailRedirectTo:redirectUrl}
+  }).then(function(r){
+    if(r.error){showWgStatus('err','Could not send — check your email and try again.');}
+    else{showWgStatus('ok','✅ Magic link sent! Check your email inbox.');}
+  }).catch(function(){showWgStatus('err','Network error — check your connection.');});
+}
+
+function showWgStatus(type,msg){
+  var el=document.getElementById('wg-status');
+  if(!el)return;
+  el.className='wg-status '+(type||'');
+  el.textContent=msg||'';
+}
+
+/* ── Save consent to localStorage, then backend ── */
+function saveConsentLocally(){
+  var consent={version:TOS_VERSION,timestamp:new Date().toISOString(),userAgent:navigator.userAgent};
   try{localStorage.setItem(LS_TOS_CONSENT,JSON.stringify(consent));}
-  catch(e){console.warn('[FFTP] acceptTos — consent save failed:',e);}
-  // Hide overlay
-  var overlay=document.getElementById('tos-overlay');
-  if(overlay)overlay.classList.add('hidden');
-  // Proceed to gate
-  initGate();
-  // Send consent record to backend for ALL users (Lite and Pro)
-  sendConsentToBackend(email||null);
+  catch(e){console.warn('[FFTP] consent save failed:',e);}
+}
+
+/* ── Main gate init — called from window.onload ── */
+function initWelcomeGate(){
+  // Already consented AND already chose a tier — skip gate entirely
+  if(localStorage.getItem(LS_TOS_CONSENT)&&localStorage.getItem(LS_GATE)){
+    hideGate();
+    return;
+  }
+  // Already Pro-unlocked (e.g. returning user, key stored locally)
+  if(localStorage.getItem('ff_pro_v1')==='unlocked'&&localStorage.getItem(LS_GATE)){
+    hideGate();
+    return;
+  }
+  // If Supabase session already exists (returning user), go straight to license panel
+  // (session restore fires async — we show welcome panel first, then route in onAuthStateChange)
+  var g=document.getElementById('code-gate');
+  if(g)g.classList.remove('hidden');
+  GATE_ACTIVE=true;
+  // Default: show welcome panel
+  showPanel('welcome-panel');
 }
 
 function sendConsentToBackend(emailOverride){
@@ -6099,7 +6229,7 @@ function sendConsentToBackend(emailOverride){
     var consent=JSON.parse(localStorage.getItem(LS_TOS_CONSENT)||'{}');
     var key=localStorage.getItem('ff_license_key')||null;
     var tier=localStorage.getItem('ff_pro_v1')==='unlocked'?'pro':'lite';
-    var resolvedEmail=emailOverride||consent.email||null;
+    var resolvedEmail=emailOverride||(CURRENT_USER&&CURRENT_USER.email)||consent.email||null;
     var token=getAuthToken?getAuthToken():null;
     var headers={'Content-Type':'application/json'};
     if(token)headers['Authorization']='Bearer '+token;
@@ -6118,37 +6248,69 @@ function sendConsentToBackend(emailOverride){
 }
 
 /* ════════════════════════════════════════════════════════════
-   TIER GATE — Lite (free) or Pro (license key)
+   TIER GATE — panel helpers
 ════════════════════════════════════════════════════════════ */
-// Gate key — stores 'lite' (free tier) or 'pro' (PRO activated at gate)
 var LS_GATE='ff_access_v1';
 var GATE_ACTIVE=false;
 
-function initGate(){
-  // Skip gate if user has already made a choice, or PRO is already active
-  if(localStorage.getItem(LS_GATE)){hideGate();return;}
-  if(localStorage.getItem('ff_pro_v1')==='unlocked'){hideGate();return;}
-  // Show gate
-  var g=document.getElementById('code-gate');
-  if(g)g.classList.remove('hidden');
-  GATE_ACTIVE=true;
+/* ── Show a specific panel inside the gate overlay ── */
+function showPanel(panelId){
+  ['welcome-panel','license-panel'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.classList.toggle('hidden',id!==panelId);
+  });
+}
+
+/* ── After sign-in: route to license panel or dismiss gate ── */
+function postAuthRoute(){
+  // If gate isn't showing, nothing to do
+  if(!GATE_ACTIVE)return;
+  var token=getAuthToken();
+  if(!token){showLicensePanel();return;}
+  // Check if user already has a Pro license linked
+  fetch(SYNC_API_BASE+'/check-license-link',{
+    method:'GET',
+    headers:{'Authorization':'Bearer '+token}
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.has_active_license){
+      // Auto-linked Pro — celebrate and dismiss
+      try{
+        localStorage.setItem(LS_PRO,'unlocked');
+        if(data.license_key)localStorage.setItem(LS_LICENSE,data.license_key);
+        localStorage.setItem(LS_GATE,'pro');
+      }catch(e){}
+      updateProUI();
+      showToast('⭐ Pro license auto-linked! Welcome back, Coach.');
+      hideGate();
+    } else {
+      // No license on account — show license panel
+      showLicensePanel();
+    }
+  })
+  .catch(function(){showLicensePanel();});
+}
+
+function showLicensePanel(){
+  var titleEl=document.getElementById('gate-title-text');
+  if(titleEl)titleEl.textContent='UNLOCK PRO';
+  showPanel('license-panel');
+  setTimeout(function(){
+    var inp=document.getElementById('gate-code-input');
+    if(inp)inp.focus();
+  },150);
 }
 
 /* ── SHOW GATE FOR PRO ACTIVATION (safe to call any time) ── */
 function showGateForActivation(){
-  // Close any open modal that might be in the way
   var proModal=document.getElementById('pro-upgrade-modal');
   if(proModal)proModal.classList.remove('show');
-  // Show the gate screen which has the proven license key entry
   var g=document.getElementById('code-gate');
   if(g){
     g.classList.remove('hidden');
     GATE_ACTIVE=true;
-    // Focus the key input so the user can type right away
-    setTimeout(function(){
-      var inp=document.getElementById('gate-code-input');
-      if(inp)inp.focus();
-    },100);
+    showLicensePanel();
   }
 }
 
@@ -6235,6 +6397,8 @@ function submitGateCode(){
 function enterFree(){
   try{localStorage.setItem(LS_GATE,'lite');}catch(e){}
   hideGate();
+  if(!localStorage.getItem(LS_TOS_CONSENT)){saveConsentLocally();}
+  sendConsentToBackend(null);
 }
 
 function hideGate(){
@@ -6243,19 +6407,18 @@ function hideGate(){
   if(g)g.classList.add('hidden');
 }
 
-// Override window.onload to check ToS consent first, then gate
+// window.onload — auth-first onboarding
 var _origOnload=window.onload;
 window.onload=function(){
   if(_origOnload)_origOnload();
-  checkTosConsent();
+  // Initialize Supabase Auth first — session restore fires onAuthStateChange
+  initSupabaseAuth();
+  // Then check gate (may open welcome-panel or skip if already authed + gated)
+  initWelcomeGate();
   // If already Pro, update all UI elements
   if(isPro()) updateProUI();
   // Silently re-validate Pro license in background (max once every 3 days)
   setTimeout(scheduleProRecheck, 3000);
-  // Send ToS consent for Pro users who consented before upgrading
-  sendConsentToBackend();
-  // Initialize Supabase Auth (sign-in, session restore, cloud sync)
-  initSupabaseAuth();
   // Auto-show license activation screen if arriving via ?activate=1
   if(new URLSearchParams(window.location.search).get('activate')==='1'){
     setTimeout(showGateForActivation, 400);
@@ -6933,31 +7096,37 @@ function initSupabaseAuth(){
       if(event==='SIGNED_IN'&&session){
         closeAuthModal();
         showToast('✅ Signed in as '+(CURRENT_USER.email||'').split('@')[0]);
-        // Upsert coach profile (captures marketing opt-in from signup modal)
+        // Upsert coach profile (captures marketing opt-in)
         upsertCoachProfile(AUTH_MKT_OPT_IN);
-        // Reset checkbox for next open
         AUTH_MKT_OPT_IN=false;
         var mktCb=document.getElementById('auth-mkt-opt');
         if(mktCb)mktCb.checked=false;
-        // Check for linked license + sync data from cloud
+        // Save consent locally if not already done, then send to backend WITH user_id via JWT
+        if(!localStorage.getItem(LS_TOS_CONSENT))saveConsentLocally();
         setTimeout(function(){
-          checkAndLinkLicense();
-          SYNC_ENGINE.downloadAll();
-          // Re-send consent record now that we have a user_id to link it to
+          // Send consent record — JWT in headers lets backend link to user_id
           sendConsentToBackend(null);
-        },500);
+          // Route: check if Pro license linked → dismiss gate, or show license panel
+          postAuthRoute();
+          // Pull cloud data
+          SYNC_ENGINE.downloadAll();
+        },600);
       }
       if(event==='SIGNED_OUT'){
         showToast('👤 Signed out');
       }
     });
 
-    // Restore existing session
+    // Restore existing session — returning authenticated user
     sbClient.auth.getSession().then(function(result){
       if(result.data&&result.data.session){
         AUTH_SESSION=result.data.session;
         CURRENT_USER=result.data.session.user;
         updateAuthUI();
+        // If gate is showing (returning user who somehow lost localStorage), route past auth panel
+        if(GATE_ACTIVE){
+          setTimeout(postAuthRoute, 300);
+        }
       }
     });
 
@@ -6977,11 +7146,14 @@ function initSupabaseAuth(){
           AUTH_SESSION=sess;
           CURRENT_USER=sess.user;
           updateAuthUI();
+          upsertCoachProfile(false);
           showToast('✅ Signed in as '+(CURRENT_USER.email||'').split('@')[0]);
+          if(!localStorage.getItem(LS_TOS_CONSENT))saveConsentLocally();
           setTimeout(function(){
-            checkAndLinkLicense();
+            sendConsentToBackend(null);
+            postAuthRoute();
             SYNC_ENGINE.downloadAll();
-          },500);
+          },600);
         } else if(sess&&CURRENT_USER){
           // Already signed in — just refresh data quietly
           if(typeof SYNC_ENGINE!=='undefined'&&SYNC_ENGINE.downloadAll){

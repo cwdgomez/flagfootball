@@ -527,8 +527,13 @@ footer{
 .plan-col.pro-col .plan-name{background:linear-gradient(135deg,var(--gold),var(--gold3));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .plan-price{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;
-  color:rgba(255,255,255,.3);margin-bottom:22px;}
+  color:rgba(255,255,255,.3);margin-bottom:12px;}
 .plan-col.pro-col .plan-price{color:rgba(255,215,0,.45);}
+.save-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(34,197,94,.18),rgba(34,197,94,.08));
+  border:1px solid rgba(34,197,94,.35);border-radius:20px;padding:5px 12px;margin-bottom:18px;
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;
+  color:rgb(74,222,128);text-transform:uppercase;}
+.save-badge .sb-pill{background:rgba(34,197,94,.22);border-radius:10px;padding:1px 6px;font-size:11px;}
 .plan-divider{height:1px;background:rgba(255,255,255,.06);margin-bottom:22px;}
 .plan-col.pro-col .plan-divider{background:rgba(255,215,0,.12);}
 .plan-features{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
@@ -560,6 +565,110 @@ footer{
 }
 .plan-cta-btn.pro-contact:hover{transform:translateY(-2px);box-shadow:0 10px 44px rgba(255,215,0,.5);}
 .pro-star-deco{position:absolute;top:-12px;right:-12px;font-size:80px;opacity:.04;pointer-events:none;line-height:1;}
+
+/* ── STAT CARD BAND ── */
+.statcard-band{position:relative;z-index:10;padding:80px 20px;overflow:hidden;}
+@media(max-width:480px){.statcard-band{padding:60px 16px;}}
+.statcard-band::before{content:'';position:absolute;top:-60px;left:-60px;width:480px;height:480px;background:radial-gradient(50% 50% at 50% 50%,rgba(168,85,247,.1) 0%,transparent 70%);pointer-events:none;}
+.statcard-band-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 430px;gap:64px;align-items:center;}
+@media(max-width:960px){.statcard-band-inner{grid-template-columns:1fr;gap:40px;}}
+.statcard-band-text p{font-family:'Barlow',sans-serif;font-size:15px;line-height:1.75;color:rgba(255,255,255,.52);margin-bottom:20px;}
+.statcard-band-text .sec-rule{margin-left:0;}
+@media(max-width:960px){.statcard-band-text{text-align:center;}.statcard-band-text .sec-rule{margin:16px auto 28px;}}
+.sc-steps{display:flex;flex-direction:column;gap:14px;margin-bottom:28px;}
+.sc-step{display:flex;align-items:flex-start;gap:14px;}
+.sc-step-num{width:30px;height:30px;border-radius:8px;flex-shrink:0;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#c084fc;margin-top:2px;}
+.sc-step-txt{font-family:'Barlow',sans-serif;font-size:14px;line-height:1.55;color:rgba(255,255,255,.48);padding-top:4px;}
+.sc-step-txt strong{color:rgba(255,255,255,.82);}
+@media(max-width:960px){.sc-step{text-align:left;}}
+.statcard-visual{display:flex;align-items:flex-start;gap:14px;justify-content:center;}
+/* stat card CSS mockup */
+.sc-card-mock{width:190px;flex-shrink:0;border-radius:14px;overflow:hidden;position:relative;background:linear-gradient(160deg,#AA0000 0%,#500000 28%,#181818 62%,#111 100%);box-shadow:0 20px 50px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.06),0 0 50px rgba(170,0,0,.18);}
+.sc-mock-topbar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,0,0,.42);border-bottom:1px solid rgba(255,255,255,.04);}
+.sc-mock-brand{font-family:'Barlow Condensed',sans-serif;font-size:6.5px;font-weight:700;letter-spacing:3px;color:rgba(255,215,0,.55);text-transform:uppercase;}
+.sc-mock-date{font-family:'Barlow Condensed',sans-serif;font-size:6px;font-weight:600;letter-spacing:1.5px;color:rgba(255,255,255,.2);text-transform:uppercase;}
+.sc-mock-mvp{position:absolute;top:9px;right:12px;padding:3px 8px;border:1px solid rgba(255,215,0,.5);border-radius:20px;background:rgba(255,215,0,.1);font-family:'Barlow Condensed',sans-serif;font-size:7px;font-weight:700;letter-spacing:3px;color:#FFD700;text-transform:uppercase;}
+.sc-mock-name-block{padding:8px 12px 6px;position:relative;}
+.sc-mock-num{position:absolute;top:6px;left:12px;width:26px;height:32px;background:rgba(0,0,0,.5);border:1px solid rgba(255,215,0,.28);border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;}
+.sc-mock-num-lbl{font-family:'Barlow Condensed',sans-serif;font-size:4.5px;font-weight:700;letter-spacing:1px;color:rgba(255,215,0,.5);text-transform:uppercase;}
+.sc-mock-num-val{font-family:'Bebas Neue',sans-serif;font-size:14px;color:#FFD700;line-height:1;}
+.sc-mock-pos{font-family:'Barlow Condensed',sans-serif;font-size:6.5px;font-weight:700;letter-spacing:4px;color:rgba(255,215,0,.6);text-transform:uppercase;text-align:center;margin-bottom:2px;}
+.sc-mock-fname{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:rgba(255,255,255,.62);text-align:center;line-height:1;}
+.sc-mock-lname{font-family:'Bebas Neue',sans-serif;font-size:46px;color:#fff;text-align:center;line-height:.9;margin-bottom:6px;}
+.sc-mock-divider{height:2px;margin:0 12px 7px;background:linear-gradient(90deg,transparent,#FFD700 20%,rgba(255,255,255,.5) 50%,#FFD700 80%,transparent);opacity:.55;}
+.sc-mock-score{padding:0 12px 7px;text-align:center;}
+.sc-mock-score-nums{display:flex;align-items:baseline;justify-content:center;gap:5px;}
+.sc-mock-su{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FFD700;line-height:1;}
+.sc-mock-ssep{font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(255,255,255,.2);}
+.sc-mock-st{font-family:'Bebas Neue',sans-serif;font-size:22px;color:rgba(255,255,255,.32);}
+.sc-mock-score-sub{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:2px;}
+.sc-mock-tname{font-family:'Barlow Condensed',sans-serif;font-size:6.5px;font-weight:700;letter-spacing:1px;color:rgba(255,215,0,.5);text-transform:uppercase;}
+.sc-mock-oname{font-family:'Barlow Condensed',sans-serif;font-size:6.5px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.25);text-transform:uppercase;}
+.sc-mock-result-badge{font-family:'Barlow Condensed',sans-serif;font-size:7px;font-weight:700;letter-spacing:2px;color:#22C55E;background:rgba(34,197,94,.1);padding:2px 5px;border-radius:3px;text-transform:uppercase;}
+.sc-mock-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:0 9px 6px;}
+.sc-mock-tile{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:5px 3px 4px;text-align:center;position:relative;overflow:hidden;}
+.sc-mock-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--tc,#fff);}
+.sc-mock-tile-v{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1;color:var(--tc,#fff);}
+.sc-mock-tile-l{font-family:'Barlow Condensed',sans-serif;font-size:5px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.3);text-transform:uppercase;}
+.sc-mock-perf{margin:0 9px 9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:6px 9px;}
+.sc-mock-perf-lbl{font-family:'Barlow Condensed',sans-serif;font-size:5px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.25);text-transform:uppercase;margin-bottom:3px;}
+.sc-mock-perf-row{display:flex;align-items:center;gap:5px;}
+.sc-mock-perf-v{font-family:'Bebas Neue',sans-serif;font-size:16px;color:#FFD700;line-height:1;}
+.sc-mock-bar-bg{flex:1;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+.sc-mock-bar-fill{height:100%;width:68%;background:linear-gradient(90deg,#FFD700,#FFF5B0);border-radius:2px;}
+.sc-mock-footer{padding:7px 12px;background:rgba(170,0,0,.2);border-top:1px solid rgba(255,215,0,.28);text-align:center;}
+.sc-mock-footer-b{font-family:'Barlow Condensed',sans-serif;font-size:5.5px;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.38);text-transform:uppercase;}
+.sc-mock-footer-u{font-family:'Barlow Condensed',sans-serif;font-size:5.5px;font-weight:700;letter-spacing:2px;color:rgba(255,215,0,.5);text-transform:uppercase;margin-top:1px;}
+/* chat thread mockup */
+.sc-thread{width:155px;flex-shrink:0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden;}
+@media(max-width:480px){.sc-thread{display:none;}}
+.sc-thread-hdr{background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.06);padding:8px 12px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.25);text-transform:uppercase;}
+.sc-thread-body{padding:10px 10px 14px;display:flex;flex-direction:column;gap:7px;}
+.sc-bubble{padding:7px 9px;border-radius:10px;font-family:'Barlow',sans-serif;font-size:9.5px;line-height:1.4;}
+.sc-bubble.me{background:rgba(168,85,247,.18);border:1px solid rgba(168,85,247,.22);color:rgba(255,255,255,.7);align-self:flex-end;border-radius:10px 10px 2px 10px;}
+.sc-bubble.them{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.52);align-self:flex-start;border-radius:10px 10px 10px 2px;}
+.sc-bubble-img{width:100%;aspect-ratio:4/5;border-radius:6px;margin-top:5px;overflow:hidden;background:linear-gradient(160deg,#AA0000 0%,#500000 30%,#151515 70%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;}
+.sc-bubble-img-name{font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff;}
+.sc-bubble-img-stat{font-family:'Barlow Condensed',sans-serif;font-size:6px;font-weight:700;letter-spacing:1.5px;color:rgba(255,215,0,.7);text-transform:uppercase;}
+
+/* ── SOCIAL PROOF / QUOTES ── */
+.quotes-sec{position:relative;z-index:10;padding:60px 20px;}
+@media(max-width:480px){.quotes-sec{padding:44px 16px;}}
+.quotes-inner{max-width:1100px;margin:0 auto;}
+.quotes-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:6px;color:rgba(255,215,0,.45);text-transform:uppercase;margin-bottom:28px;text-align:center;}
+.quotes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:780px){.quotes-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.quotes-grid{grid-template-columns:1fr;}}
+.quote-card{background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:22px 22px 18px;position:relative;overflow:hidden;transition:border-color .25s;}
+.quote-card:hover{border-color:rgba(255,215,0,.15);}
+.quote-card::before{content:'\201C';position:absolute;top:-8px;left:14px;font-size:80px;font-family:'Bebas Neue',sans-serif;color:rgba(255,215,0,.08);line-height:1;pointer-events:none;}
+.quote-text{font-family:'Barlow',sans-serif;font-size:14px;line-height:1.7;color:rgba(255,255,255,.58);margin-bottom:16px;position:relative;z-index:1;}
+.quote-author{display:flex;align-items:center;gap:10px;}
+.quote-avatar{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--red),var(--red2));border:1px solid rgba(255,215,0,.18);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.quote-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.7);}
+.quote-role{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;color:rgba(255,215,0,.4);text-transform:uppercase;}
+/* ── FAQ ACCORDION ── */
+.faq-sec{position:relative;z-index:10;padding:70px 20px 60px;}
+@media(max-width:480px){.faq-sec{padding:50px 16px 44px;}}
+.faq-inner{max-width:760px;margin:0 auto;}
+.faq-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:6px;color:rgba(255,215,0,.45);text-transform:uppercase;margin-bottom:12px;text-align:center;}
+.faq-heading{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,44px);letter-spacing:3px;color:#fff;text-align:center;margin-bottom:36px;}
+.faq-heading span{color:var(--gold);}
+.faq-item{border-bottom:1px solid rgba(255,255,255,.07);overflow:hidden;}
+.faq-item:first-of-type{border-top:1px solid rgba(255,255,255,.07);}
+.faq-q{width:100%;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+  padding:18px 4px;gap:12px;text-align:left;}
+.faq-q-text{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.5px;
+  color:rgba(255,255,255,.82);line-height:1.3;}
+.faq-chevron{flex-shrink:0;width:20px;height:20px;border:1.5px solid rgba(255,215,0,.35);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;transition:transform .28s,border-color .28s;color:rgba(255,215,0,.6);font-size:11px;}
+.faq-item.open .faq-chevron{transform:rotate(180deg);border-color:rgba(255,215,0,.7);color:var(--gold);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .32s ease,padding .28s ease;}
+.faq-item.open .faq-a{max-height:400px;}
+.faq-a-inner{font-family:'Barlow',sans-serif;font-size:14px;line-height:1.75;color:rgba(255,255,255,.52);
+  padding:0 4px 20px;}
+.faq-a-inner a{color:var(--gold);text-decoration:none;}
+.faq-a-inner a:hover{text-decoration:underline;}
 </style>
 <script type="application/ld+json">
 {
@@ -657,7 +766,7 @@ footer{
     <span class="l2">Tracker</span>
     <span class="l3">Pro</span>
   </h1>
-  <p class="hero-sub">Live Stats · Smart Rotations · Season Analytics · Works Offline</p>
+  <p class="hero-sub">Stop coaching with a clipboard. Start coaching with data.</p>
   <div class="launch-wrap">
     <div class="pulse-ring"></div>
     <div class="pulse-ring"></div>
@@ -671,6 +780,7 @@ footer{
     <div class="hchip">🔗 Shareable</div>
     <div class="hchip">📴 Offline</div>
     <div class="hchip">📈 Season Trends</div>
+    <div class="hchip">🎴 Stat Cards</div>
     <div class="hchip">📤 Game Recaps</div>
     <div class="hchip">🎙️ Voice Logging</div>
     <div class="hchip">🔒 Coach Access</div>
@@ -696,6 +806,7 @@ footer{
     <div class="ti"><span class="ti-icon">🔒</span><span class="ti-val">Pro</span><span class="ti-lbl">Coach Access</span></div>
     <div class="ti"><span class="ti-icon">🤝</span><span class="ti-val">Stat</span><span class="ti-lbl">Coach</span></div>
     <div class="ti"><span class="ti-icon">🔐</span><span class="ti-val">Secure</span><span class="ti-lbl">Sign-In</span></div>
+    <div class="ti"><span class="ti-icon">🎴</span><span class="ti-val">Stat</span><span class="ti-lbl">Cards</span></div>
     <!-- duplicate for seamless loop -->
     <div class="ti"><span class="ti-icon">👥</span><span class="ti-val">Any</span><span class="ti-lbl">Roster Size</span></div>
     <div class="ti"><span class="ti-icon">⭐</span><span class="ti-val">8</span><span class="ti-lbl">Stat Types</span></div>
@@ -709,6 +820,7 @@ footer{
     <div class="ti"><span class="ti-icon">🔒</span><span class="ti-val">Pro</span><span class="ti-lbl">Coach Access</span></div>
     <div class="ti"><span class="ti-icon">🤝</span><span class="ti-val">Stat</span><span class="ti-lbl">Coach</span></div>
     <div class="ti"><span class="ti-icon">🔐</span><span class="ti-val">Secure</span><span class="ti-lbl">Sign-In</span></div>
+    <div class="ti"><span class="ti-icon">🎴</span><span class="ti-val">Stat</span><span class="ti-lbl">Cards</span></div>
   </div>
 </div>
 
@@ -781,7 +893,8 @@ footer{
     <div class="live-band-text reveal">
       <div class="sec-eyebrow">Pro Feature</div>
       <h2>Live Parent <span class="acc">Scoreboard</span></h2>
-      <p>Coach generates a link before the game. Parents open it on their phones and watch the score and stats update in real time — no app install required, no account, no setup.</p>
+      <p>The parent stuck at work. The grandparent three states away. The sibling away at college. They all follow every TD, every flag pull, every quarter — live, on their phone, right now.</p>
+      <p>Coach generates a link before the game and drops it in the team group chat. Anyone who can't make it taps it and watches the score and stats update in real time. No app install, no account, no setup — just open and follow along.</p>
       <div class="live-steps">
         <div class="live-step">
           <div class="live-step-num">1</div>
@@ -885,6 +998,100 @@ footer{
   </div>
 </section>
 
+<!-- PLAYER STAT CARD FEATURE -->
+<section class="statcard-band" id="stat-cards">
+  <div class="statcard-band-inner">
+    <!-- Text side -->
+    <div class="statcard-band-text reveal">
+      <div class="sec-eyebrow">Pro Feature</div>
+      <h2>Player Stat Cards —<br><span class="acc">Every Kid Gets Their Moment</span></h2>
+      <div class="sec-rule"></div>
+      <p>After every game, generate a beautiful 1080×1350 Instagram-ready stat card for any player in seconds. Send it to the group chat — parents screenshot it and post it. Their name. Their stats. Your team colors. Your brand on every share.</p>
+      <div class="sc-steps">
+        <div class="sc-step">
+          <div class="sc-step-num">1</div>
+          <div class="sc-step-txt"><strong>Tap 🎴 Generate Player Stat Cards</strong> on the Summary tab — the MVP is auto-selected and a live preview appears instantly</div>
+        </div>
+        <div class="sc-step">
+          <div class="sc-step-num">2</div>
+          <div class="sc-step-txt"><strong>Pick any player</strong> to switch the card — colors pull from your team theme automatically, no setup</div>
+        </div>
+        <div class="sc-step">
+          <div class="sc-step-num">3</div>
+          <div class="sc-step-txt"><strong>Share, Save, or Download All</strong> — one tap sends it straight to the group chat, or batch-download every player's card at once</div>
+        </div>
+      </div>
+      <a href="./app.html" class="btn-gold" style="display:inline-flex;font-size:17px;padding:13px 28px;">⚡ Try It After Your Next Game</a>
+    </div>
+    <!-- Visual side — card + chat thread -->
+    <div class="reveal">
+      <div class="statcard-visual">
+        <!-- CSS stat card mockup -->
+        <div class="sc-card-mock">
+          <div class="sc-mock-topbar">
+            <div class="sc-mock-brand">CGMax FFTP</div>
+            <div class="sc-mock-date">Mar 8, 2026</div>
+          </div>
+          <div class="sc-mock-mvp">MVP</div>
+          <div class="sc-mock-name-block">
+            <div class="sc-mock-num"><div class="sc-mock-num-lbl">NO.</div><div class="sc-mock-num-val">7</div></div>
+            <div class="sc-mock-pos">Quarterback</div>
+            <div class="sc-mock-fname">JAXON</div>
+            <div class="sc-mock-lname">B.</div>
+          </div>
+          <div class="sc-mock-divider"></div>
+          <div class="sc-mock-score">
+            <div class="sc-mock-score-nums">
+              <div class="sc-mock-su">14</div>
+              <div class="sc-mock-ssep">–</div>
+              <div class="sc-mock-st">7</div>
+            </div>
+            <div class="sc-mock-score-sub">
+              <div class="sc-mock-tname">River Hawks</div>
+              <div class="sc-mock-result-badge">WIN</div>
+              <div class="sc-mock-oname">Eagles</div>
+            </div>
+          </div>
+          <div class="sc-mock-tiles">
+            <div class="sc-mock-tile" style="--tc:#22C55E"><div class="sc-mock-tile-v">3</div><div class="sc-mock-tile-l">TDs</div></div>
+            <div class="sc-mock-tile" style="--tc:#3B82F6"><div class="sc-mock-tile-v">4</div><div class="sc-mock-tile-l">Flags</div></div>
+            <div class="sc-mock-tile" style="--tc:#A855F7"><div class="sc-mock-tile-v">5</div><div class="sc-mock-tile-l">Catches</div></div>
+            <div class="sc-mock-tile" style="--tc:#F97316"><div class="sc-mock-tile-v">1</div><div class="sc-mock-tile-l">INTs</div></div>
+            <div class="sc-mock-tile" style="--tc:#14B8A6"><div class="sc-mock-tile-v">2</div><div class="sc-mock-tile-l">Conv</div></div>
+            <div class="sc-mock-tile" style="--tc:#F59E0B"><div class="sc-mock-tile-v">0</div><div class="sc-mock-tile-l">Def</div></div>
+          </div>
+          <div class="sc-mock-perf">
+            <div class="sc-mock-perf-lbl">Performance Rating</div>
+            <div class="sc-mock-perf-row">
+              <div class="sc-mock-perf-v">68</div>
+              <div class="sc-mock-bar-bg"><div class="sc-mock-bar-fill"></div></div>
+            </div>
+          </div>
+          <div class="sc-mock-footer">
+            <div class="sc-mock-footer-b">CGMax FFTP · Flag Football Tracker Pro</div>
+            <div class="sc-mock-footer-u">CGMAXFFTP.COM</div>
+          </div>
+        </div>
+        <!-- Group chat thread -->
+        <div class="sc-thread">
+          <div class="sc-thread-hdr">🏈 Team Chat</div>
+          <div class="sc-thread-body">
+            <div class="sc-bubble me">Jaxon went off today! 🔥
+              <div class="sc-bubble-img">
+                <div class="sc-bubble-img-name">JAXON B.</div>
+                <div class="sc-bubble-img-stat">3 TD · 4 Flags · 5 Catches</div>
+              </div>
+            </div>
+            <div class="sc-bubble them">Posting this!! 🙌🙌</div>
+            <div class="sc-bubble them">Can you make one for Marcus?</div>
+            <div class="sc-bubble them">🏆 MVP for real this week</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- WHAT'S NEW -->
 <section class="new-band" id="new">
   <div class="new-band-inner">
@@ -947,6 +1154,33 @@ footer{
         <div class="nf-icon">✏️</div>
         <div class="nf-title">Play Designer</div>
         <div class="nf-body">Draw plays on a real field canvas. Drag players, draw routes, save your playbook. Up to 20 saved plays with thumbnail previews.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="quotes-sec">
+  <div class="quotes-inner">
+    <div class="quotes-eyebrow">Built by a coach · Used by coaches</div>
+    <div class="quotes-grid">
+      <div class="quote-card reveal">
+        <div class="quote-text">"Our parents are obsessed with the live scoreboard. Game days feel different now — grandparents watching from out of state, the family group chat reacting in real time. It's changed how the whole family experiences the season."</div>
+        <div class="quote-author">
+          <div><div class="quote-name">Coach Marcus T.</div><div class="quote-role">U10 Flag · Spring League</div></div>
+        </div>
+      </div>
+      <div class="quote-card reveal">
+        <div class="quote-text">"The stat cards are a game changer for team morale. Every kid gets recognized — not just the top scorers. I send them out after every game and parents screenshot and post them within minutes. My league noticed."</div>
+        <div class="quote-author">
+          <div><div class="quote-name">Coach Danielle R.</div><div class="quote-role">U8 Flag · City Rec League</div></div>
+        </div>
+      </div>
+      <div class="quote-card reveal">
+        <div class="quote-text">"I used to track rotations on a clipboard and miss half the plays. Now I call it out by voice, the app logs it, and I'm actually watching my players. The rotation recommendations alone are worth it — fair play time, every game."</div>
+        <div class="quote-author">
+          <div><div class="quote-name">Coach Andre W.</div><div class="quote-role">U12 Flag · Saturday League</div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1073,7 +1307,8 @@ footer{
         <div class="pro-star-deco">⭐</div>
         <div class="plan-badge pro">Pro</div>
         <div class="plan-name">CGMax Pro</div>
-        <div class="plan-price">$9.99/mo · $79.99/yr · License key emailed instantly</div>
+        <div class="plan-price">$9.99/mo · License key emailed instantly</div>
+        <div class="save-badge">💰 Go annual — <span class="sb-pill">Save $40/yr</span> · Only $6.67/mo</div>
         <div class="plan-divider"></div>
         <div class="plan-features">
           <div class="pf-row">
@@ -1245,6 +1480,65 @@ footer{
   <div class="cta-tagline reveal">Works on iPhone · iPad · Android · Any browser</div>
 </section>
 
+<!-- FAQ -->
+<section class="faq-sec">
+  <div class="faq-inner">
+    <div class="faq-eyebrow">Got questions?</div>
+    <h2 class="faq-heading">Common <span>Questions</span></h2>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+        <span class="faq-q-text">Does it work without Wi-Fi or cell service?</span>
+        <span class="faq-chevron">▾</span>
+      </button>
+      <div class="faq-a" role="region">
+        <div class="faq-a-inner">Yes — CGMax FFTP is built offline-first. Every feature including live scoring, rotations, play logging, and stats works completely offline. Data is stored on your device. Wi-Fi is only needed if you're using the live parent scoreboard link or the optional cloud sync feature.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+        <span class="faq-q-text">What happens if I lose my Pro license key?</span>
+        <span class="faq-chevron">▾</span>
+      </button>
+      <div class="faq-a" role="region">
+        <div class="faq-a-inner">No problem. Your license key is emailed to you at purchase and can be re-entered in the app at any time under Settings → License. If you can't locate the email, <a href="mailto:cgmaxfftp@itcc.llc?subject=License%20Key%20Recovery">contact us</a> with your order info and we'll resend it right away.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+        <span class="faq-q-text">Can I use it for more than one team?</span>
+        <span class="faq-chevron">▾</span>
+      </button>
+      <div class="faq-a" role="region">
+        <div class="faq-a-inner">Absolutely. One Pro license covers all the teams you coach. You can set up separate team profiles — each with their own roster, colors, and season history — and switch between them instantly. No extra charge per team.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+        <span class="faq-q-text">Is there a free trial before I commit to Pro?</span>
+        <span class="faq-chevron">▾</span>
+      </button>
+      <div class="faq-a" role="region">
+        <div class="faq-a-inner">Yes — the Lite version is 100% free with no time limit. You get live scoring, rotations, play logging, and basic season history at no cost. Pro unlocks advanced stats, player stat card generation, cross-device cloud sync, and more. Try Lite first and upgrade whenever you're ready.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+        <span class="faq-q-text">How does the live parent scoreboard work?</span>
+        <span class="faq-chevron">▾</span>
+      </button>
+      <div class="faq-a" role="region">
+        <div class="faq-a-inner">Before the game, tap "Generate Scoreboard Link" in the app and share it in your team group chat. Parents, grandparents, and anyone else who can't make it opens the link on their phone — no app download required. They see the live score and key stats update in real time as you track the game.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="foot-main">
@@ -1263,6 +1557,19 @@ footer{
 </footer>
 
 <script>
+// FAQ accordion
+function toggleFaq(btn){
+  var item=btn.closest('.faq-item');
+  var isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(function(el){
+    el.classList.remove('open');
+    el.querySelector('.faq-q').setAttribute('aria-expanded','false');
+  });
+  if(!isOpen){
+    item.classList.add('open');
+    btn.setAttribute('aria-expanded','true');
+  }
+}
 // Scroll reveal
 var reveals=document.querySelectorAll('.reveal');
 var io=new IntersectionObserver(function(entries){
