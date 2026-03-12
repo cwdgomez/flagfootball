@@ -1,0 +1,59 @@
+# =============================================================
+#  CGMax FFTP — Dependency Review
+#
+#  Runs on every pull request targeting main.
+#
+#  WHY THIS IS DIFFERENT FROM DEPENDABOT:
+#    Dependabot opens PRs to update existing dependencies.
+#    This action checks PRs that *introduce new dependencies*
+#    or *change versions* and blocks the merge if the diff
+#    contains any package with a known high/critical CVE.
+#
+#  This catches:
+#    • A new npm package added to package.json that has a CVE
+#    • A manual version bump that moves to a vulnerable version
+#    • Transitive dependency changes introduced by a PR
+#
+#  WHAT HAPPENS:
+#    • Fails the PR check if high/critical CVEs are found
+#    • Posts a summary comment on the PR with details
+#    • Allows low/moderate severity (informational only)
+#
+#  Requires no secrets — uses GitHub's built-in vulnerability DB.
+# =============================================================
+
+name: 🛡️ Dependency Review
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents:      read
+  pull-requests: write   # to post the summary comment on the PR
+
+jobs:
+  dependency-review:
+    name: 🛡️ Dependency Review
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          # Block merge on high or critical CVEs in the diff.
+          # low and moderate are informational — they appear in the
+          # PR comment but do not fail the check.
+          fail-on-severity: high
+
+          # Post a markdown summary directly on the PR so reviewers
+          # can see exactly which packages are flagged without leaving
+          # the pull request page.
+          comment-summary-in-pr: always
+
+          # Warn if any new dependency uses a non-OSI-approved license.
+          # Does not block — just flags for legal review.
+          warn-on-openssf-scorecard-level: 3

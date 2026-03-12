@@ -1,0 +1,66 @@
+# =============================================================
+#  CGMax FFTP — CodeQL SAST (Static Application Security Testing)
+#
+#  Runs GitHub's CodeQL engine on every push to main, every PR,
+#  and weekly. Unlike the regex-based security-check.js, CodeQL
+#  performs actual data-flow analysis — it traces user input
+#  through the codebase and catches XSS via DOM sinks, open
+#  redirects, path traversal, and prototype pollution that
+#  cross function boundaries.
+#
+#  Results appear in:
+#    GitHub → Security → Code scanning alerts
+#
+#  On PRs: CodeQL posts inline comments on flagged lines.
+#  On push: alerts appear in the Security tab for review.
+#
+#  Uses the 'security-extended' query suite — broader coverage
+#  than the default suite, at the cost of a few extra minutes.
+# =============================================================
+
+name: 🔬 CodeQL SAST
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 8 * * 1'   # Weekly Monday 8 AM UTC (between SSL & realtime monitors)
+  workflow_dispatch:
+
+permissions:
+  actions:         read
+  contents:        read
+  security-events: write   # required to upload SARIF results to GitHub Security tab
+
+jobs:
+  analyze:
+    name: 🔬 Analyze JavaScript (CodeQL)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+          # security-extended adds ~30 extra queries on top of the default suite:
+          # reflected XSS, stored XSS, DOM-based XSS, open redirect, path traversal,
+          # SQL injection, command injection, SSRF, prototype pollution, etc.
+          queries: security-extended
+
+      - name: Autobuild
+        # For JavaScript/TypeScript, autobuild is a no-op (no compile step needed).
+        # CodeQL scans the source files directly.
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: /language:javascript
+          # Upload results to GitHub Security tab. Alerts are visible to repo owners
+          # and will appear as PR checks that block merge if configured as required.
+          upload: true
