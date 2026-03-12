@@ -105,8 +105,9 @@ function checkHTML(filename) {
   let match;
   while ((match = srcPattern.exec(content)) !== null) {
     const ref = match[1];
-    // Skip data URIs, external URLs, and anchors
+    // Skip data URIs, external URLs, anchors, and non-file URI schemes
     if (ref.startsWith('data:') || /^https?:\/\//.test(ref) || ref.startsWith('//')) continue;
+    if (/^(?:mailto|tel|sms|javascript):/i.test(ref)) continue; // not file refs
     assetRefs.push(ref);
   }
   const missing = assetRefs.filter(ref => !fileExists(path.join(ROOT, ref)));
@@ -395,7 +396,10 @@ function checkBackend() {
     }
 
     // OPTIONS preflight handled
-    if (!content.includes('OPTIONS')) {
+    // Skip for server-to-server endpoints: agents (Vercel cron), webhooks (Stripe).
+    // These are never called by a browser so CORS preflight is irrelevant.
+    const isServerSideOnly = filePath.includes('/agents/') || /webhook/i.test(filePath);
+    if (!isServerSideOnly && !content.includes('OPTIONS')) {
       warn(`[${rel}] No OPTIONS preflight handler — CORS preflight requests will fail`);
     } else {
       pass(`[${rel}] OPTIONS preflight handled`);
