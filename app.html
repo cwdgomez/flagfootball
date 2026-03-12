@@ -30,7 +30,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow-x:hidden;}
-body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--txt);-webkit-font-smoothing:antialiased;}
+body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--txt);-webkit-font-smoothing:antialiased;overscroll-behavior:none;}
 #grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;}
 .screen{display:none;min-height:100vh;position:relative;z-index:1;}
 .screen.active{display:flex;flex-direction:column;}
@@ -4722,20 +4722,37 @@ if('serviceWorker' in navigator){
 /* ════════════════════════════════════════════════════
    PWA PULL-TO-REFRESH (Home Screen / standalone mode)
    Works on iOS Safari standalone + Android TWA/Chrome
+   Guard: does NOT fire during momentum scroll or when
+   an input/textarea is focused — prevents data wipe
+   on iPhone when scrolling back to the top of the page.
 ════════════════════════════════════════════════════ */
 (function(){
-  var isPWA=window.matchMedia('(display-mode: standalone)').matches
-           ||window.navigator.standalone===true;
-  // Also enable on mobile browsers for consistency
   if(!('ontouchstart' in window))return;
 
   var ptr=document.getElementById('ptr-indicator');
   if(!ptr)return;
-  var startY=0,pulling=false,threshold=80;
+  var startY=0,pulling=false,threshold=100;
+
+  // Track whether the page is (or was recently) scrolling.
+  // We mark it true on every scroll event and clear it
+  // after 600 ms of inactivity.  PTR is blocked while this
+  // flag is set so momentum-scroll that coasts to scrollY=0
+  // can never accidentally trigger a page reload.
+  var _scrollActive=false,_scrollTimer=null;
+  window.addEventListener('scroll',function(){
+    _scrollActive=true;
+    clearTimeout(_scrollTimer);
+    _scrollTimer=setTimeout(function(){_scrollActive=false;},600);
+  },{passive:true});
 
   document.addEventListener('touchstart',function(e){
-    // Only trigger at top of page
+    // Only activate PTR when already at the very top
     if(window.scrollY>5)return;
+    // Skip if the page is still settling from a scroll gesture
+    if(_scrollActive)return;
+    // Skip if the user is typing in a form field
+    var ae=document.activeElement;
+    if(ae&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.tagName==='SELECT'))return;
     startY=e.touches[0].clientY;
     pulling=true;
   },{passive:true});
@@ -4757,7 +4774,7 @@ if('serviceWorker' in navigator){
     if(!pulling)return;
     pulling=false;
     if(ptr.classList.contains('active')){
-      // Trigger refresh
+      // Trigger refresh only after intentional full pull
       ptr.classList.add('releasing');
       setTimeout(function(){
         window.location.reload();
