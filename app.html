@@ -5897,7 +5897,9 @@ function stopLiveSync(){
       body:JSON.stringify({game_code:syncSession,license_key:licenseKey,action:'end'})
     }).catch(function(){});
   }
-  // Clean up co-coach channel
+  // Clean up co-coach channel — mark inactive first so auto-reconnect doesn't fire
+  _cocoachActive=false;
+  if(_cocoachReconnectTimer){clearTimeout(_cocoachReconnectTimer);_cocoachReconnectTimer=null;}
   if(cocoachChannel){try{sbClient.removeChannel(cocoachChannel);}catch(e){}cocoachChannel=null;}
   // Hide stat coach quick-action button + collapse grid back to 3 cols
   var scBtn=document.getElementById('statcoach-btn');
@@ -6020,6 +6022,8 @@ function copyParentLink(){
 ════════════════════════════════════════════════════════════ */
 var cocoachChannel=null;
 var _cocoachPingInterval=null;
+var _cocoachActive=false;      // true while stat coach is intentionally running
+var _cocoachReconnectTimer=null; // pending auto-reconnect after channel drop
 
 function _startCocoachPing(){
   _stopCocoachPing();
@@ -6038,7 +6042,10 @@ function _stopCocoachPing(){
 function startCocoachChannel(){
   if(!sbClient||!syncSession)return;
   _stopCocoachPing();
+  // Cancel any pending reconnect — we're starting fresh
+  if(_cocoachReconnectTimer){clearTimeout(_cocoachReconnectTimer);_cocoachReconnectTimer=null;}
   if(cocoachChannel){try{sbClient.removeChannel(cocoachChannel);}catch(e){}cocoachChannel=null;}
+  _cocoachActive=true;
   cocoachChannel=sbClient.channel('cocoach:'+syncSession,{config:{broadcast:{ack:false}}});
   cocoachChannel
     .on('broadcast',{event:'stat_event'},function(msg){
@@ -6046,7 +6053,7 @@ function startCocoachChannel(){
       if(!p||!p.name||!p.key)return;
       if(!G.stats[p.name])return;
       var q=p.q||G.cq;
-      if(!G.stats[p.name][q])G.stats[p.name][q]=blankStat();
+      if(!G.stats[p.name][q])G.stats[p.name][q]=blankStats();
       G.stats[p.name][q][p.key]++;
       G.last={type:'stat',name:p.name,key:p.key,q:q};
       var lbl={catches:'Catch',tds:'TD',flags:'Flag Pull',ints:'INT',conv1:'1pt Conv',conv2:'2pt Conv',qbTDs:'TD Pass',qbInts:'INT Thrown',qbConvs:'Conv Pass',fumbles:'Fumble',blocks:'Deflection'};
@@ -6067,6 +6074,14 @@ function startCocoachChannel(){
       }
       if(status==='CLOSED'||status==='CHANNEL_ERROR'){
         _stopCocoachPing();
+        // Auto-reconnect after 2s if stat coach was intentionally active.
+        // This recovers from iOS backgrounding the app, network switches,
+        // or any other transient WebSocket drop — without requiring a new link.
+        if(_cocoachActive){
+          _cocoachReconnectTimer=setTimeout(function(){
+            if(_cocoachActive)startCocoachChannel();
+          },2000);
+        }
       }
     });
 }
@@ -6127,6 +6142,8 @@ function activateStatCoach(){
 }
 
 function deactivateStatCoach(){
+  _cocoachActive=false;
+  if(_cocoachReconnectTimer){clearTimeout(_cocoachReconnectTimer);_cocoachReconnectTimer=null;}
   _stopCocoachPing();
   if(cocoachChannel){try{sbClient.removeChannel(cocoachChannel);}catch(e){}cocoachChannel=null;}
   var inactive=document.getElementById('statcoach-bar-inactive');
@@ -7175,6 +7192,13 @@ function initSupabaseAuth(){
           // Already signed in — just refresh data quietly
           if(typeof SYNC_ENGINE!=='undefined'&&SYNC_ENGINE.downloadAll){
             SYNC_ENGINE.downloadAll();
+          }
+        }
+        // Re-establish stat coach channel if iOS killed the WebSocket while backgrounded
+        if(_cocoachActive&&syncSession){
+          var cs=cocoachChannel&&cocoachChannel.state;
+          if(!cs||cs==='closed'||cs==='errored'){
+            startCocoachChannel();
           }
         }
       });
