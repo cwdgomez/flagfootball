@@ -23,7 +23,12 @@
 const fs   = require('fs');
 const path = require('path');
 
-const ROOT   = path.resolve(__dirname, '..');
+const ROOT    = path.resolve(__dirname, '..');
+// The backend lives in a sibling repo (cgmax-fftp-backend) next to the frontend.
+// Falls back to a legacy 'backend/api' sub-folder for partial checkouts.
+const API_DIR = fs.existsSync(path.join(ROOT, '..', 'cgmax-fftp-backend', 'api'))
+  ? path.join(ROOT, '..', 'cgmax-fftp-backend', 'api')
+  : path.join(ROOT, 'backend', 'api');
 const RESET  = '\x1b[0m';
 const RED    = '\x1b[31m';
 const YELLOW = '\x1b[33m';
@@ -105,8 +110,7 @@ function checkA01_AccessControl() {
   section('A01 — Broken Access Control');
 
   // ── Backend: protected endpoints must have auth ──
-  const apiDir = path.join(ROOT, 'backend', 'api');
-  const files  = getJSFiles(apiDir);
+  const files = getJSFiles(API_DIR);
 
   const PROTECTED = ['sync-coach-data','download-coach-data','backup-season','check-license','link-license'];
 
@@ -223,7 +227,7 @@ function checkA02_CryptoFailures() {
   }
 
   // ── Backend: secrets must be in env vars ──
-  const apiFiles = getJSFiles(path.join(ROOT, 'backend', 'api'));
+  const apiFiles = getJSFiles(API_DIR);
   apiFiles.forEach(fp => {
     const rel     = path.relative(ROOT, fp);
     const content = readFile(fp);
@@ -304,7 +308,7 @@ function checkA03_Injection() {
   }
 
   // ── Backend injection checks ──
-  const apiFiles = getJSFiles(path.join(ROOT, 'backend', 'api'));
+  const apiFiles = getJSFiles(API_DIR);
   apiFiles.forEach(fp => {
     const rel     = path.relative(ROOT, fp);
     const content = readFile(fp);
@@ -348,7 +352,7 @@ function checkA03_Injection() {
 function checkA04_InsecureDesign() {
   section('A04 — Insecure Design');
 
-  const apiFiles = getJSFiles(path.join(ROOT, 'backend', 'api'));
+  const apiFiles = getJSFiles(API_DIR);
 
   // Rate limiting on public endpoints
   const PUBLIC_ENDPOINTS = ['validate-license', 'live-game', 'roster-share', 'send-consent'];
@@ -432,7 +436,7 @@ function checkA05_Misconfiguration() {
   }
 
   // ── Backend: CORS must be restrictive (not wildcard) ──
-  const apiFiles = getJSFiles(path.join(ROOT, 'backend', 'api'));
+  const apiFiles = getJSFiles(API_DIR);
   apiFiles.forEach(fp => {
     const rel     = path.relative(ROOT, fp);
     const content = readFile(fp);
@@ -550,7 +554,7 @@ function checkA06_VulnerableComponents() {
 function checkA07_AuthFailures() {
   section('A07 — Identification & Authentication Failures');
 
-  const apiFiles = getJSFiles(path.join(ROOT, 'backend', 'api'));
+  const apiFiles = getJSFiles(API_DIR);
 
   apiFiles.forEach(fp => {
     const rel     = path.relative(ROOT, fp);
@@ -650,7 +654,7 @@ function checkA08_IntegrityFailures() {
   }
 
   // ── Backend: JSON deserialization safety ──
-  const apiFiles = getJSFiles(path.join(ROOT, 'backend', 'api'));
+  const apiFiles = getJSFiles(API_DIR);
   apiFiles.forEach(fp => {
     const rel     = path.relative(ROOT, fp);
     const content = readFile(fp);
@@ -697,7 +701,7 @@ function checkA08_IntegrityFailures() {
 function checkA09_LoggingFailures() {
   section('A09 — Security Logging & Monitoring Failures');
 
-  const apiFiles = getJSFiles(path.join(ROOT, 'backend', 'api'));
+  const apiFiles = getJSFiles(API_DIR);
 
   apiFiles.forEach(fp => {
     const rel     = path.relative(ROOT, fp);
@@ -743,7 +747,7 @@ function checkA09_LoggingFailures() {
 function checkA10_SSRF() {
   section('A10 — Server-Side Request Forgery (SSRF)');
 
-  const apiFiles = getJSFiles(path.join(ROOT, 'backend', 'api'));
+  const apiFiles = getJSFiles(API_DIR);
 
   apiFiles.forEach(fp => {
     const rel     = path.relative(ROOT, fp);

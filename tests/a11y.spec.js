@@ -4,13 +4,16 @@
 //  Uses @axe-core/playwright to run axe-core against every
 //  public-facing page in the app at WCAG 2.1 AA standard.
 //
-//  MODE: Violations are REPORTED but do NOT fail the build.
-//        (skipFailures = true)
+//  ENFORCEMENT TIERS:
+//    skipFailures = false  →  BLOCKING (violations fail the build)
+//    skipFailures = true   →  REPORTING ONLY (log but keep going)
 //
-//  HOW TO PROMOTE TO BLOCKING:
-//    Once a page is clean, change its `skipFailures` to false.
-//    Violations will then fail the Playwright run, protecting
-//    that page from future regressions.
+//  CURRENT STATUS:
+//    BLOCKING  : index.html, terms.html, privacy.html, help.html,
+//                consent.html (static/legal — these must stay clean)
+//    REPORTING : app.html, tournament.html, playdesigner.html,
+//                parent.html, statcoach.html (complex pages — audits
+//                pending; flip to false once violations are resolved)
 //
 //  WHAT AXE CATCHES:
 //    • Insufficient color contrast (critical for bright-sunlight
@@ -74,7 +77,7 @@ test.describe('A11y — app.html (main coaching PWA)', () => {
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(800);
 
-    // ── Change skipFailures to false when you are ready to enforce ──
+    // Complex PWA page — violations logged but build continues until audit passes
     await runA11y(page, 'app.html — Setup screen', true);
   });
 
@@ -119,7 +122,8 @@ test.describe('A11y — index.html (landing page)', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(600);
 
-    await runA11y(page, 'index.html', true);
+    // Static marketing page — BLOCKING: violations fail the build
+    await runA11y(page, 'index.html', false);
   });
 
 });
@@ -186,7 +190,8 @@ test.describe('A11y — consent.html (parent consent form)', () => {
 
     // IMPORTANT: Consent form is used by parents on their own devices.
     // WCAG compliance here is especially important — unknown audience.
-    await runA11y(page, 'consent.html', true);
+    // BLOCKING: violations fail the build.
+    await runA11y(page, 'consent.html', false);
   });
 
 });
@@ -199,7 +204,8 @@ test.describe('A11y — Legal pages (terms + privacy)', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(400);
 
-    await runA11y(page, 'terms.html', true);
+    // Legal page — BLOCKING: violations fail the build
+    await runA11y(page, 'terms.html', false);
   });
 
   test('Privacy Policy passes axe WCAG 2.1 AA audit', async ({ page }) => {
@@ -207,7 +213,8 @@ test.describe('A11y — Legal pages (terms + privacy)', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(400);
 
-    await runA11y(page, 'privacy.html', true);
+    // Legal page — BLOCKING: violations fail the build
+    await runA11y(page, 'privacy.html', false);
   });
 
   test('Help page passes axe WCAG 2.1 AA audit', async ({ page }) => {
@@ -215,7 +222,8 @@ test.describe('A11y — Legal pages (terms + privacy)', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(400);
 
-    await runA11y(page, 'help.html', true);
+    // Static help page — BLOCKING: violations fail the build
+    await runA11y(page, 'help.html', false);
   });
 
 });

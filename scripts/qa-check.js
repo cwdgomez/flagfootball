@@ -346,10 +346,16 @@ function checkFileSizes() {
 
 // ─── BACKEND QA ──────────────────────────────────────────────
 function checkBackend() {
-  section('Backend QA — /backend/api/');
+  section('Backend QA — cgmax-fftp-backend/api/');
 
-  const apiDir = path.join(ROOT, 'backend', 'api');
-  if (!fs.existsSync(apiDir)) { warn('backend/api not found — skipping'); return; }
+  // The backend lives in a sibling repo next to the frontend root.
+  // ROOT = flagfootball/ so the backend api is one level up then into
+  // cgmax-fftp-backend/api. Falls back to legacy 'backend/api' if the
+  // sibling repo isn't present (e.g. partial checkouts).
+  const apiDir = fs.existsSync(path.join(ROOT, '..', 'cgmax-fftp-backend', 'api'))
+    ? path.join(ROOT, '..', 'cgmax-fftp-backend', 'api')
+    : path.join(ROOT, 'backend', 'api');
+  if (!fs.existsSync(apiDir)) { warn('cgmax-fftp-backend/api not found — skipping backend checks'); return; }
 
   function getJSFiles(dir) {
     const results = [];

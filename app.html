@@ -3762,16 +3762,16 @@ function importSeason(event){
 var BACKUP_URL='https://api.cgmaxfftp.com/api/backup-season';
 
 function cloudBackup(){
-  var key=localStorage.getItem('ff_license_key');
-  if(!key){showToast('❌ Pro license required');return;}
+  var token=getAuthToken();
+  if(!token){showToast('❌ Sign in required for cloud backup');return;}
   var season=loadSeason();
   if(!season||!season.length){showToast('⚠️ No season data to backup');return;}
   var backupData={season:season,team:getActiveTeamName(),teamId:ACTIVE_TEAM_ID,exported:new Date().toISOString()};
   showToast('☁️ Uploading backup…');
   fetch(BACKUP_URL,{
     method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({license_key:key,backup_data:backupData})
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body:JSON.stringify({backup_data:backupData})
   })
   .then(function(r){return r.json();})
   .then(function(data){
@@ -3787,10 +3787,10 @@ function cloudBackup(){
 }
 
 function cloudRestore(){
-  var key=localStorage.getItem('ff_license_key');
-  if(!key){showToast('❌ Pro license required');return;}
+  var token=getAuthToken();
+  if(!token){showToast('❌ Sign in required for cloud restore');return;}
   showToast('☁️ Fetching backup…');
-  fetch(BACKUP_URL+'?license_key='+encodeURIComponent(key))
+  fetch(BACKUP_URL,{headers:{'Authorization':'Bearer '+token}})
   .then(function(r){return r.json();})
   .then(function(data){
     if(!data.success){showToast('❌ '+(data.error||'Restore failed'));return;}
@@ -6532,6 +6532,22 @@ function scheduleProRecheck(){
       if(data.valid){
         localStorage.setItem(LS_PRO_LAST_CHECK,String(Date.now()));
         localStorage.removeItem(LS_PRO_FAIL_SINCE);
+      } else if(data.status==='server_error'){
+        // Backend hiccup — treat same as a network failure so that
+        // a cancelled user cannot exploit repeated server errors to
+        // keep refreshing into a valid state. Apply the 7-day grace period.
+        var failSince=parseInt(localStorage.getItem(LS_PRO_FAIL_SINCE)||'0',10);
+        if(!failSince){
+          localStorage.setItem(LS_PRO_FAIL_SINCE,String(Date.now()));
+        } else if(Date.now()-failSince>PRO_GRACE_PERIOD){
+          localStorage.removeItem(LS_PRO);
+          localStorage.removeItem(LS_LICENSE);
+          localStorage.removeItem(LS_PRO_LAST_CHECK);
+          localStorage.removeItem(LS_PRO_FAIL_SINCE);
+          showToast('⚠️ Could not verify Pro license after 7 days offline. Reverted to Lite.');
+        } else {
+          showToast('🔄 Pro working offline — will verify when connected.','',2200);
+        }
       } else {
         localStorage.removeItem(LS_PRO);
         localStorage.removeItem(LS_LICENSE);
