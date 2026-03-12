@@ -23,6 +23,12 @@ on:
     branches: [main]
   workflow_dispatch:       # allow manual trigger from GitHub UI
 
+# Force all JavaScript actions (e.g. upload-artifact) to run on
+# Node.js 24 — required as Node 20 is deprecated on GitHub Actions
+# runners after June 2026.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 # Default all jobs to read-only. The sw-version-bump job overrides
 # this with contents: write because it commits back to the repo.
 permissions:
@@ -63,7 +69,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm install
@@ -108,7 +114,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Run API health check
         # Uses only Node.js built-ins (https module) — no npm install needed.
@@ -140,7 +146,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Bump cache version date to today
         run: node scripts/bump-sw-version.js
@@ -171,7 +177,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm install
