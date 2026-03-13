@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: javascript
           # security-extended adds ~30 extra queries on top of the default suite:
@@ -55,10 +55,10 @@ jobs:
       - name: Autobuild
         # For JavaScript/TypeScript, autobuild is a no-op (no compile step needed).
         # CodeQL scans the source files directly.
-        uses: github/codeql-action/autobuild@v3
+        uses: github/codeql-action/autobuild@v4
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: /language:javascript
           # Upload results to GitHub Security tab. Alerts are visible to repo owners
