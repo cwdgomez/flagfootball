@@ -56,9 +56,9 @@ nav{
 .nav-logo span{color:rgba(255,255,255,.25);}
 .nav-back{
   font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
-  letter-spacing:2px;color:rgba(255,215,0,.5);text-decoration:none;
+  letter-spacing:2px;color:rgba(255,215,0,.82);text-decoration:none;
   text-transform:uppercase;padding:7px 16px;border-radius:7px;
-  border:1px solid rgba(255,215,0,.15);transition:all .2s;
+  border:1px solid rgba(255,215,0,.25);transition:all .2s;
 }
 .nav-back:hover{color:var(--gold);border-color:rgba(255,215,0,.35);background:rgba(255,215,0,.05);}
 @media(max-width:480px){
@@ -78,8 +78,8 @@ nav{
 
 /* ── HERO BLOCK ── */
 .doc-eyebrow{
-  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:6px;color:rgba(255,215,0,.45);text-transform:uppercase;
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:6px;color:rgba(255,215,0,.75);text-transform:uppercase;
   margin-bottom:16px;
 }
 .doc-title{
@@ -97,14 +97,14 @@ nav{
   padding:16px 20px;
   background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.1);border-radius:12px;
 }
-.doc-meta-item{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.45);}
+.doc-meta-item{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.65);}
 .doc-meta-item strong{color:rgba(255,215,0,.75);}
 
 /* ── SECTION BLOCKS ── */
 .doc-section{margin-bottom:48px;}
 .doc-section-num{
-  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;
-  color:rgba(255,215,0,.38);text-transform:uppercase;margin-bottom:6px;
+  font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:4px;
+  color:rgba(255,215,0,.62);text-transform:uppercase;margin-bottom:6px;
 }
 .doc-section h2{
   font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,4vw,30px);letter-spacing:2px;
@@ -201,8 +201,8 @@ footer{
 .foot-logo{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:4px;color:rgba(255,215,0,.3);}
 .foot-links{display:flex;gap:16px;flex-wrap:wrap;}
 .foot-link{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;
-  color:rgba(255,255,255,.22);text-decoration:none;text-transform:uppercase;transition:color .2s;}
-.foot-link:hover{color:rgba(255,215,0,.6);}
+  color:rgba(255,255,255,.55);text-decoration:none;text-transform:uppercase;transition:color .2s;}
+.foot-link:hover{color:rgba(255,215,0,.8);}
 .foot-copy{
   font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;
   color:rgba(255,255,255,.1);text-transform:uppercase;width:100%;margin-top:8px;
@@ -211,14 +211,30 @@ footer{
   footer{padding:18px 16px;}
   .foot-inner{flex-direction:column;align-items:flex-start;gap:8px;}
 }
+
+/* ── FOCUS RINGS (WCAG 2.4.7) ── */
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px;}
+.nav-back:focus-visible{border-radius:7px;}
+
+/* ── SKIP NAV (WCAG 2.4.1) ── */
+.skip-nav{
+  position:fixed;top:-100px;left:16px;z-index:9999;
+  background:var(--gold);color:#0a0a0a;
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:2px;
+  padding:10px 20px;border-radius:50px;text-decoration:none;text-transform:uppercase;
+  transition:top .15s;
+}
+.skip-nav:focus{top:16px;}
 </style>
 </head>
 <body>
+<a href="#main-content" class="skip-nav">Skip to main content</a>
 <div class="bg"><div class="bg-grad"></div><div class="bg-grid"></div></div>
 <nav>
   <a href="./index.html" class="nav-logo">CGMax <span>·</span> FFTP</a>
   <a href="./index.html" class="nav-back">← Back to Home</a>
 </nav>
+<main id="main-content">
 <div class="page">
 
   <div class="doc-eyebrow">CGMax FFTP · Legal Documents</div>
@@ -480,10 +496,11 @@ footer{
       <p style="margin-top:12px;"><strong>Email:</strong> <a href="mailto:cgmaxfftp@itcc.llc">cgmaxfftp@itcc.llc</a></p>
       <p><strong>Company:</strong> ITCC LLC</p>
       <p><strong>Product:</strong> CGMax FFTP — Flag Football Tracker Pro</p>
-      <p style="margin-top:12px;font-size:13px;color:rgba(255,255,255,.4);">We aim to respond to all privacy inquiries within 5 business days.</p>
+      <p style="margin-top:12px;font-size:13px;color:rgba(255,255,255,.6);">We aim to respond to all privacy inquiries within 5 business days.</p>
     </div>
   </div>
 </div>
+</main>
 
 <footer>
   <div class="foot-inner">

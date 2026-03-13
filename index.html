@@ -76,16 +76,17 @@ nav{
 .nav-logo span{color:rgba(255,255,255,.28);}
 .nav-links{display:flex;align-items:center;gap:4px;flex-wrap:nowrap;}
 .nav-link{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;
-  color:rgba(255,255,255,.32);text-decoration:none;padding:5px 9px;border-radius:6px;
+  color:rgba(255,255,255,.52);text-decoration:none;padding:5px 9px;border-radius:6px;
   transition:color .2s;text-transform:uppercase;white-space:nowrap;}
 .nav-link:hover{color:rgba(255,215,0,.7);}
 .nav-cta{
-  background:linear-gradient(135deg,var(--red),var(--red2));
-  border:1px solid rgba(255,215,0,.25);border-radius:7px;padding:7px 16px;
-  color:var(--gold);font-family:'Barlow Condensed',sans-serif;
-  font-size:13px;font-weight:700;letter-spacing:2px;text-decoration:none;
-  text-transform:uppercase;transition:transform .15s,box-shadow .15s;white-space:nowrap;}
-.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(170,0,0,.55);}
+  background:linear-gradient(130deg,var(--gold) 0%,var(--gold3) 40%,var(--gold2) 100%);
+  background-size:200% 100%;border:none;border-radius:50px;padding:7px 18px;
+  color:#0a0a0a;font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;font-weight:800;letter-spacing:2px;text-decoration:none;
+  text-transform:uppercase;transition:transform .15s,box-shadow .15s;white-space:nowrap;
+  box-shadow:0 2px 16px rgba(255,215,0,.35);}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(255,215,0,.55);}
 @media(max-width:640px){
   .nav-links .nav-link{display:none;}
   nav{padding:10px 16px;}
@@ -101,8 +102,8 @@ nav{
   text-align:center;
 }
 .hero-eyebrow{
-  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:6px;color:rgba(255,215,0,.52);text-transform:uppercase;
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:6px;color:rgba(255,215,0,.78);text-transform:uppercase;
   margin-bottom:22px;animation:fadeUp .7s ease both;
 }
 
@@ -151,8 +152,8 @@ nav{
 .hero-title .l3{display:block;color:var(--red3);text-shadow:0 4px 0 rgba(0,0,0,.8),0 0 40px rgba(170,0,0,.5);}
 .hero-sub{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(12px,2.5vw,16px);font-weight:600;
-  letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.32);
+  font-size:clamp(14px,2.5vw,16px);font-weight:600;
+  letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.52);
   margin:16px 0 36px;animation:fadeUp .7s .3s ease both;
 }
 
@@ -179,8 +180,8 @@ nav{
 @media(max-width:380px){.launch-btn{padding:15px 34px;}}
 
 .launch-note{
-  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;
-  color:rgba(255,255,255,.2);text-transform:uppercase;animation:fadeUp .7s .55s ease both;
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;
+  color:rgba(255,255,255,.65);text-transform:uppercase;animation:fadeUp .7s .55s ease both;
 }
 
 /* feature chips */
@@ -190,16 +191,16 @@ nav{
   max-width:480px;
 }
 .hchip{
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:20px;
-  padding:4px 11px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:1px;color:rgba(255,255,255,.42);text-transform:uppercase;
+  background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.18);border-radius:5px;
+  padding:4px 11px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:1px;color:rgba(255,255,255,.65);text-transform:uppercase;
 }
 
 .scroll-hint{
   margin-top:36px;display:flex;flex-direction:column;align-items:center;gap:5px;
   animation:fadeUp .7s .75s ease both;color:rgba(255,215,0,.25);
 }
-.scroll-hint span{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;}
+.scroll-hint span{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;}
 .scroll-line{width:1px;height:32px;background:linear-gradient(180deg,rgba(255,215,0,.35),transparent);
   animation:scrollDrop 2s ease-in-out infinite;}
 @keyframes scrollDrop{0%,100%{transform:scaleY(1);opacity:.45;}50%{transform:scaleY(1.35);opacity:1;}}
@@ -217,15 +218,15 @@ nav{
 .ti{display:flex;align-items:center;gap:8px;padding:0 32px;border-right:1px solid rgba(255,215,0,.12);white-space:nowrap;}
 .ti-icon{font-size:15px;}
 .ti-val{font-family:'Bebas Neue',sans-serif;font-size:19px;color:var(--gold);}
-.ti-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.35);text-transform:uppercase;}
+.ti-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.55);text-transform:uppercase;}
 @keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
 
 /* ── SECTIONS ── */
 .sec{position:relative;z-index:10;padding:80px 20px;}
 @media(max-width:480px){.sec{padding:60px 16px;}}
 .sec-inner{max-width:1100px;margin:0 auto;}
-.sec-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:6px;
-  color:rgba(255,215,0,.45);text-transform:uppercase;margin-bottom:12px;}
+.sec-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:6px;
+  color:rgba(255,215,0,.75);text-transform:uppercase;margin-bottom:12px;}
 .sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,7vw,68px);letter-spacing:3px;line-height:.95;margin-bottom:10px;}
 .sec-title .acc{background:linear-gradient(135deg,var(--gold),var(--gold3));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -248,9 +249,9 @@ nav{
   letter-spacing:2px;color:rgba(255,215,0,.7);text-transform:uppercase;margin-bottom:8px;}
 .fc-tag.new{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:var(--green);}
 .fc-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--gold);margin-bottom:8px;}
-.fc-body{font-family:'Barlow',sans-serif;font-size:13px;line-height:1.65;color:rgba(255,255,255,.48);}
+.fc-body{font-family:'Barlow',sans-serif;font-size:15px;line-height:1.65;color:rgba(255,255,255,.65);}
 .fc-bullets{list-style:none;margin-top:10px;display:flex;flex-direction:column;gap:5px;}
-.fc-bullets li{font-family:'Barlow',sans-serif;font-size:12px;color:rgba(255,255,255,.42);
+.fc-bullets li{font-family:'Barlow',sans-serif;font-size:14px;color:rgba(255,255,255,.62);
   padding-left:14px;position:relative;line-height:1.4;}
 .fc-bullets li::before{content:'►';position:absolute;left:0;font-size:7px;color:var(--gold);opacity:.65;top:4px;}
 .fc-num{position:absolute;bottom:14px;right:18px;font-family:'Bebas Neue',sans-serif;font-size:68px;
@@ -267,7 +268,7 @@ nav{
   font-size:86px;color:rgba(255,215,0,.04);line-height:1;pointer-events:none;}
 .hiw-icon{font-size:30px;margin-bottom:10px;}
 .hiw-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--gold);margin-bottom:6px;}
-.hiw-body{font-family:'Barlow',sans-serif;font-size:13px;line-height:1.55;color:rgba(255,255,255,.42);}
+.hiw-body{font-family:'Barlow',sans-serif;font-size:15px;line-height:1.55;color:rgba(255,255,255,.65);}
 
 /* ── PHONE PREVIEW ── */
 .preview-sec{background:linear-gradient(180deg,transparent,rgba(170,0,0,.07) 50%,transparent);padding:80px 20px;}
@@ -433,7 +434,7 @@ nav{
   letter-spacing:2px;color:#FF5555;text-transform:uppercase;}
 .nf-icon{font-size:26px;margin-bottom:10px;}
 .nf-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;color:var(--gold);margin-bottom:5px;}
-.nf-body{font-family:'Barlow',sans-serif;font-size:13px;line-height:1.6;color:rgba(255,255,255,.42);}
+.nf-body{font-family:'Barlow',sans-serif;font-size:15px;line-height:1.6;color:rgba(255,255,255,.65);}
 
 /* ── FINAL CTA ── */
 .cta-sec{position:relative;z-index:10;text-align:center;padding:90px 20px 100px;}
@@ -456,7 +457,7 @@ nav{
   text-decoration:none;cursor:pointer;transition:border-color .2s,color .2s,background .2s;}
 .btn-outline:hover{border-color:rgba(255,215,0,.55);color:var(--gold);background:rgba(255,215,0,.05);}
 .cta-tagline{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;letter-spacing:3px;
-  color:rgba(255,255,255,.28);text-transform:uppercase;margin:12px 0 0;}
+  color:rgba(255,255,255,.55);text-transform:uppercase;margin:12px 0 0;}
 
 /* ── FOOTER ── */
 footer{
@@ -489,6 +490,32 @@ footer{
 @keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
 .reveal{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease;}
 .reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ── FOCUS RINGS (WCAG 2.4.7) ── */
+/* Visible keyboard focus indicator on all interactive elements */
+:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:3px;
+  border-radius:4px;
+}
+/* Pill-shaped buttons get a matching pill ring */
+.launch-btn:focus-visible,
+.nav-cta:focus-visible,
+.btn-gold:focus-visible,
+.btn-outline:focus-visible,
+.plan-cta-btn:focus-visible{
+  outline-offset:4px;
+  border-radius:50px;
+}
+/* Skip link shown on focus for keyboard users */
+.skip-nav{
+  position:fixed;top:-100px;left:16px;z-index:9999;
+  background:var(--gold);color:#0a0a0a;
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:2px;
+  padding:10px 20px;border-radius:50px;text-decoration:none;text-transform:uppercase;
+  transition:top .15s;
+}
+.skip-nav:focus{top:16px;}
 
 /* ── MOBILE PARALLAX FIX ── */
 /* On iOS, position:fixed backgrounds can stutter. We disable the noise overlay on low-end */
@@ -542,12 +569,12 @@ footer{
 .pf-icon.yes{background:rgba(34,197,94,.18);border:1px solid rgba(34,197,94,.3);color:#22C55E;}
 .pf-icon.no{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.18);}
 .pf-icon.yes-pro{background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.3);color:var(--gold);}
-.pf-text{font-family:'Barlow',sans-serif;font-size:13.5px;line-height:1.45;}
+.pf-text{font-family:'Barlow',sans-serif;font-size:15px;line-height:1.45;}
 .pf-text.active{color:rgba(255,255,255,.72);}
 .pf-text.inactive{color:rgba(255,255,255,.22);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.1);}
 .pf-text.pro-active{color:rgba(255,215,0,.85);}
 .plan-cta-area{padding-top:4px;}
-.plan-cta-note{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,.25);margin-bottom:14px;}
+.plan-cta-note{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,.55);margin-bottom:14px;}
 .plan-cta-btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   width:100%;padding:13px 20px;border-radius:12px;border:none;cursor:pointer;
@@ -635,14 +662,14 @@ footer{
 .quotes-sec{position:relative;z-index:10;padding:60px 20px;}
 @media(max-width:480px){.quotes-sec{padding:44px 16px;}}
 .quotes-inner{max-width:1100px;margin:0 auto;}
-.quotes-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:6px;color:rgba(255,215,0,.45);text-transform:uppercase;margin-bottom:28px;text-align:center;}
+.quotes-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:6px;color:rgba(255,215,0,.75);text-transform:uppercase;margin-bottom:28px;text-align:center;}
 .quotes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
 @media(max-width:780px){.quotes-grid{grid-template-columns:1fr 1fr;}}
 @media(max-width:480px){.quotes-grid{grid-template-columns:1fr;}}
 .quote-card{background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:22px 22px 18px;position:relative;overflow:hidden;transition:border-color .25s;}
 .quote-card:hover{border-color:rgba(255,215,0,.15);}
 .quote-card::before{content:'\201C';position:absolute;top:-8px;left:14px;font-size:80px;font-family:'Bebas Neue',sans-serif;color:rgba(255,215,0,.08);line-height:1;pointer-events:none;}
-.quote-text{font-family:'Barlow',sans-serif;font-size:14px;line-height:1.7;color:rgba(255,255,255,.58);margin-bottom:16px;position:relative;z-index:1;}
+.quote-text{font-family:'Barlow',sans-serif;font-size:14px;line-height:1.7;color:rgba(255,255,255,.75);margin-bottom:16px;position:relative;z-index:1;}
 .quote-author{display:flex;align-items:center;gap:10px;}
 .quote-avatar{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--red),var(--red2));border:1px solid rgba(255,215,0,.18);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
 .quote-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.7);}
@@ -718,6 +745,9 @@ footer{
 </script>
 </head>
 <body>
+<!-- Skip to main content — for keyboard/screen reader users (WCAG 2.4.1) -->
+<a href="#main-content" class="skip-nav">Skip to main content</a>
+
 <div class="bg">
   <div class="bg-grad"></div>
   <div class="bg-grid"></div>
@@ -732,9 +762,12 @@ footer{
     <a href="#plans" class="nav-link">Pricing</a>
     <a href="./help.html" class="nav-link">Help</a>
     <a href="./tournament.html" class="nav-link">Tournament</a>
-    <a href="./app.html" class="nav-cta">⚡ Launch App</a>
+    <a href="./app.html" class="nav-cta">Launch App</a>
   </div>
 </nav>
+
+<!-- MAIN CONTENT (landmark for screen readers / WCAG 2.4.1) -->
+<main id="main-content">
 
 <!-- HERO -->
 <section class="hero">
@@ -1538,6 +1571,8 @@ footer{
 
   </div>
 </section>
+
+</main><!-- /main-content -->
 
 <!-- FOOTER -->
 <footer>
