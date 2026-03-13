@@ -10,7 +10,7 @@
 <style>
 :root{
   --p:#AA0000;--s:#FFD700;--dark:#080808;--dark2:#0E0E0E;--dark3:#1a1a1a;--dark4:#242424;--sur:#181818;
-  --txt:#f2f2f2;--dim:#888;--dimmer:#444;
+  --txt:#f2f2f2;--dim:#888;--dimmer:#767676;
   --green:#22C55E;--blue:#3B82F6;--purple:#A855F7;--teal:#14B8A6;--orange:#F97316;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -72,7 +72,7 @@ body{padding:0 0 60px;}
 }
 .toc-btn{
   background:var(--dark3);border:1px solid var(--dark4);border-radius:20px;
-  padding:6px 14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;
+  padding:6px 14px;font-family:'Barlow Condensed',sans-serif;font-size:13px;
   font-weight:700;letter-spacing:1px;color:var(--dim);text-decoration:none;
   text-transform:uppercase;transition:all .2s;
 }
@@ -110,7 +110,7 @@ body{padding:0 0 60px;}
   color:var(--txt);line-height:1.2;margin-bottom:4px;
 }
 .info-desc{
-  font-family:'Barlow',sans-serif;font-size:13px;line-height:1.6;color:var(--dim);
+  font-family:'Barlow',sans-serif;font-size:14px;line-height:1.6;color:var(--dim);
 }
 .info-desc strong{color:rgba(255,255,255,.75);}
 .info-desc code{
@@ -128,7 +128,7 @@ body{padding:0 0 60px;}
 .cmd-say em{font-style:normal;color:var(--s);}
 .cmd-examples{display:flex;flex-direction:column;gap:3px;margin-top:4px;}
 .cmd-ex{font-family:monospace;font-size:12px;background:var(--dark3);border:1px solid var(--dark4);border-radius:5px;padding:3px 8px;color:var(--dim);display:inline-block;align-self:flex-start;}
-.cmd-note{font-family:'Barlow',sans-serif;font-size:11px;color:var(--dimmer);margin-top:5px;line-height:1.5;}
+.cmd-note{font-family:'Barlow',sans-serif;font-size:13px;color:var(--dimmer);margin-top:5px;line-height:1.5;}
 
 /* ── HIGHLIGHT BOX ── */
 .hl-box{
@@ -146,7 +146,7 @@ body{padding:0 0 60px;}
 
 /* ── TIPS CARD ── */
 .tips-card{background:var(--dark2);border:1px solid var(--dark3);border-radius:14px;padding:16px;margin-bottom:16px;}
-.tips-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;color:var(--s);text-transform:uppercase;margin-bottom:12px;}
+.tips-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2.5px;color:var(--s);text-transform:uppercase;margin-bottom:12px;}
 .tip-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
 .tip-item:last-child{margin-bottom:0;}
 .tip-bullet{font-size:16px;flex-shrink:0;}
@@ -159,7 +159,7 @@ body{padding:0 0 60px;}
 .step-num{width:24px;height:24px;border-radius:50%;background:var(--s);color:#000;font-family:'Bebas Neue',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .step-body{flex:1;min-width:0;}
 .step-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--txt);margin-bottom:2px;}
-.step-desc{font-family:'Barlow',sans-serif;font-size:13px;color:var(--dim);line-height:1.55;}
+.step-desc{font-family:'Barlow',sans-serif;font-size:14px;color:var(--dim);line-height:1.55;}
 .step-desc strong{color:rgba(255,255,255,.75);}
 
 /* ── DIVIDER ── */
@@ -178,7 +178,7 @@ hr.div{border:none;border-top:1px solid var(--dark3);margin:8px 0 4px;}
   -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
 }
 .sec-nav a{
-  display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:11px;
+  display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:12px;
   font-weight:700;letter-spacing:1.5px;color:var(--dim);text-decoration:none;
   text-transform:uppercase;margin-right:16px;padding:4px 0;
   border-bottom:2px solid transparent;transition:all .2s;
@@ -231,6 +231,11 @@ hr.div{border:none;border-top:1px solid var(--dark3);margin:8px 0 4px;}
   .hero{padding:28px 14px 20px;}
   .content{padding:0 12px;}
 }
+/* ── FOCUS RINGS (WCAG 2.4.7) ── */
+:focus-visible{outline:2px solid var(--s);outline-offset:3px;border-radius:4px;}
+.back-btn:focus-visible{border-radius:8px;}
+.toc-btn:focus-visible{border-radius:20px;}
+.search-input:focus-visible{outline:2px solid rgba(255,215,0,.5);outline-offset:0;border-radius:10px;}
 </style>
 </head>
 <body>
@@ -243,6 +248,7 @@ hr.div{border:none;border-top:1px solid var(--dark3);margin:8px 0 4px;}
   <a href="./index.html" class="back-btn">Home</a>
 </div>
 
+<main id="main-content">
 <!-- SECTION NAV -->
 <div class="sec-nav">
   <a href="#setup">Setup</a>
