@@ -477,14 +477,14 @@ footer{
   border-top:1px solid rgba(255,255,255,.05);padding-top:14px;
 }
 .foot-legal-link{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;
-  color:rgba(255,255,255,.25);text-decoration:none;text-transform:uppercase;transition:color .2s;}
-.foot-legal-link:hover{color:rgba(255,215,0,.6);}
-.foot-sep{color:rgba(255,255,255,.12);font-size:10px;}
-.foot-contact{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,.22);}
-.foot-contact a{color:rgba(255,215,0,.45);text-decoration:none;transition:color .2s;}
-.foot-contact a:hover{color:rgba(255,215,0,.8);}
+  color:rgba(255,255,255,.55);text-decoration:none;text-transform:uppercase;transition:color .2s;}
+.foot-legal-link:hover{color:rgba(255,215,0,.85);}
+.foot-sep{color:rgba(255,255,255,.22);font-size:10px;}
+.foot-contact{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,.55);}
+.foot-contact a{color:rgba(255,215,0,.82);text-decoration:none;transition:color .2s;}
+.foot-contact a:hover{color:#FFD700;}
 .foot-copy{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;
-  color:rgba(255,255,255,.12);text-transform:uppercase;margin-top:8px;}
+  color:rgba(255,255,255,.45);text-transform:uppercase;margin-top:8px;}
 
 /* ── ANIMATIONS ── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
@@ -547,15 +547,15 @@ footer{
   display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;
   letter-spacing:3px;text-transform:uppercase;border-radius:6px;padding:3px 10px;margin-bottom:14px;
 }
-.plan-badge.lite{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.45);}
+.plan-badge.lite{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.68);}
 .plan-badge.pro{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#111;}
 .plan-name{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;margin-bottom:4px;line-height:1;}
 .plan-col:not(.pro-col) .plan-name{color:rgba(255,255,255,.55);}
 .plan-col.pro-col .plan-name{background:linear-gradient(135deg,var(--gold),var(--gold3));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .plan-price{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;
-  color:rgba(255,255,255,.3);margin-bottom:12px;}
-.plan-col.pro-col .plan-price{color:rgba(255,215,0,.45);}
+  color:rgba(255,255,255,.55);margin-bottom:12px;}
+.plan-col.pro-col .plan-price{color:rgba(255,215,0,.82);}
 .save-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(34,197,94,.18),rgba(34,197,94,.08));
   border:1px solid rgba(34,197,94,.35);border-radius:20px;padding:5px 12px;margin-bottom:18px;
   font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;
@@ -755,7 +755,7 @@ footer{
 </div>
 
 <!-- NAV -->
-<nav>
+<nav aria-label="Site Navigation">
   <div class="nav-logo">CGMax <span>·</span> FFTP</div>
   <div class="nav-links">
     <a href="#features" class="nav-link">Features</a>
