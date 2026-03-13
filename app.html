@@ -7177,6 +7177,14 @@ function initSupabaseAuth(){
         if(GATE_ACTIVE){
           setTimeout(postAuthRoute, 300);
         }
+        // Pull cloud data for session-restored users.
+        // (onAuthStateChange only fires SIGNED_IN for fresh logins — not for session restores.
+        //  Without this call, returning users on a new device get empty UI until a manual reload.)
+        setTimeout(function(){
+          if(typeof SYNC_ENGINE!=='undefined'&&SYNC_ENGINE.downloadAll){
+            SYNC_ENGINE.downloadAll();
+          }
+        },800);
       }
     });
 
@@ -7559,12 +7567,21 @@ var SYNC_ENGINE={
       });
       if(applied>0){
         showToast('☁️ Restored '+applied+' items from cloud');
-        // Reload UI state
+        // Full UI refresh from newly applied localStorage data
         try{
+          // Re-seat active team (picks up downloaded teams list + persisted active team id)
+          var restoredActive=localStorage.getItem(LS_ACTIVE_TM)||ACTIVE_TEAM_ID||'default';
+          setActiveTeam(restoredActive);      // reloads colors, updates team label
           LIVE_ROSTER=loadRosterData();
           rebuildFromRoster();
-          renderGameUI();
-        }catch(e){}
+          if(typeof loadNotes==='function')loadNotes();
+          if(typeof applyTheme==='function')applyTheme();
+          if(typeof buildQBList==='function')buildQBList();
+          if(typeof buildAbsentList==='function')buildAbsentList();
+          if(typeof renderAll==='function')renderAll();
+          if(typeof renderRosterScreen==='function')renderRosterScreen();
+          if(typeof renderSeasonScreen==='function')renderSeasonScreen();
+        }catch(e){console.error('[Sync] UI refresh after download failed:',e);}
       }
       showSyncIndicator('synced');
     })
