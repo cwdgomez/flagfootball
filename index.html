@@ -6,9 +6,9 @@
 <meta name="theme-color" content="#AA0000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="description" content="CGMax FFTP — Flag Football Tracker Pro. The complete youth flag football coaching app. Live stats, smart rotations, MVP rankings, season history — works offline on any phone.">
+<meta name="description" content="CGMax FFTP — Flag Football Tracker Pro. The complete youth flag football coaching app. Live stats, smart rotations, MVP rankings, AI-generated season report cards, and automatic parent delivery — works offline on any phone.">
 <meta property="og:title" content="CGMax FFTP — Youth Flag Football Coaching Made Easy">
-<meta property="og:description" content="The #1 free coaching app for youth flag football. Live scoring, smart rotations, play designer, tournament brackets, and a live parent scoreboard.">
+<meta property="og:description" content="The #1 free coaching app for youth flag football. Live scoring, smart rotations, play designer, tournament brackets, AI-generated season report cards, and a live parent scoreboard.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://cgmaxfftp.com">
 <meta property="og:image" content="https://cgmaxfftp.com/og-banner.png">
@@ -16,7 +16,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="CGMax FFTP — Youth Flag Football Coaching Made Easy">
-<meta name="twitter:description" content="The ultimate youth flag football coaching app.">
+<meta name="twitter:description" content="The ultimate youth flag football coaching app — with AI-generated season report cards delivered to every player's parents automatically.">
 <meta name="twitter:image" content="https://cgmaxfftp.com/og-banner.png">
 <title>CGMax FFTP — Flag Football Tracker Pro</title>
 <link rel="manifest" href="manifest.json">
@@ -720,7 +720,7 @@ footer{
       "name": "Pro",
       "price": "9.99",
       "priceCurrency": "USD",
-      "description": "Pro tier with cloud sync, multiple teams, voice logging, tournament mode, and play designer"
+      "description": "Pro tier with cloud sync, multiple teams, voice logging, tournament mode, play designer, and AI-generated season report cards with automatic parent email delivery"
     }
   ],
   "description": "The complete youth flag football coaching app. Live stats, smart rotations, season analytics, tournament brackets, play designer, and a live parent scoreboard. Free to start, Pro upgrades available.",
@@ -736,7 +736,8 @@ footer{
     "Google, Microsoft, and magic link sign-in with cross-device cloud sync",
     "Voice stat logging",
     "Offline mode",
-    "Cloud sync across devices"
+    "Cloud sync across devices",
+    "AI Season Report Cards — personalized end-of-season player cards with automatic parent email delivery"
   ],
   "publisher": {
     "@type": "Organization",
@@ -819,6 +820,7 @@ footer{
     <div class="hchip">📤 Game Recaps</div>
     <div class="hchip">🎙️ Voice Logging</div>
     <div class="hchip">🔒 Coach Access</div>
+    <div class="hchip">🤖 AI Report Cards</div>
   </div>
   <div class="scroll-hint">
     <span>Explore</span>
@@ -842,6 +844,7 @@ footer{
     <div class="ti"><span class="ti-icon">🤝</span><span class="ti-val">Stat</span><span class="ti-lbl">Coach</span></div>
     <div class="ti"><span class="ti-icon">🔐</span><span class="ti-val">Secure</span><span class="ti-lbl">Sign-In</span></div>
     <div class="ti"><span class="ti-icon">🎴</span><span class="ti-val">Stat</span><span class="ti-lbl">Cards</span></div>
+    <div class="ti"><span class="ti-icon">🤖</span><span class="ti-val">AI</span><span class="ti-lbl">Report Cards</span></div>
     <!-- duplicate for seamless loop -->
     <div class="ti"><span class="ti-icon">👥</span><span class="ti-val">Any</span><span class="ti-lbl">Roster Size</span></div>
     <div class="ti"><span class="ti-icon">⭐</span><span class="ti-val">8</span><span class="ti-lbl">Stat Types</span></div>
@@ -856,6 +859,7 @@ footer{
     <div class="ti"><span class="ti-icon">🤝</span><span class="ti-val">Stat</span><span class="ti-lbl">Coach</span></div>
     <div class="ti"><span class="ti-icon">🔐</span><span class="ti-val">Secure</span><span class="ti-lbl">Sign-In</span></div>
     <div class="ti"><span class="ti-icon">🎴</span><span class="ti-val">Stat</span><span class="ti-lbl">Cards</span></div>
+    <div class="ti"><span class="ti-icon">🤖</span><span class="ti-val">AI</span><span class="ti-lbl">Report Cards</span></div>
   </div>
 </div>
 
@@ -915,6 +919,14 @@ footer{
         <div class="fc-body">Say "Jaxon touchdown" or "set offense Jaxon Reed Cade" and the app logs it. Hands-free coaching during live action.</div>
         <ul class="fc-bullets"><li>Natural language commands</li><li>Set full lineups by voice</li><li>Confidence filtering cuts noise</li></ul>
         <div class="fc-num">06</div>
+      </div>
+      <div class="fc reveal">
+        <div class="fc-icon">🤖</div>
+        <div class="fc-tag">Pro</div>
+        <div class="fc-title">AI Season Report Cards</div>
+        <div class="fc-body">At the end of the season, Claude AI writes a personalized report card for every player — highlighting their best moments, growth, and contributions. Coach shares or sends automatically.</div>
+        <ul class="fc-bullets"><li>One card per player, written by AI</li><li>Auto-emailed to parents with consent on file</li><li>Coach can share via text to any parent</li></ul>
+        <div class="fc-num">07</div>
       </div>
     </div>
   </div>
@@ -1127,6 +1139,101 @@ footer{
   </div>
 </section>
 
+<!-- AI SEASON REPORT CARDS FEATURE -->
+<section class="ai-cards-band" id="ai-report-cards">
+  <style>
+    .ai-cards-band{background:linear-gradient(135deg,#0a0a12 0%,#0d0d1f 40%,#0f0f1a 100%);position:relative;overflow:hidden;padding:80px 0;}
+    .ai-cards-band::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 30% 50%,rgba(168,85,247,.13) 0%,transparent 70%);pointer-events:none;}
+    .ai-cards-band-inner{max-width:1120px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+    @media(max-width:800px){.ai-cards-band-inner{grid-template-columns:1fr;gap:40px;}}
+    .ai-cards-band-text .sec-eyebrow{color:#a855f7;}
+    .ai-cards-band-text h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,6vw,64px);line-height:.95;color:#fff;margin:0 0 16px;}
+    .ai-cards-band-text p{font-family:'Barlow',sans-serif;font-size:16px;line-height:1.65;color:rgba(255,255,255,.72);margin:0 0 14px;}
+    .ai-steps{display:flex;flex-direction:column;gap:14px;margin:24px 0 32px;}
+    .ai-step{display:flex;align-items:flex-start;gap:14px;}
+    .ai-step-num{min-width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a855f7);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:14px;color:#fff;flex-shrink:0;margin-top:2px;}
+    .ai-step-txt{font-family:'Barlow',sans-serif;font-size:15px;line-height:1.5;color:rgba(255,255,255,.75);}
+    .ai-step-txt strong{color:#fff;}
+    /* Mockup */
+    .ai-mockup{display:flex;flex-direction:column;gap:16px;}
+    .aim-card{background:linear-gradient(160deg,#1a1128 0%,#120e1e 100%);border:1px solid rgba(168,85,247,.3);border-radius:18px;padding:20px 22px;box-shadow:0 8px 40px rgba(168,85,247,.15);}
+    .aim-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+    .aim-player-name{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:.5px;}
+    .aim-ai-badge{background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:20px;padding:3px 10px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:1.5px;color:#fff;text-transform:uppercase;}
+    .aim-quote{font-family:'Barlow',sans-serif;font-size:13.5px;line-height:1.6;color:rgba(255,255,255,.75);font-style:italic;border-left:3px solid #a855f7;padding-left:12px;margin-bottom:14px;}
+    .aim-stats-row{display:flex;gap:8px;}
+    .aim-stat{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);border-radius:8px;padding:6px 10px;text-align:center;flex:1;}
+    .aim-stat-v{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:#a855f7;}
+    .aim-stat-l{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.45);text-transform:uppercase;}
+    .aim-email-card{background:#0d0d18;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;}
+    .aim-email-hdr{background:#111;border-bottom:1px solid rgba(255,255,255,.07);padding:10px 16px;display:flex;align-items:center;gap:8px;}
+    .aim-email-dot{width:8px;height:8px;border-radius:50%;background:#a855f7;}
+    .aim-email-from{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.45);}
+    .aim-email-subject{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,.85);margin-left:auto;}
+    .aim-email-body{padding:14px 16px;font-family:'Barlow',sans-serif;font-size:13px;line-height:1.55;color:rgba(255,255,255,.6);}
+    .aim-email-body strong{color:rgba(255,255,255,.85);}
+    .aim-sent-row{display:flex;align-items:center;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);}
+    .aim-sent-icon{font-size:14px;}
+    .aim-sent-txt{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;color:rgba(168,85,247,.7);}
+  </style>
+  <div class="ai-cards-band-inner">
+    <!-- Text side -->
+    <div class="ai-cards-band-text reveal">
+      <div class="sec-eyebrow">🤖 New Pro Feature</div>
+      <h2>AI Season<br><span style="color:#a855f7;">Report Cards</span></h2>
+      <p>At the end of every season, Claude AI reads your team's full stat history and writes a genuine, personalized report card for every single player — every kid gets recognized, not just the MVPs.</p>
+      <p>Coaches can share cards with any parent in one tap. And for families who filled out a photo consent form, the card is delivered automatically straight to their inbox — no action needed.</p>
+      <div class="ai-steps">
+        <div class="ai-step">
+          <div class="ai-step-num">1</div>
+          <div class="ai-step-txt"><strong>Tap "Generate Season Report Cards"</strong> in the Season Summary — AI reads every player's full-season stats and writes one card per player instantly</div>
+        </div>
+        <div class="ai-step">
+          <div class="ai-step-num">2</div>
+          <div class="ai-step-txt"><strong>Review and share</strong> — send any card to a parent via text, copy the quote, or let the app handle delivery automatically</div>
+        </div>
+        <div class="ai-step">
+          <div class="ai-step-num">3</div>
+          <div class="ai-step-txt"><strong>Parents with consent forms on file get emailed automatically</strong> — a beautiful branded card lands in their inbox the moment you hit Generate</div>
+        </div>
+      </div>
+      <a href="./app.html" class="btn-gold" style="display:inline-flex;font-size:17px;padding:13px 28px;">⭐ Unlock with Pro</a>
+    </div>
+    <!-- Mockup side -->
+    <div class="ai-mockup reveal">
+      <!-- Player card mockup -->
+      <div class="aim-card">
+        <div class="aim-card-header">
+          <div class="aim-player-name">JAXON B.</div>
+          <div class="aim-ai-badge">🤖 AI Generated</div>
+        </div>
+        <div class="aim-quote">"Jaxon was the heartbeat of this offense all season long. His instincts on the ball and relentless hustle on defense made him one of the most complete players on the roster."</div>
+        <div class="aim-stats-row">
+          <div class="aim-stat"><div class="aim-stat-v">12</div><div class="aim-stat-l">TDs</div></div>
+          <div class="aim-stat"><div class="aim-stat-v">8</div><div class="aim-stat-l">Flags</div></div>
+          <div class="aim-stat"><div class="aim-stat-v">6-2</div><div class="aim-stat-l">Record</div></div>
+        </div>
+      </div>
+      <!-- Auto-email mockup -->
+      <div class="aim-email-card">
+        <div class="aim-email-hdr">
+          <div class="aim-email-dot"></div>
+          <div class="aim-email-from">noreply@cgmaxfftp.com</div>
+          <div class="aim-email-subject">Jaxon's Season Report Card 🏈</div>
+        </div>
+        <div class="aim-email-body">
+          <strong>Hi Sarah,</strong><br>
+          Coach wanted to make sure you saw Jaxon's end-of-season report card from CGMax FFTP. He had an incredible Spring 2025 — read the full card below.<br>
+          <div class="aim-sent-row">
+            <div class="aim-sent-icon">📧</div>
+            <div class="aim-sent-txt">Delivered automatically · No action needed from coach</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- WHAT'S NEW -->
 <section class="new-band" id="new">
   <div class="new-band-inner">
@@ -1136,6 +1243,12 @@ footer{
       <div class="sec-rule"></div>
     </div>
     <div class="new-features-grid">
+      <div class="nf-card reveal">
+        <div class="nf-hot-tag">🤖 AI</div>
+        <div class="nf-icon">🎓</div>
+        <div class="nf-title">AI Season Report Cards</div>
+        <div class="nf-body">Claude AI writes a personalized end-of-season card for every player. Coach shares via text — and parents with consent forms on file get theirs emailed automatically. Every kid gets a moment.</div>
+      </div>
       <div class="nf-card reveal">
         <div class="nf-new-tag">New</div>
         <div class="nf-icon">🤝</div>
@@ -1425,6 +1538,10 @@ footer{
           <div class="pf-row">
             <div class="pf-icon yes-pro">✓</div>
             <div class="pf-text pro-active">Penalty Sound Effects — distinct audio cue on flag press</div>
+          </div>
+          <div class="pf-row">
+            <div class="pf-icon yes-pro">✓</div>
+            <div class="pf-text pro-active">AI Season Report Cards — personalized end-of-season cards per player, auto-emailed to consent-form parents</div>
           </div>
           <div class="pf-row">
             <div class="pf-icon yes-pro">✓</div>
