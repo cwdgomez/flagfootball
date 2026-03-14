@@ -2,7 +2,7 @@
   "name": "CGMax FFTP \u2014 Flag Football Tracker Pro",
   "short_name": "CGMax FFTP",
   "description": "Professional youth flag football coaching app by ITCC LLC. Live stats, smart rotations, MVP rankings.",
-  "start_url": "./app.html",
+  "start_url": "/app.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#080808",

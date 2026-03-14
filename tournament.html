@@ -1025,6 +1025,9 @@
     </div>
 
     <script>
+        // XSS escaping utility
+        function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
         // App State
         const state = {
             isPro: false,
@@ -1415,7 +1418,7 @@
             container.innerHTML = `
                 <div class="champion-container">
                     <div class="champion-icon">🏆</div>
-                    <div class="champion-name">${champion}</div>
+                    <div class="champion-name">${esc(champion)}</div>
                     <div class="champion-label">Tournament Champion</div>
                 </div>
             `;
@@ -1437,7 +1440,7 @@
             tableData.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td class="team-col">${row.team}</td>
+                    <td class="team-col">${esc(row.team)}</td>
                     <td class="num-col">${row.w}</td>
                     <td class="num-col">${row.l}</td>
                     <td class="num-col">${row.pf || 0}</td>
@@ -1528,13 +1531,13 @@
             historyData.slice(0, 10).forEach(t => {
                 html += `
                     <div class="history-card">
-                        <div class="history-card-name">${t.name}</div>
+                        <div class="history-card-name">${esc(t.name)}</div>
                         <div class="history-card-info">
                             <div>📅 ${new Date(t.date).toLocaleDateString()}</div>
                             <div>🏆 ${t.teams.length} Teams</div>
                             <div>${t.format === 'single' ? '🔀 Single Elim' : '🔄 Round Robin'}</div>
                         </div>
-                        ${t.champion ? `<div class="history-card-champion">🎯 ${t.champion}</div>` : ''}
+                        ${t.champion ? `<div class="history-card-champion">🎯 ${esc(t.champion)}</div>` : ''}
                     </div>
                 `;
             });

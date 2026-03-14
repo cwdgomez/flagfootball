@@ -4130,7 +4130,7 @@ async function submitImportCode(){
       var tcKey='ff_tc_'+(ACTIVE_TEAM_ID||'default');
       try{localStorage.setItem(tcKey,JSON.stringify(TC));}
       catch(e){console.warn('[FFTP] roster import — color save failed:',e);}
-      applyTeamColors();
+      saveTeamColors();applyTheme();
     }
 
     // Apply photos (Pro only)
