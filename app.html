@@ -3865,7 +3865,7 @@ function renderRosterScreen(){
     fileInput.setAttribute('onchange','handlePhotoUpload('+idx+',this)');
     photoCol.appendChild(fileInput);
 
-    var isPro=!!localStorage.getItem('ff_pro');
+    var isPro=!!localStorage.getItem('ff_pro_v1');
     var photoLblEl=document.createElement('div');
     photoLblEl.className='rpr-photo-lbl';
     if(isPro){
@@ -7586,6 +7586,8 @@ var SYNC_ENGINE={
         }catch(e){console.error('[Sync] UI refresh after download failed:',e);}
       }
       showSyncIndicator('synced');
+      // After download, upload any local plays that have never been synced to cloud
+      if(typeof syncPlaysIfNeeded==='function')syncPlaysIfNeeded();
     })
     .catch(function(e){
       console.error('Download all error:',e);
@@ -7615,6 +7617,9 @@ function applyCloudData(teamId,dataType,data){
         break;
       case 'photos':
         localStorage.setItem('ff_photos_v1',JSON.stringify(data));
+        break;
+      case 'plays':
+        localStorage.setItem('ff_plays',JSON.stringify(data));
         break;
       case 'teams':
         localStorage.setItem(LS_TEAMS,JSON.stringify(data));
@@ -7692,5 +7697,40 @@ saveNote=function(name,val){
     }catch(e){}
   }
 };
+
+/* ── Hook into savePhotos (Pro-only cloud sync) ── */
+var _origSavePhotos=savePhotos;
+savePhotos=function(p){
+  _origSavePhotos(p);
+  if(CURRENT_USER&&isPro()&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
+    SYNC_ENGINE.queueChange(ACTIVE_TEAM_ID,'photos',p);
+  }
+};
+
+/* ── Plays sync ── */
+// Queue local plays on first login/session-restore if they've never reached the cloud
+function syncPlaysIfNeeded(){
+  if(!CURRENT_USER||!isPro())return;
+  try{
+    var existingPlays=JSON.parse(localStorage.getItem('ff_plays')||'null');
+    if(!existingPlays||(Array.isArray(existingPlays)&&existingPlays.length===0))return;
+    var versionKey='ff_sync_ver:_global:plays';
+    var localVersion=parseInt(localStorage.getItem(versionKey)||'0',10);
+    if(localVersion===0){
+      // Never synced to cloud — queue initial upload
+      SYNC_ENGINE.queueChange('_global','plays',existingPlays);
+    }
+  }catch(e){}
+}
+
+// Detect plays saved by playdesigner.html while it's open in another tab/window
+window.addEventListener('storage',function(e){
+  if(e.key==='ff_plays'&&CURRENT_USER&&isPro()){
+    try{
+      var plays=JSON.parse(e.newValue||'[]');
+      SYNC_ENGINE.queueChange('_global','plays',plays);
+    }catch(err){}
+  }
+});
 </script>
 </html>

@@ -1125,7 +1125,14 @@
             }
 
             teamInputs.innerHTML = '';
-            const userTeam = localStorage.getItem('ff_team') || 'My Team';
+            // Resolve active team name from ff_teams_v1 (same structure as app.html)
+            let userTeam = 'My Team';
+            try {
+              const activeId = localStorage.getItem('ff_active_team') || 'default';
+              const teams = JSON.parse(localStorage.getItem('ff_teams_v1') || '[]');
+              const activeTeam = teams.find(t => t.id === activeId);
+              if (activeTeam && activeTeam.name) userTeam = activeTeam.name;
+            } catch(e) {}
 
             for (let i = 0; i < count; i++) {
                 const input = document.createElement('input');
