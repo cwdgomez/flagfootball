@@ -3197,7 +3197,8 @@ function finalizeGame(){
   // Show recap card for Pro users, then open Season
   if(isPro()){
     var gamesAfter=loadSeason();
-    setTimeout(function(){openRecapCard(us,them,mvps,gamesAfter);},600);
+    var _endQb=G.qb,_endQbSt=playerStats[G.qb]||null;
+    setTimeout(function(){openRecapCard(us,them,mvps,gamesAfter,{qb:_endQb,qbStats:_endQbSt});},600);
   } else {
     setTimeout(function(){openSeason();},900);
   }
@@ -3511,7 +3512,8 @@ function endAndSave(){
   showToast('✅ Game saved!');
   // Show recap card for Pro users, then open Season
   if(isPro()){
-    setTimeout(function(){openRecapCard(us,them,mvps,games);},600);
+    var _eas_qb=G.qb,_eas_qbSt=playerStats[G.qb]||null;
+    setTimeout(function(){openRecapCard(us,them,mvps,games,{qb:_eas_qb,qbStats:_eas_qbSt});},600);
   } else {
     setTimeout(function(){openSeason();},800);
   }
@@ -3598,7 +3600,9 @@ function openSeasonRecap(id,ev){
   openRecapCard(game.us,game.them,sortedPlayers,games,{
     team:game.team,
     opp:game.opp,
-    date:game.date
+    date:game.date,
+    qb:game.qb||null,
+    qbStats:game.playerStats[game.qb]||null
   });
 }
 function rcRectPath(ctx,x,y,w,h,r){
@@ -3609,22 +3613,55 @@ function rcRectPath(ctx,x,y,w,h,r){
   ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
   ctx.closePath();
 }
-// buildRecapCanvas — 5th param gameCtx overrides G.team/G.opp/G.date when
-// building a recap from season history instead of the live game.
+// buildRecapCanvas — 5th param gameCtx carries team/opp/date/qb/qbStats
+// when called from season history; falls back to live G.* values.
 function buildRecapCanvas(us,them,mvps,games,gameCtx){
   var canvas=document.getElementById('recap-canvas');
   var ctx=canvas.getContext('2d');
   var W=720,H=960;
   canvas.width=W;canvas.height=H;
 
-  // Resolve team/opp/date from context or live game
+  // ── Resolve context ──
   var rcTeam=(gameCtx&&gameCtx.team)||G.team||'Team';
   var rcOpp=(gameCtx&&gameCtx.opp)||G.opp||'Opp';
   var rcDate=(gameCtx&&gameCtx.date!==undefined?gameCtx.date:G.date)||null;
+  var rcQb=(gameCtx&&gameCtx.qb)||G.qb||null;
+  var rcQbStats=(gameCtx&&gameCtx.qbStats)||null;
 
   var primary=TC.primary||'#AA0000';
   var secondary=TC.secondary||'#FFD700';
   var result=us>them?'WIN':us<them?'LOSS':'TIE';
+
+  // ── Word-wrap helper: draws text wrapped to maxW, returns line count ──
+  function rcWrapText(text,cx,y,maxW,lineH){
+    var words=text.split(' '),line='',lines=[];
+    for(var n=0;n<words.length;n++){
+      var test=line?line+' '+words[n]:words[n];
+      if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=words[n];}
+      else line=test;
+    }
+    if(line)lines.push(line);
+    for(var i=0;i<lines.length;i++)ctx.fillText(lines[i],cx,y+i*lineH);
+    return lines.length;
+  }
+
+  // ── QB story sentence builder (template-only, no AI) ──
+  function buildQBStory(qbName,qbSt){
+    var first=firstName(qbName);
+    if(!qbSt)return first+' led the team today! Keep grinding!';
+    var td=qbSt.qbTDs||0,fl=qbSt.flags||0,ni=qbSt.qbInts||0,cv=qbSt.qbConvs||0;
+    var opener=td>=5?'was on fire today!':td>=3?'had a fantastic game!':td>=1?'had a great game!':'led the offense today!';
+    var parts=[];
+    if(td>0)parts.push('threw '+td+' TD'+(td>1?' passes':' pass'));
+    if(cv>0)parts.push('connected on '+cv+' conversion'+(cv>1?'s':''));
+    if(fl>0)parts.push('pulled '+fl+' flag'+(fl>1?'s':'')+' on defense');
+    if(ni>0)parts.push('threw '+ni+' INT'+(ni>1?'s':''));
+    var detail='';
+    if(parts.length===1)detail=' He '+parts[0]+'!';
+    else if(parts.length===2)detail=' He '+parts[0]+' and '+parts[1]+'!';
+    else if(parts.length>2){var last=parts.pop();detail=' He '+parts.join(', ')+', and '+last+'!';}
+    return first+' '+opener+detail;
+  }
 
   // ── Background ──
   var bg=ctx.createLinearGradient(0,0,0,H);
@@ -3649,6 +3686,7 @@ function buildRecapCanvas(us,them,mvps,games,gameCtx){
   ctx.font='bold 52px "Bebas Neue",sans-serif';
   ctx.letterSpacing='4px';
   ctx.fillText(rcTeam.toUpperCase(),W/2,80);
+  ctx.letterSpacing='0px';
 
   // ── VS line ──
   ctx.fillStyle='rgba(255,255,255,0.4)';
@@ -3702,25 +3740,36 @@ function buildRecapCanvas(us,them,mvps,games,gameCtx){
   ctx.font='bold 32px "Bebas Neue",sans-serif';
   ctx.fillText(result,W/2,scY+scH/2+11);
 
-  // ── MVP Section ──
+  // ── TOP PERFORMERS — field players only (QB ranked separately below) ──
   var mvpY=scY+scH+28;
   ctx.textAlign='center';
   ctx.fillStyle=rgba(secondary,0.7);
   ctx.font='bold 22px "Bebas Neue",sans-serif';
   ctx.fillText('\u2605  TOP PERFORMERS  \u2605',W/2,mvpY+2);
 
-  var topMvps=mvps.slice(0,3);
-  var cardW=topMvps.length===1?320:topMvps.length===2?290:200;
-  var cardH=180;
-  var totalW=topMvps.length*cardW+(topMvps.length-1)*14;
+  // Filter QB out so field players always get the #1/#2/#3 spots
+  var fieldMvps=mvps.filter(function(m){return m.name!==rcQb;});
+  var topMvps=fieldMvps.slice(0,3);
+  var numCards=topMvps.length;
+  var cardW=numCards===0?200:numCards===1?320:numCards===2?290:200;
+  var cardH=200;
+  var totalW=numCards===0?0:numCards*cardW+(numCards-1)*14;
   var startX=(W-totalW)/2;
   var cardY=mvpY+18;
+
+  if(numCards===0){
+    ctx.fillStyle='rgba(255,255,255,0.3)';
+    ctx.font='500 16px "Barlow Condensed",sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('No field player stats recorded yet',W/2,cardY+30);
+  }
 
   topMvps.forEach(function(mvp,i){
     var cx=startX+i*(cardW+14);
     var isFirst=i===0;
+    var rankColors=['#FFD700','#C0C0C0','#CD7F32'];
 
-    // Card bg
+    // Card background
     rcRectPath(ctx,cx,cardY,cardW,cardH,14);
     var cg=ctx.createLinearGradient(cx,cardY,cx,cardY+cardH);
     cg.addColorStop(0,isFirst?rgba(secondary,0.18):'rgba(255,255,255,0.08)');
@@ -3731,18 +3780,16 @@ function buildRecapCanvas(us,them,mvps,games,gameCtx){
     ctx.lineWidth=isFirst?2:1;ctx.stroke();
 
     // Rank badge
-    var rankColors=['#FFD700','#C0C0C0','#CD7F32'];
     ctx.fillStyle=rankColors[i]||'rgba(255,255,255,0.4)';
     ctx.font='bold '+(isFirst?'22':'18')+'px "Bebas Neue",sans-serif';
     ctx.textAlign='left';
     ctx.fillText('#'+(i+1),cx+12,cardY+24);
 
-    // Name
+    // Player name
     ctx.fillStyle=isFirst?secondary:'rgba(255,255,255,0.85)';
     ctx.font='bold '+(isFirst?'26':'22')+'px "Bebas Neue",sans-serif';
     ctx.textAlign='center';
-    var displayName=firstName(mvp.name);
-    ctx.fillText(displayName.toUpperCase(),cx+cardW/2,cardY+52);
+    ctx.fillText(firstName(mvp.name).toUpperCase(),cx+cardW/2,cardY+52);
 
     // Score
     ctx.fillStyle=isFirst?secondary:'rgba(255,255,255,0.5)';
@@ -3753,18 +3800,62 @@ function buildRecapCanvas(us,them,mvps,games,gameCtx){
     ctx.font='600 14px "Barlow Condensed",sans-serif';
     ctx.fillText('RATING',cx+cardW/2,cardY+118);
 
-    // Why (stats)
+    // Stats — word-wrapped so all stats fit inside the card
     if(mvp.why){
       ctx.fillStyle='rgba(255,255,255,0.55)';
       ctx.font='500 '+(cardW<220?12:13)+'px "Barlow Condensed",sans-serif';
       ctx.textAlign='center';
-      var why=mvp.why.length>28?mvp.why.substring(0,26)+'\u2026':mvp.why;
-      ctx.fillText(why,cx+cardW/2,cardY+cardH-16);
+      rcWrapText(mvp.why,cx+cardW/2,cardY+136,cardW-28,18);
     }
   });
 
+  // ── QB Spotlight (gold box — QB always at the top of his own section) ──
+  var qbBoxY=cardY+cardH+24;
+  var recY=qbBoxY+8; // default season-record position if no QB section
+  if(rcQb){
+    var qbBoxH=96,qbBoxX=80,qbBoxW=W-160;
+
+    // QB box background
+    rcRectPath(ctx,qbBoxX,qbBoxY,qbBoxW,qbBoxH,14);
+    var qbGrad=ctx.createLinearGradient(qbBoxX,qbBoxY,qbBoxX,qbBoxY+qbBoxH);
+    qbGrad.addColorStop(0,'rgba(255,215,0,0.10)');
+    qbGrad.addColorStop(1,'rgba(0,0,0,0.20)');
+    ctx.fillStyle=qbGrad;ctx.fill();
+    rcRectPath(ctx,qbBoxX,qbBoxY,qbBoxW,qbBoxH,14);
+    ctx.strokeStyle=rgba(secondary,0.45);ctx.lineWidth=1.5;ctx.stroke();
+
+    // Section label
+    ctx.textAlign='left';
+    ctx.fillStyle=rgba(secondary,0.55);
+    ctx.font='bold 12px "Barlow Condensed",sans-serif';
+    ctx.letterSpacing='3px';
+    ctx.fillText('\u26A1 QUARTERBACK',qbBoxX+18,qbBoxY+20);
+    ctx.letterSpacing='0px';
+
+    // QB first name
+    ctx.fillStyle=secondary;
+    ctx.font='bold 32px "Bebas Neue",sans-serif';
+    ctx.fillText(firstName(rcQb).toUpperCase(),qbBoxX+18,qbBoxY+54);
+
+    // QB stat line
+    if(rcQbStats){
+      var qbTd=rcQbStats.qbTDs||0,qbNi=rcQbStats.qbInts||0,qbCv=rcQbStats.qbConvs||0,qbFl=rcQbStats.flags||0;
+      ctx.fillStyle='rgba(255,255,255,0.5)';
+      ctx.font='500 14px "Barlow Condensed",sans-serif';
+      ctx.fillText(qbTd+' TDs  \u2022  '+qbNi+' INTs  \u2022  '+qbCv+' Convs  \u2022  '+qbFl+' Flags',qbBoxX+18,qbBoxY+76);
+    }
+
+    // Story blurb — word-wrapped below the QB box
+    var storyStr=buildQBStory(rcQb,rcQbStats);
+    var storyY=qbBoxY+qbBoxH+16;
+    ctx.textAlign='center';
+    ctx.fillStyle='rgba(255,255,255,0.5)';
+    ctx.font='italic 14px "Barlow Condensed",sans-serif';
+    var nStoryLines=rcWrapText(storyStr,W/2,storyY,W-160,20);
+    recY=storyY+nStoryLines*20+22;
+  }
+
   // ── Season Record ──
-  var recY=cardY+cardH+28;
   var wins=0,losses=0,ties=0;
   (games||[]).forEach(function(g){
     if(g.us>g.them)wins++;else if(g.us<g.them)losses++;else ties++;
