@@ -1529,6 +1529,17 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
     <!-- COACH TOOLS SECTION -->
     <div style="margin-top:18px;border-top:1px solid rgba(255,255,255,.07);padding-top:16px;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.58);text-transform:uppercase;margin-bottom:10px;">⚡ Coach Tools</div>
+      <button type="button" onclick="proGate('season',function(){openSeason('setup')})"
+        style="width:100%;display:flex;align-items:center;justify-content:space-between;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.3);border-radius:12px;padding:13px 16px;cursor:pointer;margin-bottom:8px;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">📚</span>
+          <div style="text-align:left;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.9);">Season Stats &amp; History</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:rgba(255,255,255,.45);margin-top:1px;">View games, leaderboard &amp; player cards</div>
+          </div>
+        </div>
+        <span class="pro-badge" style="flex-shrink:0;">PRO</span>
+      </button>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;">
         <button type="button" onclick="proGate('tournament',function(){window.open('./tournament.html','_blank')})"
           style="background:rgba(170,0,0,.12);border:1px solid rgba(170,0,0,.35);border-radius:12px;padding:14px 8px;cursor:pointer;text-align:center;transition:all .2s;">
@@ -3354,14 +3365,17 @@ function switchTab(tab){
   if(tab==='summary')renderSummary();
   if(tab==='rotations')renderRots();
 }
-function openSeason(){
+var _seasonFrom='main'; // 'main' or 'setup' — tracks where to return on Close
+function openSeason(from){
+  _seasonFrom=from||'main';
   document.getElementById('screen-main').classList.remove('active');
+  document.getElementById('screen-setup').classList.remove('active');
   document.getElementById('screen-season').classList.add('active');
   renderSeasonScreen();
 }
 function closeSeason(){
   document.getElementById('screen-season').classList.remove('active');
-  document.getElementById('screen-main').classList.add('active');
+  document.getElementById(_seasonFrom==='setup'?'screen-setup':'screen-main').classList.add('active');
 }
 
 /* ── TOAST / UNDO ── */
@@ -3509,7 +3523,7 @@ function endAndSave(){
 function openRecapCard(us,them,mvps,games,gameCtx){
   var modal=document.getElementById('recap-modal');
   if(!modal)return;
-  buildRecapCanvas(us,them,mvps,games,gameCtx);
+  try{buildRecapCanvas(us,them,mvps,games,gameCtx);}catch(e){console.error('Recap canvas error:',e);}
   modal.classList.add('open');
   var rcTeamName=(gameCtx&&gameCtx.team)||G.team||'Team';
   var rcOppName=(gameCtx&&gameCtx.opp)||G.opp||'Opp';
@@ -3552,7 +3566,7 @@ function openRecapCard(us,them,mvps,games,gameCtx){
 function closeRecapCard(){
   var modal=document.getElementById('recap-modal');
   if(modal)modal.classList.remove('open');
-  setTimeout(function(){openSeason();},300);
+  setTimeout(function(){openSeason(_seasonFrom);},300);
 }
 
 /* ── Open the canvas Game Recap from Season History ──────────────────── */
@@ -3614,7 +3628,7 @@ function buildRecapCanvas(us,them,mvps,games,gameCtx){
 
   // ── Background ──
   var bg=ctx.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,darken(primary,0.85));
+  bg.addColorStop(0,darken(primary,80));
   bg.addColorStop(1,'#0a0a0a');
   ctx.fillStyle=bg;
   ctx.fillRect(0,0,W,H);

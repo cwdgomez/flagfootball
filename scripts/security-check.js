@@ -278,9 +278,11 @@ function checkA03_Injection() {
       pass('A03', 'No eval() usage found');
     }
 
-    // document.write() (excluding print window usage)
+    // document.write() (excluding print/popup window usage)
+    // Safe pattern: w.document.write('<!DOCTYPE html>...') or w.document.write('<html...')
+    // where w is a window.open() handle — no user data is written.
     const docWriteHits = findLines(appContent, /document\.write\s*\(/)
-      .filter(({ text }) => !/window\.open|print|'<html|"<html/.test(text));
+      .filter(({ text }) => !/window\.open|print|'<!DOCTYPE|"<!DOCTYPE|'<html|"<html/.test(text));
     if (docWriteHits.length) {
       fail('A03', `Unsafe document.write() usage (${docWriteHits.length} hit)`,
         docWriteHits.slice(0,3).map(m => `Line ${m.line}: ${m.text}`).join('\n         '));
@@ -635,7 +637,10 @@ function checkA07_AuthFailures() {
   // but flag if anything that looks like a session token is there
   const appContent = readFile(path.join(ROOT, 'app.html'));
   if (appContent) {
-    const sessionStorage = findLines(appContent, /localStorage\.setItem\s*\([^)]*(?:session|access_token|refresh_token)/i);
+    // Only flag when the localStorage KEY is a string literal containing sensitive words.
+    // Variable names that happen to contain "session" (e.g. LS_LIVE_SESSION which stores
+    // a 6-char game code) are not auth tokens and should not trigger this warning.
+    const sessionStorage = findLines(appContent, /localStorage\.setItem\s*\(\s*['"][^'"]*(?:session|access_token|refresh_token)/i);
     if (sessionStorage.length) {
       warn('A07', `Supabase session tokens stored in localStorage (${sessionStorage.length} hit) — XSS can steal them; consider httpOnly cookies if you move to SSR`,
         sessionStorage.slice(0,3).map(m => `Line ${m.line}: ${m.text}`).join('\n         '));
