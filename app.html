@@ -4030,8 +4030,13 @@ function closeEditGame(){
   _editGameId=null;
 }
 
-/* ══ STAT CARDS ══════════════════════════════════════════════════════════ */
+/* ══ STAT CARDS — SEASON HISTORY ═════════════════════════════════════════
+   Opens the full canvas stat-card overlay from a saved game.
+   _scSavedGame tracks which saved game is active so renderStatCard can
+   read from it instead of the live G.stats.
+══════════════════════════════════════════════════════════════════════════ */
 var _scGameId=null;
+var _scSavedGame=null;   // set when viewing a saved-game card; null in live mode
 
 function openStatCards(id,ev){
   if(ev&&ev.stopPropagation)ev.stopPropagation();
@@ -4040,27 +4045,43 @@ function openStatCards(id,ev){
   for(var gi=0;gi<games.length;gi++){if(games[gi].id===id){game=games[gi];break;}}
   if(!game)return;
   _scGameId=id;
-  var result=game.us>game.them?'WIN':game.us<game.them?'LOSS':'TIE';
-  var dateStr=game.date?new Date(game.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
-  document.getElementById('scm-subtitle').textContent=(game.team||'')+(game.opp?' vs. '+game.opp:'')+' · '+result+' '+game.us+'–'+game.them+(dateStr?' · '+dateStr:'');
+  _scSavedGame=game;   // tell renderStatCard to use saved data
 
-  // Order: QB first, then rest sorted — present players only, absent excluded
+  // Build player list: QB first, then alphabetical; absent excluded
   var absentList=game.absent||[];
-  var presentPlayers=Object.keys(game.playerStats||{}).filter(function(n){return absentList.indexOf(n)<0;});
-  // QB first
-  presentPlayers.sort(function(a,b){
-    if(a===game.qb)return -1;if(b===game.qb)return 1;return a.localeCompare(b);
-  });
+  var presentPlayers=Object.keys(game.playerStats||{})
+    .filter(function(n){return absentList.indexOf(n)<0;})
+    .sort(function(a,b){if(a===game.qb)return -1;if(b===game.qb)return 1;return a.localeCompare(b);});
 
   if(!presentPlayers.length){
-    document.getElementById('scm-cards').innerHTML='<div style="text-align:center;padding:32px;color:var(--dimmer);font-family:\'Barlow Condensed\',sans-serif;font-size:15px">No player stats recorded for this game.</div>';
-  }else{
-    document.getElementById('scm-cards').innerHTML=presentPlayers.map(function(name){
-      return _buildStatCard(name,game);
-    }).join('');
+    showToast('No player stats recorded for this game.');
+    return;
   }
-  document.getElementById('statcards-modal').classList.add('open');
-  document.getElementById('statcards-modal').scrollTop=0;
+
+  // Open the canvas overlay and populate the player picker
+  var overlay=document.getElementById('statcard-overlay');
+  var grid=document.getElementById('statcard-player-grid');
+  grid.innerHTML='';
+  presentPlayers.forEach(function(name){
+    var btn=document.createElement('button');
+    btn.className='statcard-player-btn';
+    btn.textContent=firstName(name)+(name===game.qb?' ⚡':'')+(name===game.mvp?' ⭐':'');
+    btn.onclick=function(){
+      grid.querySelectorAll('.statcard-player-btn').forEach(function(b){b.classList.remove('sel');});
+      btn.classList.add('sel');
+      _statCardPlayer=name;
+      renderStatCard(name,_scSavedGame);
+    };
+    grid.appendChild(btn);
+  });
+
+  // Auto-select MVP if present, else first player
+  var autoName=game.mvp&&presentPlayers.indexOf(game.mvp)>=0?game.mvp:presentPlayers[0];
+  _statCardPlayer=autoName;
+  var autoIdx=presentPlayers.indexOf(autoName);
+  if(autoIdx>=0)grid.children[autoIdx].classList.add('sel');
+  renderStatCard(autoName,_scSavedGame);
+  overlay.classList.add('show');
 }
 
 function closeStatCards(){
@@ -4778,6 +4799,9 @@ var _statCardPlayer=null;
 var _statCardFontsLoaded=false;
 
 function openProStatCard(){
+  // Live game mode — clear any saved-game context so renderStatCard reads from G.stats
+  _scSavedGame=null;
+  _scGameId=null;
   var overlay=document.getElementById('statcard-overlay');
   var grid=document.getElementById('statcard-player-grid');
   grid.innerHTML='';
@@ -4804,43 +4828,78 @@ function openProStatCard(){
   }
   overlay.classList.add('show');
 }
-function closeProStatCard(){document.getElementById('statcard-overlay').classList.remove('show');}
+function closeProStatCard(){
+  document.getElementById('statcard-overlay').classList.remove('show');
+  // Clear saved-game context so next live-game open starts fresh
+  _scSavedGame=null;
+  _scGameId=null;
+}
 
-function renderStatCard(name){
+// renderStatCard — draws one player's image stat card onto #statcard-canvas.
+// Called with just a name for LIVE game cards (reads from G.stats).
+// Called with (name, savedGame) for SEASON history cards (reads from savedGame.playerStats).
+function renderStatCard(name, savedGame){
   var canvas=document.getElementById('statcard-canvas');
   var ctx=canvas.getContext('2d');
   var W=1080,H=1350;
   canvas.width=W;canvas.height=H;
 
+  // ── Resolve colours: prefer saved game team colours, fall back to current ──
   var p=TC.primary,s=TC.secondary;
+  if(savedGame&&savedGame.tc){p=savedGame.tc.primary||p;s=savedGame.tc.secondary||s;}
   var pRgb=hexToRgb(p),sRgb=hexToRgb(s);
   var p2=darken(p,60);
-  var isQB=(name===G.qb);
+
+  // ── Resolve game context ──
+  var isQB, us, them, result, rank, dateStr2;
+  var c=0,t=0,f=0,ii=0,cv=0,qbt=0,qbi=0,qbc=0,fu=0,bl=0,score=0,offSnaps=0,defSnaps=0;
+  var teamName, oppName;
+
+  if(savedGame){
+    // Season mode — read from aggregated playerStats
+    isQB=(name===savedGame.qb);
+    us=savedGame.us||0; them=savedGame.them||0;
+    result=us>them?'WIN':us<them?'LOSS':'TIE';
+    // Determine rank from saved game playerStats scores
+    var allScores=Object.keys(savedGame.playerStats||{})
+      .filter(function(n){return (savedGame.absent||[]).indexOf(n)<0;})
+      .map(function(n){return {name:n,score:(savedGame.playerStats[n]||{}).score||0};})
+      .sort(function(a,b){return b.score-a.score;});
+    rank=-1;
+    allScores.forEach(function(m,i){if(m.name===name)rank=i;});
+    dateStr2=savedGame.date?new Date(savedGame.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).toUpperCase():'';
+    var st2=savedGame.playerStats[name]||{};
+    c=st2.catches||0; t=st2.tds||0; f=st2.flags||0; ii=st2.ints||0;
+    cv=st2.conv||0; qbt=st2.qbTDs||0; qbi=st2.qbInts||0; qbc=st2.qbConvs||0;
+    fu=st2.fumbles||0; bl=st2.blocks||0; score=st2.score||0;
+    offSnaps=st2.snapO||0; defSnaps=st2.snapD||0;
+    teamName=savedGame.team||'US'; oppName=savedGame.opp||'OPP';
+  }else{
+    // Live game mode — read from current G.stats
+    isQB=(name===G.qb);
+    us=G.scores.us.reduce(function(a,b){return a+b;},0);
+    them=G.scores.them.reduce(function(a,b){return a+b;},0);
+    result=us>them?'WIN':us<them?'LOSS':'TIE';
+    var mvps=mvpCalc();
+    rank=-1;
+    mvps.forEach(function(m,i){if(m.name===name)rank=i;});
+    dateStr2=G.date?new Date(G.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).toUpperCase():'';
+    for(var q=1;q<=G.quarters;q++){
+      var st=G.stats[name][q];
+      c+=st.catches;t+=st.tds;f+=st.flags;ii+=st.ints;
+      cv+=st.conv1+st.conv2;qbt+=st.qbTDs;qbi+=st.qbInts;qbc+=st.qbConvs;
+      fu+=st.fumbles||0;bl+=st.blocks||0;
+    }
+    score=qbt*5+t*10+ii*12+c*3+f*2+cv*4+qbc*4-qbi*3+bl*6-fu*4;
+    for(var q2=1;q2<=G.quarters;q2++){
+      var r=G.rots[name][q2];
+      offSnaps+=r.offSnaps+(r.onField==='off'?1:0);
+      defSnaps+=r.defSnaps+(r.onField==='def'?1:0);
+    }
+    teamName=G.team||'US'; oppName=G.opp||'OPP';
+  }
+
   var num=jerseyNum(name);
-  var us=G.scores.us.reduce(function(a,b){return a+b;},0);
-  var them=G.scores.them.reduce(function(a,b){return a+b;},0);
-  var result=us>them?'WIN':us<them?'LOSS':'TIE';
-  var mvps=mvpCalc();
-  var rank=-1;
-  mvps.forEach(function(m,i){if(m.name===name)rank=i;});
-
-  // Collect stats
-  var c=0,t=0,f=0,ii=0,cv=0,qbt=0,qbi=0,qbc=0,fu=0,bl=0;
-  for(var q=1;q<=G.quarters;q++){
-    var st=G.stats[name][q];
-    c+=st.catches;t+=st.tds;f+=st.flags;ii+=st.ints;
-    cv+=st.conv1+st.conv2;qbt+=st.qbTDs;qbi+=st.qbInts;qbc+=st.qbConvs;
-    fu+=st.fumbles||0;bl+=st.blocks||0;
-  }
-  var score=qbt*5+t*10+ii*12+c*3+f*2+cv*4+qbc*4-qbi*3+bl*6-fu*4;
-
-  // Snap count
-  var offSnaps=0,defSnaps=0;
-  for(var q2=1;q2<=G.quarters;q2++){
-    var r=G.rots[name][q2];
-    offSnaps+=r.offSnaps+(r.onField==='off'?1:0);
-    defSnaps+=r.defSnaps+(r.onField==='def'?1:0);
-  }
 
   // ── BACKGROUND ──
   // Gradient from team primary — slower, more breathable fade
@@ -4893,7 +4952,6 @@ function renderStatCard(name){
   ctx.textAlign='right';
   ctx.fillStyle='rgba(255,255,255,.35)';
   ctx.letterSpacing='3px';
-  var dateStr2=G.date?new Date(G.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).toUpperCase():'';
   ctx.fillText(dateStr2,W-42,43);
   ctx.letterSpacing='0px';
 
@@ -5025,10 +5083,10 @@ function renderStatCard(name){
   ctx.letterSpacing='2px';
   ctx.fillStyle='rgba('+sRgb.r+','+sRgb.g+','+sRgb.b+',.6)';
   ctx.textAlign='right';
-  ctx.fillText((G.team||'US').toUpperCase(),W/2-30,scoreY+26);
+  ctx.fillText(teamName.toUpperCase(),W/2-30,scoreY+26);
   ctx.fillStyle='rgba(255,255,255,.3)';
   ctx.textAlign='left';
-  ctx.fillText((G.opp||'OPP').toUpperCase(),W/2+30,scoreY+26);
+  ctx.fillText(oppName.toUpperCase(),W/2+30,scoreY+26);
   ctx.letterSpacing='0px';
 
   // Result badge
@@ -5212,10 +5270,14 @@ function downloadStatCard(){
 
 function shareStatCard(){
   var canvas=document.getElementById('statcard-canvas');
+  // Re-render with current context before sharing to make sure canvas is up to date
+  if(_statCardPlayer)renderStatCard(_statCardPlayer,_scSavedGame||null);
+  var teamLabel=_scSavedGame?(_scSavedGame.team||'Team'):G.team;
+  var oppLabel=_scSavedGame?(_scSavedGame.opp||'Opp'):G.opp;
   canvas.toBlob(function(blob){
     if(navigator.share&&navigator.canShare){
       var file=new File([blob],firstName(_statCardPlayer).toLowerCase()+'_statcard.png',{type:'image/png'});
-      var shareData={files:[file],title:firstName(_statCardPlayer)+' — Game Stats',text:G.team+' vs '+G.opp+' | Tracked with CGMax FFTP'};
+      var shareData={files:[file],title:firstName(_statCardPlayer)+' — Game Stats',text:teamLabel+' vs '+oppLabel+' | Tracked with CGMax FFTP'};
       if(navigator.canShare(shareData)){
         navigator.share(shareData).catch(function(){downloadStatCard();});
         return;
@@ -5318,14 +5380,15 @@ if('serviceWorker' in navigator){
   },{passive:true});
 
   document.addEventListener('touchstart',function(e){
-    // ── CRITICAL FIX: completely disable PTR during an active game ──
-    // Prevents accidental page reloads that kill live sessions and lose stats
-    var mainScreen=document.getElementById('screen-main');
-    if(mainScreen&&mainScreen.classList.contains('active'))return;
-    // ── CRITICAL FIX: disable PTR when edit-game-modal is open ──
+    // ── PTR GUARD: only allow PTR on the setup screen ──
+    // Season, active game, roster, trend, and any open modal all block it.
+    // This is the safest approach — PTR on those screens causes reloads that
+    // kill live sessions, lose stats, and disrupt parents/stat coach.
+    var setupScreen=document.getElementById('screen-setup');
+    if(!setupScreen||!setupScreen.classList.contains('active'))return;
+    // Also block if any fixed overlay/modal is open on top of setup
     var editModal=document.getElementById('edit-game-modal');
     if(editModal&&editModal.classList.contains('open'))return;
-    // ── CRITICAL FIX: disable PTR when stat cards modal is open ──
     var scModal=document.getElementById('statcards-modal');
     if(scModal&&scModal.classList.contains('open'))return;
     // Only activate PTR when already at the very top
@@ -6451,6 +6514,10 @@ var syncSession=null;
 var syncActive=false;
 var syncInterval=null;
 var syncPushPending=false;
+// ── Heartbeat: persists live session keys to localStorage every 5 s while
+// a live session is active.  This ensures the data is always current even
+// if iOS Safari skips the beforeunload / pagehide event on a hard refresh.
+var _persistInterval=null;
 var LIVE_GAME_URL='https://api.cgmaxfftp.com/api/live-game';
 
 /* ── PERSISTENT LIVE SESSION KEYS ──
@@ -6502,10 +6569,12 @@ function restoreLiveSession(){
     if(scBtn){scBtn.style.display='flex';}
     var strip=document.getElementById('quick-action-strip');
     if(strip){strip.style.gridTemplateColumns='1fr 1fr 1fr 1fr';}
-    // Resume pushing live data every 15s
+    // Resume pushing live data every 15s + restart persist heartbeat
     syncPush();
     if(syncInterval)clearInterval(syncInterval);
     syncInterval=setInterval(function(){if(syncActive)syncPush();},15000);
+    if(_persistInterval)clearInterval(_persistInterval);
+    _persistInterval=setInterval(function(){if(syncActive)persistLiveState();},5000);
     // Reconnect co-coach channel if it was active
     if(wasCocoach){
       startCocoachChannel();
@@ -6555,6 +6624,10 @@ function hostSession(){
   syncPush();
   if(syncInterval)clearInterval(syncInterval);
   syncInterval=setInterval(function(){if(syncActive)syncPush();},15000);
+  // Persist heartbeat — writes session keys every 5 s so iOS hard-refresh
+  // never finds stale/missing localStorage and kills the live link.
+  if(_persistInterval)clearInterval(_persistInterval);
+  _persistInterval=setInterval(function(){if(syncActive)persistLiveState();},5000);
   // Start co-coach realtime channel
   startCocoachChannel();
 }
@@ -6564,6 +6637,7 @@ function stopLiveSync(){
   syncActive=false;
   clearPersistedLiveState();
   if(syncInterval){clearInterval(syncInterval);syncInterval=null;}
+  if(_persistInterval){clearInterval(_persistInterval);_persistInterval=null;}
   var licenseKey=localStorage.getItem(LS_LICENSE)||'';
   if(syncSession&&licenseKey){
     fetch(LIVE_GAME_URL,{
