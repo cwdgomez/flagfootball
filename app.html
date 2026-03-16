@@ -595,6 +595,23 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 /* Game card stat-cards button */
 .ghc-cards{background:none;border:1px solid var(--dark5);border-radius:8px;padding:6px 10px;font-size:15px;cursor:pointer;min-height:40px;min-width:40px;color:var(--txt);}
 .ghc-cards:hover{background:var(--dark3);}
+/* ── Needs Action widget ── */
+.na-section{margin:16px 0 8px;padding:14px 14px 10px;background:var(--dark2);border:1px solid var(--dark5);border-radius:14px;}
+.na-header{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--txt);margin-bottom:2px;}
+.na-header .na-icon{font-size:18px;}
+.na-subtitle{font-size:12px;color:var(--txt3);margin-bottom:10px;}
+.na-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--dark3);border-radius:10px;margin-bottom:6px;}
+.na-row:last-child{margin-bottom:0;}
+.na-rank{font-size:18px;flex-shrink:0;}
+.na-name{font-size:14px;font-weight:600;color:var(--txt);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.na-snaps{font-size:12px;color:var(--txt3);flex-shrink:0;}
+.na-tags{display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0;}
+.na-tag{font-size:11px;font-weight:600;padding:3px 7px;border-radius:20px;white-space:nowrap;}
+.na-tag.zero-snaps{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3);}
+.na-tag.zero-catches{background:rgba(251,146,60,.15);color:#fb923c;border:1px solid rgba(251,146,60,.3);}
+.na-tag.zero-tds{background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3);}
+.na-tag.low-snaps{background:rgba(100,116,139,.15);color:#94a3b8;border:1px solid rgba(100,116,139,.3);}
+.na-empty{font-size:13px;color:var(--txt3);text-align:center;padding:6px 0;}
 
 .season-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
 .sact-btn{flex:1;min-width:100px;border-radius:10px;padding:11px 8px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid;text-align:center;}
@@ -1711,7 +1728,7 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
     <div class="nav-tab" role="tab" aria-selected="false" aria-controls="panel-summary" onclick="switchTab('summary')">🏆 Summary</div>
     <div class="nav-tab" role="tab" aria-selected="false" onclick="proGate('season',openSeason)">📚 Season<span class="pro-badge">PRO</span></div>
   </nav>
-  <div id="panel-stats" class="panel active"><div class="player-list" id="player-list"></div></div>
+  <div id="panel-stats" class="panel active"><div class="player-list" id="player-list"></div><div id="needs-action-panel"></div></div>
   <div id="panel-rotations" class="panel"><div id="rot-content"></div></div>
   <div id="panel-summary" class="panel"><div id="sum-content"></div></div>
 </div>
@@ -2763,7 +2780,7 @@ function startGame(){
 }
 
 /* ── RENDER ALL ── */
-function renderAll(){updateHeader();renderQBar();renderScore();renderStats();renderRots();scheduleAutoSave();}
+function renderAll(){updateHeader();renderQBar();renderScore();renderStats();renderNeedsAction();renderRots();scheduleAutoSave();}
 
 function updateHeader(){
   var d=G.date?' · '+new Date(G.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';
@@ -2874,6 +2891,71 @@ function renderStats(){
   });
 }
 
+function renderNeedsAction(){
+  var panel=document.getElementById('needs-action-panel');
+  if(!panel)return;
+  // Only show during an active game (at least one quarter played)
+  var present=ALL_PLAYERS.filter(function(n){return n!==G.qb&&!isAbsent(n);});
+  if(present.length===0){panel.innerHTML='';return;}
+
+  // Accumulate totals across ALL quarters played so far
+  var playerData=present.map(function(name){
+    var totalOff=0,totalDef=0,totalCatches=0,totalTDs=0,totalTouches=0;
+    for(var q=1;q<=G.cq;q++){
+      var r=G.rots[name][q];
+      var snap=(r.offSnaps||0)+(r.defSnaps||0);
+      // Count being on field right now as a partial snap
+      if(q===G.cq){
+        if(r.onField==='off')snap+=0.5;
+        if(r.onField==='def')snap+=0.5;
+      }
+      totalOff+=r.offSnaps+(q===G.cq&&r.onField==='off'?0.5:0);
+      totalDef+=r.defSnaps+(q===G.cq&&r.onField==='def'?0.5:0);
+      var st=G.stats[name][q];
+      totalCatches+=st.catches||0;
+      totalTDs+=st.tds||0;
+      totalTouches+=(st.catches||0)+(st.tds||0)+(st.flags||0)+(st.ints||0)+(st.blocks||0);
+    }
+    var totalSnaps=totalOff+totalDef;
+    // Neglect score: lower = needs more action (snaps weighted heavily)
+    var neglect=totalSnaps*100+totalTouches;
+    return{name:name,snaps:totalSnaps,catches:totalCatches,tds:totalTDs,touches:totalTouches,neglect:neglect};
+  });
+
+  // Only show widget if game has actually started (someone has a snap or stat)
+  var gameStarted=playerData.some(function(p){return p.snaps>0||p.touches>0;});
+  if(!gameStarted){panel.innerHTML='';return;}
+
+  // Sort ascending by neglect (lowest participation first), take top 3
+  var sorted=playerData.slice().sort(function(a,b){return a.neglect-b.neglect;});
+  var top3=sorted.slice(0,3);
+
+  var medals=['🥇','🥈','🥉'];
+  var rows=top3.map(function(p,i){
+    var tags='';
+    if(p.snaps===0){
+      tags+='<span class="na-tag zero-snaps">0 snaps</span>';
+    } else if(p.snaps<2){
+      tags+='<span class="na-tag low-snaps">low play time</span>';
+    }
+    if(p.catches===0)tags+='<span class="na-tag zero-catches">0 catches</span>';
+    if(p.tds===0)tags+='<span class="na-tag zero-tds">0 TDs</span>';
+    var snapLabel=Math.floor(p.snaps)+(p.snaps%1>=0.5?'½':'')+' snap'+(p.snaps!==1?'s':'');
+    return '<div class="na-row">'
+      +'<div class="na-rank">'+medals[i]+'</div>'
+      +'<div class="na-name">'+esc(dispName(p.name))+'</div>'
+      +(tags?'<div class="na-tags">'+tags+'</div>':'')
+      +'<div class="na-snaps">'+snapLabel+'</div>'
+      +'</div>';
+  }).join('');
+
+  panel.innerHTML='<div class="na-section">'
+    +'<div class="na-header"><span class="na-icon">⚠️</span>Needs Action</div>'
+    +'<div class="na-subtitle">Top 3 least-involved players — force a play their way!</div>'
+    +rows
+    +'</div>';
+}
+
 function toggleP(name){G.expP=G.expP===name?null:name;renderStats();}
 
 function logStat(name,key,ev){
@@ -2884,6 +2966,7 @@ function logStat(name,key,ev){
   showToast(firstName(name)+' · '+(lbl[key]||key));
   if(ev&&ev.currentTarget){ev.currentTarget.classList.add('pop');setTimeout(function(){try{ev.currentTarget.classList.remove('pop');}catch(e){}},240);}
   renderStats();
+  renderNeedsAction();
   if(G.tab==='summary')renderSummary();
   broadcastGameStateToCoach();
 }
@@ -3421,25 +3504,28 @@ function endAndSave(){
 }
 
 /* ── POST-GAME RECAP CARD ── */
-function openRecapCard(us,them,mvps,games){
+// openRecapCard — optional 5th param gameCtx overrides G.* when called from
+// season history (openSeasonRecap) instead of the live end-game flow.
+function openRecapCard(us,them,mvps,games,gameCtx){
   var modal=document.getElementById('recap-modal');
   if(!modal)return;
-  buildRecapCanvas(us,them,mvps,games);
+  buildRecapCanvas(us,them,mvps,games,gameCtx);
   modal.classList.add('open');
+  var rcTeamName=(gameCtx&&gameCtx.team)||G.team||'Team';
+  var rcOppName=(gameCtx&&gameCtx.opp)||G.opp||'Opp';
   // Share button
   document.getElementById('recap-share-btn').onclick=function(){
     var canvas=document.getElementById('recap-canvas');
     canvas.toBlob(function(blob){
       var result=us>them?'WIN':us<them?'LOSS':'TIE';
-      var fileName=G.team.replace(/\s+/g,'_')+'_vs_'+G.opp.replace(/\s+/g,'_')+'_recap.png';
+      var fileName=rcTeamName.replace(/\s+/g,'_')+'_vs_'+rcOppName.replace(/\s+/g,'_')+'_recap.png';
       var file=new File([blob],fileName,{type:'image/png'});
-      var shareText=result==='WIN'?'We won! '+us+'\u2013'+them+' vs '+G.opp+' \ud83c\udfc6':
-                    result==='LOSS'?'Final score: '+us+'\u2013'+them+' vs '+G.opp:
-                    'It\'s a tie! '+us+'\u2013'+them+' vs '+G.opp;
+      var shareText=result==='WIN'?'We won! '+us+'\u2013'+them+' vs '+rcOppName+' \ud83c\udfc6':
+                    result==='LOSS'?'Final score: '+us+'\u2013'+them+' vs '+rcOppName:
+                    'It\'s a tie! '+us+'\u2013'+them+' vs '+rcOppName;
       if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-        navigator.share({title:G.team+' Recap',text:shareText,files:[file]}).catch(function(){});
+        navigator.share({title:rcTeamName+' Recap',text:shareText,files:[file]}).catch(function(){});
       } else {
-        // Fallback: download
         var a=document.createElement('a');
         a.href=URL.createObjectURL(blob);
         a.download=fileName;
@@ -3453,7 +3539,7 @@ function openRecapCard(us,them,mvps,games){
     var canvas=document.getElementById('recap-canvas');
     var a=document.createElement('a');
     a.href=canvas.toDataURL('image/png');
-    a.download=G.team.replace(/\s+/g,'_')+'_recap.png';
+    a.download=rcTeamName.replace(/\s+/g,'_')+'_recap.png';
     a.click();
   };
   // Skip button
@@ -3468,6 +3554,39 @@ function closeRecapCard(){
   if(modal)modal.classList.remove('open');
   setTimeout(function(){openSeason();},300);
 }
+
+/* ── Open the canvas Game Recap from Season History ──────────────────── */
+function openSeasonRecap(id,ev){
+  if(ev&&ev.stopPropagation)ev.stopPropagation();
+  var games=loadSeason();
+  var game=null;
+  for(var gi=0;gi<games.length;gi++){if(games[gi].id===id){game=games[gi];break;}}
+  if(!game)return;
+
+  // Build MVP list from saved playerStats scores (desc order)
+  var absentList=game.absent||[];
+  var sortedPlayers=Object.keys(game.playerStats||{})
+    .filter(function(n){return absentList.indexOf(n)<0;})
+    .map(function(n){
+      var st=game.playerStats[n]||{};
+      // Build a "why" string for the recap card
+      var parts=[];
+      if(st.qbTDs)parts.push(st.qbTDs+' TD pass'+(st.qbTDs>1?'es':''));
+      if(st.tds)parts.push(st.tds+' TD'+(st.tds>1?'s':''));
+      if(st.ints)parts.push(st.ints+' INT'+(st.ints>1?'s':''));
+      if(st.catches)parts.push(st.catches+' catch'+(st.catches>1?'es':''));
+      if(st.flags)parts.push(st.flags+' flag'+(st.flags>1?'s':''));
+      if(st.blocks)parts.push(st.blocks+' block'+(st.blocks>1?'s':''));
+      return{name:n,score:st.score||0,why:parts.join(', ')};
+    })
+    .sort(function(a,b){return b.score-a.score;});
+
+  openRecapCard(game.us,game.them,sortedPlayers,games,{
+    team:game.team,
+    opp:game.opp,
+    date:game.date
+  });
+}
 function rcRectPath(ctx,x,y,w,h,r){
   ctx.beginPath();
   ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
@@ -3476,11 +3595,18 @@ function rcRectPath(ctx,x,y,w,h,r){
   ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
   ctx.closePath();
 }
-function buildRecapCanvas(us,them,mvps,games){
+// buildRecapCanvas — 5th param gameCtx overrides G.team/G.opp/G.date when
+// building a recap from season history instead of the live game.
+function buildRecapCanvas(us,them,mvps,games,gameCtx){
   var canvas=document.getElementById('recap-canvas');
   var ctx=canvas.getContext('2d');
   var W=720,H=960;
   canvas.width=W;canvas.height=H;
+
+  // Resolve team/opp/date from context or live game
+  var rcTeam=(gameCtx&&gameCtx.team)||G.team||'Team';
+  var rcOpp=(gameCtx&&gameCtx.opp)||G.opp||'Opp';
+  var rcDate=(gameCtx&&gameCtx.date!==undefined?gameCtx.date:G.date)||null;
 
   var primary=TC.primary||'#AA0000';
   var secondary=TC.secondary||'#FFD700';
@@ -3508,15 +3634,15 @@ function buildRecapCanvas(us,them,mvps,games){
   ctx.fillStyle=secondary;
   ctx.font='bold 52px "Bebas Neue",sans-serif';
   ctx.letterSpacing='4px';
-  ctx.fillText(G.team.toUpperCase(),W/2,80);
+  ctx.fillText(rcTeam.toUpperCase(),W/2,80);
 
   // ── VS line ──
   ctx.fillStyle='rgba(255,255,255,0.4)';
   ctx.font='500 26px "Barlow Condensed",sans-serif';
-  ctx.fillText('VS  '+G.opp.toUpperCase(),W/2,116);
+  ctx.fillText('VS  '+rcOpp.toUpperCase(),W/2,116);
 
   // ── Date ──
-  var dateStr=G.date?new Date(G.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+  var dateStr=rcDate?new Date(rcDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
   ctx.fillStyle='rgba(255,255,255,0.35)';
   ctx.font='500 20px "Barlow Condensed",sans-serif';
   ctx.fillText(dateStr,W/2,144);
@@ -3548,8 +3674,8 @@ function buildRecapCanvas(us,them,mvps,games){
   // Score labels
   ctx.fillStyle='rgba(255,255,255,0.3)';
   ctx.font='600 18px "Barlow Condensed",sans-serif';
-  ctx.fillText(G.team.toUpperCase(),200,scY+24);
-  ctx.fillText(G.opp.toUpperCase(),W-200,scY+24);
+  ctx.fillText(rcTeam.toUpperCase(),200,scY+24);
+  ctx.fillText(rcOpp.toUpperCase(),W-200,scY+24);
 
   // ── Result badge ──
   var badgeColors={WIN:[secondary,'#5a3a00'],LOSS:['rgba(255,255,255,0.7)','rgba(0,0,0,0.4)'],TIE:['rgba(180,180,180,0.9)','rgba(0,0,0,0.3)']};
@@ -3890,7 +4016,8 @@ function renderSeasonScreen(){
         +'</div>'
         +'<div style="display:flex;align-items:center;gap:6px">'
           +'<div class="ghc-result '+result+'">'+(result==='win'?'W':result==='loss'?'L':'T')+' '+g.us+'–'+g.them+'</div>'
-          +'<button type="button" class="ghc-cards" onclick="openStatCards('+g.id+',event)" title="View stat cards">📊</button>'
+          +'<button type="button" class="ghc-cards" onclick="openSeasonRecap('+g.id+',event)" title="Share game recap">📤</button>'
+          +'<button type="button" class="ghc-cards" onclick="openStatCards('+g.id+',event)" title="Player stat cards">📊</button>'
           +'<button type="button" class="ghc-edit" onclick="openEditGame('+g.id+',event)" title="Edit stats">✏️</button>'
           +'<button type="button" class="ghc-del" onclick="deleteGame('+g.id+',event)">🗑</button>'
         +'</div>'
