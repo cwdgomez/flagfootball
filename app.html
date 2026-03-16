@@ -525,22 +525,37 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .no-games{text-align:center;padding:32px;font-family:'Barlow Condensed',sans-serif;font-size:15px;color:var(--dimmer);}
 
 /* ── EDIT GAME MODAL ── */
-#edit-game-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 10px 80px;}
+#edit-game-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.88);align-items:flex-start;justify-content:center;overflow-y:auto;padding:16px 10px 80px;-webkit-overflow-scrolling:touch;}
 #edit-game-modal.open{display:flex;}
-.egm-card{width:100%;max-width:500px;background:var(--sur);border:1px solid var(--dark5);border-radius:16px;padding:20px;margin-top:10px;}
-.egm-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--s);margin-bottom:12px;}
-.egm-section{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin:14px 0 6px 2px;}
-.egm-score-row{display:flex;gap:12px;align-items:center;margin-bottom:6px;}
-.egm-score-label{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,.7);min-width:80px;}
-.egm-score-input{flex:1;background:var(--dark3);border:1px solid var(--dark5);border-radius:8px;padding:8px 10px;font-family:'Barlow Condensed',sans-serif;font-size:16px;color:var(--txt);text-align:center;-webkit-appearance:none;appearance:none;}
-.egm-player-row{display:grid;grid-template-columns:1fr repeat(4,48px);gap:4px;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);}
-.egm-player-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.egm-stat-input{background:var(--dark3);border:1px solid var(--dark5);border-radius:6px;padding:5px 2px;font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--txt);text-align:center;width:100%;-webkit-appearance:none;appearance:none;}
-.egm-stat-header{display:grid;grid-template-columns:1fr repeat(4,48px);gap:4px;padding:0 0 4px;border-bottom:1px solid rgba(255,255,255,.08);}
-.egm-stat-header span{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--dim);text-transform:uppercase;text-align:center;}
-.egm-btn-row{display:flex;gap:10px;margin-top:16px;}
-.egm-save{flex:1;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.45);border-radius:10px;padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:var(--green);cursor:pointer;}
-.egm-cancel{flex:1;background:var(--dark3);border:1px solid var(--dark5);border-radius:10px;padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:var(--dim);cursor:pointer;}
+.egm-card{width:100%;max-width:520px;background:var(--sur);border:1px solid var(--dark5);border-radius:16px;padding:20px;margin-top:8px;}
+.egm-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--s);margin-bottom:4px;}
+.egm-subtitle{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--dim);letter-spacing:1px;margin-bottom:14px;}
+.egm-section{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin:16px 0 8px 2px;display:flex;align-items:center;gap:8px;}
+.egm-section::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07);}
+.egm-score-row{display:flex;gap:12px;align-items:center;margin-bottom:8px;}
+.egm-score-label{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--txt);min-width:90px;}
+.egm-score-input{flex:1;background:var(--dark3);border:1px solid var(--dark5);border-radius:8px;padding:10px;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--s);text-align:center;-webkit-appearance:none;appearance:none;}
+/* Per-player card */
+.egm-player-card{background:var(--dark3);border:1px solid var(--dark5);border-radius:12px;padding:12px;margin-bottom:8px;transition:opacity .2s;}
+.egm-player-card.is-absent{opacity:.5;}
+.egm-player-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.egm-player-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--txt);}
+.egm-absent-btn{background:none;border:1px solid var(--dark5);border-radius:7px;padding:6px 11px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--dim);cursor:pointer;text-transform:uppercase;transition:background .15s,border-color .15s,color .15s;}
+.egm-absent-btn.absent{background:rgba(244,63,94,.15);border-color:rgba(244,63,94,.45);color:var(--rose);}
+.egm-absent-note{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--dim);text-align:center;padding:4px 0 2px;letter-spacing:1px;}
+/* Stat rows inside each player card */
+.egm-stat-group{display:flex;flex-direction:column;gap:4px;}
+.egm-stat-group-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,215,0,.4);text-transform:uppercase;margin-bottom:1px;}
+.egm-stat-row{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;}
+.egm-stat-cell{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.egm-stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--dim);text-transform:uppercase;text-align:center;white-space:nowrap;}
+.egm-stat-input{background:var(--dark2);border:1px solid var(--dark5);border-radius:6px;padding:6px 2px;font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--txt);text-align:center;width:100%;-webkit-appearance:none;appearance:none;min-height:38px;}
+.egm-stat-input:focus{border-color:rgba(255,215,0,.5);outline:none;}
+.egm-sep{height:1px;background:rgba(255,255,255,.05);margin:8px 0;}
+/* Button row */
+.egm-btn-row{display:flex;gap:10px;margin-top:18px;}
+.egm-save{flex:2;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.45);border-radius:10px;padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:var(--green);cursor:pointer;min-height:48px;}
+.egm-cancel{flex:1;background:var(--dark3);border:1px solid var(--dark5);border-radius:10px;padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:var(--dim);cursor:pointer;min-height:48px;}
 .season-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
 .sact-btn{flex:1;min-width:100px;border-radius:10px;padding:11px 8px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid;text-align:center;}
 .sact-btn:active{opacity:.75;}
@@ -1698,23 +1713,23 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
 </div>
 
 <!-- EDIT GAME MODAL -->
-<div id="edit-game-modal">
+<div id="edit-game-modal" role="dialog" aria-modal="true" aria-labelledby="egm-title">
   <div class="egm-card">
     <div class="egm-title" id="egm-title">Edit Game</div>
+    <div class="egm-subtitle" id="egm-subtitle"></div>
     <div class="egm-section">Score</div>
     <div class="egm-score-row">
       <div class="egm-score-label" id="egm-team-label">Team</div>
-      <input type="number" class="egm-score-input" id="egm-score-us" min="0" max="999" inputmode="numeric">
+      <input type="number" class="egm-score-input" id="egm-score-us" min="0" max="999" inputmode="numeric" aria-label="Team score">
     </div>
     <div class="egm-score-row">
       <div class="egm-score-label" id="egm-opp-label">Opponent</div>
-      <input type="number" class="egm-score-input" id="egm-score-them" min="0" max="999" inputmode="numeric">
+      <input type="number" class="egm-score-input" id="egm-score-them" min="0" max="999" inputmode="numeric" aria-label="Opponent score">
     </div>
-    <div class="egm-section">Player Stats</div>
-    <div class="egm-stat-header"><span></span><span>TDs</span><span>INT</span><span>Flags</span><span>Catch</span></div>
+    <div class="egm-section">Players &amp; Stats</div>
     <div id="egm-players"></div>
     <div class="egm-btn-row">
-      <button type="button" class="egm-save" onclick="saveEditedGame()">Save Changes</button>
+      <button type="button" class="egm-save" onclick="saveEditedGame()">💾 Save Changes</button>
       <button type="button" class="egm-cancel" onclick="closeEditGame()">Cancel</button>
     </div>
   </div>
@@ -3834,6 +3849,25 @@ function clearSeason(){if(!confirm('Delete ALL season history?'))return;try{loca
 
 /* ── EDIT SAVED GAME STATS ── */
 var _editGameId=null;
+
+function _egmStatCell(stat,val,label){
+  return '<div class="egm-stat-cell">'
+    +'<div class="egm-stat-lbl">'+label+'</div>'
+    +'<input type="number" class="egm-stat-input" data-stat="'+stat+'" value="'+(val||0)+'" min="0" inputmode="numeric" aria-label="'+label+'">'
+    +'</div>';
+}
+
+function _egmToggleAbsent(btn){
+  var card=btn.closest('.egm-player-card');
+  var isAbsent=btn.classList.toggle('absent');
+  card.classList.toggle('is-absent',isAbsent);
+  btn.textContent=isAbsent?'✗ Absent':'Present';
+  var statsDiv=card.querySelector('.egm-stats-wrap');
+  var absentNote=card.querySelector('.egm-absent-note');
+  if(statsDiv)statsDiv.style.display=isAbsent?'none':'block';
+  if(absentNote)absentNote.style.display=isAbsent?'block':'none';
+}
+
 function openEditGame(id,ev){
   if(ev&&ev.stopPropagation)ev.stopPropagation();
   var games=loadSeason();
@@ -3841,81 +3875,162 @@ function openEditGame(id,ev){
   for(var i=0;i<games.length;i++){if(games[i].id===id){game=games[i];break;}}
   if(!game){showToast('Game not found');return;}
   _editGameId=id;
-  document.getElementById('egm-title').textContent='Edit: '+game.team+' vs '+game.opp;
+
+  // Header
+  document.getElementById('egm-title').textContent='✏️ Edit Game';
+  document.getElementById('egm-subtitle').textContent=game.team+' vs '+game.opp+' · '+(game.date||'');
   document.getElementById('egm-team-label').textContent=game.team;
   document.getElementById('egm-opp-label').textContent=game.opp;
   document.getElementById('egm-score-us').value=game.us;
   document.getElementById('egm-score-them').value=game.them;
-  // Build player stat rows
-  var players=Object.keys(game.playerStats||{}).sort();
+
+  // Combine present + absent players — show everyone
+  var absentList=game.absent||[];
+  var presentPlayers=Object.keys(game.playerStats||{});
+  // Build full ordered list: present first (sorted), then absent (sorted)
+  var allPlayers=presentPlayers.slice().sort().concat(
+    absentList.filter(function(n){return presentPlayers.indexOf(n)<0;}).sort()
+  );
+
   var html='';
-  players.forEach(function(name){
-    var st=game.playerStats[name];
-    html+='<div class="egm-player-row" data-player="'+escHtml(name)+'">'
-      +'<div class="egm-player-name">'+dispName(name)+'</div>'
-      +'<input type="number" class="egm-stat-input" data-stat="tds" value="'+((st.tds||0)+(st.qbTDs||0))+'" min="0" inputmode="numeric">'
-      +'<input type="number" class="egm-stat-input" data-stat="ints" value="'+(st.ints||0)+'" min="0" inputmode="numeric">'
-      +'<input type="number" class="egm-stat-input" data-stat="flags" value="'+(st.flags||0)+'" min="0" inputmode="numeric">'
-      +'<input type="number" class="egm-stat-input" data-stat="catches" value="'+(st.catches||0)+'" min="0" inputmode="numeric">'
-      +'</div>';
+  allPlayers.forEach(function(name){
+    var isAbsent=absentList.indexOf(name)>=0;
+    // Get stats (zeroed if absent/missing)
+    var st=(!isAbsent&&game.playerStats[name])||{};
+    var absent=isAbsent?'absent':'';
+
+    html+='<div class="egm-player-card'+( isAbsent?' is-absent':'')+'" data-player="'+esc(name)+'">'
+
+      // Header: name + absent toggle
+      +'<div class="egm-player-hdr">'
+        +'<div class="egm-player-name">'+dispName(name)+'</div>'
+        +'<button type="button" class="egm-absent-btn '+absent+'" onclick="_egmToggleAbsent(this)" aria-pressed="'+(isAbsent?'true':'false')+'">'
+          +(isAbsent?'✗ Absent':'Present')
+        +'</button>'
+      +'</div>'
+
+      // "Absent — no stats" label (shown when absent)
+      +'<div class="egm-absent-note" style="display:'+(isAbsent?'block':'none')+'">Not in this game — no stats recorded</div>'
+
+      // Full stats grid (hidden when absent)
+      +'<div class="egm-stats-wrap" style="display:'+(isAbsent?'none':'block')+'">'
+
+        // ── Offensive stats
+        +'<div class="egm-stat-group-lbl">Offense</div>'
+        +'<div class="egm-stat-row">'
+          +_egmStatCell('tds',       st.tds||0,           'Rec TDs')
+          +_egmStatCell('catches',   st.catches||0,        'Catches')
+          +_egmStatCell('conv',      st.conv||0,           '2PT Conv')
+          +_egmStatCell('fumbles',   st.fumbles||0,        'Fumbles')
+          +'<div class="egm-stat-cell"></div>'
+        +'</div>'
+
+        +'<div class="egm-sep"></div>'
+
+        // ── QB stats
+        +'<div class="egm-stat-group-lbl">Quarterback</div>'
+        +'<div class="egm-stat-row">'
+          +_egmStatCell('qbTDs',     st.qbTDs||0,         'QB TDs')
+          +_egmStatCell('qbInts',    st.qbInts||0,        'QB INTs')
+          +_egmStatCell('qbConvs',   st.qbConvs||0,       'QB 2PT')
+          +'<div class="egm-stat-cell"></div>'
+          +'<div class="egm-stat-cell"></div>'
+        +'</div>'
+
+        +'<div class="egm-sep"></div>'
+
+        // ── Defensive stats
+        +'<div class="egm-stat-group-lbl">Defense</div>'
+        +'<div class="egm-stat-row">'
+          +_egmStatCell('flags',     st.flags||0,          'Flags')
+          +_egmStatCell('ints',      st.ints||0,           'INTs')
+          +_egmStatCell('blocks',    st.blocks||0,         'Blocks')
+          +'<div class="egm-stat-cell"></div>'
+          +'<div class="egm-stat-cell"></div>'
+        +'</div>'
+
+      +'</div>'// end egm-stats-wrap
+    +'</div>';// end egm-player-card
   });
+
   document.getElementById('egm-players').innerHTML=html;
   document.getElementById('edit-game-modal').classList.add('open');
+  // Scroll modal to top
+  document.getElementById('edit-game-modal').scrollTop=0;
 }
 function closeEditGame(){
   document.getElementById('edit-game-modal').classList.remove('open');
   _editGameId=null;
 }
+
 function saveEditedGame(){
   if(!_editGameId){showToast('No game selected');return;}
   var games=loadSeason();
   var game=null,gameIdx=-1;
   for(var i=0;i<games.length;i++){if(games[i].id===_editGameId){game=games[i];gameIdx=i;break;}}
   if(!game){showToast('Game not found');closeEditGame();return;}
-  // Update scores
-  var newUs=parseInt(document.getElementById('egm-score-us').value)||0;
-  var newThem=parseInt(document.getElementById('egm-score-them').value)||0;
-  game.us=Math.max(0,newUs);
-  game.them=Math.max(0,newThem);
-  // Update player stats
-  var rows=document.querySelectorAll('#egm-players .egm-player-row');
-  rows.forEach(function(row){
-    var name=row.getAttribute('data-player');
-    if(!name||!game.playerStats[name])return;
-    var st=game.playerStats[name];
-    var inputs=row.querySelectorAll('.egm-stat-input');
-    inputs.forEach(function(inp){
-      var stat=inp.getAttribute('data-stat');
+
+  // ── Update scores ──
+  game.us=Math.max(0,parseInt(document.getElementById('egm-score-us').value)||0);
+  game.them=Math.max(0,parseInt(document.getElementById('egm-score-them').value)||0);
+
+  // ── Process each player card ──
+  var newAbsent=[];
+  var newPlayerStats={};
+
+  var cards=document.querySelectorAll('#egm-players .egm-player-card');
+  cards.forEach(function(card){
+    var name=card.getAttribute('data-player');
+    if(!name)return;
+
+    var absentBtn=card.querySelector('.egm-absent-btn');
+    var isAbsent=absentBtn&&absentBtn.classList.contains('absent');
+
+    if(isAbsent){
+      // Player is absent — add to absent list, do not include in playerStats
+      newAbsent.push(name);
+      return;
+    }
+
+    // Player is present — read all stat inputs
+    var st={catches:0,tds:0,flags:0,ints:0,conv:0,qbTDs:0,qbInts:0,qbConvs:0,fumbles:0,blocks:0,snapO:0,snapD:0,score:0};
+
+    // Preserve snap counts from original record if they exist
+    if(game.playerStats[name]){
+      st.snapO=game.playerStats[name].snapO||0;
+      st.snapD=game.playerStats[name].snapD||0;
+    }
+
+    card.querySelectorAll('.egm-stat-input').forEach(function(inp){
+      var statKey=inp.getAttribute('data-stat');
       var val=Math.max(0,parseInt(inp.value)||0);
-      if(stat==='tds'){
-        // Distribute TDs: keep qbTDs ratio if they had QB TDs, otherwise all go to receiving TDs
-        var oldTotal=(st.tds||0)+(st.qbTDs||0);
-        if(oldTotal>0&&st.qbTDs>0){
-          var qbRatio=st.qbTDs/oldTotal;
-          st.qbTDs=Math.round(val*qbRatio);
-          st.tds=val-st.qbTDs;
-        }else{
-          st.tds=val;
-          st.qbTDs=0;
-        }
-      }else if(stat==='ints'){st.ints=val;}
-      else if(stat==='flags'){st.flags=val;}
-      else if(stat==='catches'){st.catches=val;}
+      if(statKey&&st.hasOwnProperty(statKey))st[statKey]=val;
     });
-    // Recalculate score
-    st.score=(st.qbTDs||0)*10+(st.tds||0)*10+(st.ints||0)*8+(st.catches||0)*3+(st.flags||0)*2+(st.conv||0)*4+(st.qbConvs||0)*4-(st.qbInts||0)*3+(st.blocks||0)*3-(st.fumbles||0)*4;
+
+    // Recalculate player score using same formula as finalizeGame
+    st.score=(st.qbTDs||0)*10+(st.tds||0)*10+(st.ints||0)*8+(st.catches||0)*3
+             +(st.flags||0)*2+(st.conv||0)*4+(st.qbConvs||0)*4-(st.qbInts||0)*3
+             +(st.blocks||0)*3-(st.fumbles||0)*4;
+
+    newPlayerStats[name]=st;
   });
-  // Recalculate MVP
+
+  // ── Commit back to game record ──
+  game.absent=newAbsent;
+  game.playerStats=newPlayerStats;
+
+  // ── Recalculate MVP (best score among present players) ──
   var topPlayer='',topScore=-Infinity;
-  Object.keys(game.playerStats).forEach(function(name){
-    if(game.playerStats[name].score>topScore){topScore=game.playerStats[name].score;topPlayer=name;}
+  Object.keys(newPlayerStats).forEach(function(name){
+    if(newPlayerStats[name].score>topScore){topScore=newPlayerStats[name].score;topPlayer=name;}
   });
   game.mvp=topPlayer;
+
   games[gameIdx]=game;
   saveSeason(games);
   closeEditGame();
   renderSeasonScreen();
-  showToast('✅ Game stats updated!');
+  showToast('✅ Game updated!');
 }
 
 function exportSeason(){
