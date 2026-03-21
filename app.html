@@ -7033,6 +7033,9 @@ function startCocoachChannel(){
       var p=msg.payload;
       if(!p||!p.name||!p.key)return;
       if(!G.stats[p.name])return;
+      // Validate stat key — only known keys are accepted
+      var validKeys={catches:1,tds:1,flags:1,ints:1,conv1:1,conv2:1,qbTDs:1,qbInts:1,qbConvs:1,fumbles:1,blocks:1};
+      if(!validKeys[p.key])return;
       var q=p.q||G.cq;
       if(!G.stats[p.name][q])G.stats[p.name][q]=blankStats();
       G.stats[p.name][q][p.key]++;
@@ -7046,6 +7049,8 @@ function startCocoachChannel(){
     .on('broadcast',{event:'rotation_event'},function(msg){
       var p=msg.payload;
       if(!p||!p.name||!p.side)return;
+      // Validate side value — only 'off' and 'def' are legal
+      if(p.side!=='off'&&p.side!=='def')return;
       if(!G.rots[p.name]||!G.rots[p.name][G.cq])return;
       // Apply the same toggle logic as rotToggle() in the head coach UI
       var r=G.rots[p.name][G.cq];

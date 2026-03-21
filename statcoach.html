@@ -418,19 +418,41 @@ body{display:flex;flex-direction:column;}
   /* ── SEND ROTATION EVENT ── */
   function sendRotation(playerName, side) {
     if (!channel || !gameState) { showToast('⚠️ Not connected yet'); return; }
+    // Validate side
+    if (side !== 'off' && side !== 'def') return;
+
+    var rots = gameState.rots || {};
+    var removing = rots[playerName] === side;
+
+    // Enforce maxOnField locally before sending — prevents brief invalid UI state
+    if (!removing) {
+      var maxOnField = gameState.maxOnField || 6;
+      var absent = gameState.absent || [];
+      var roster = gameState.roster || [];
+      var countOnSide = 0;
+      roster.forEach(function(n) {
+        if (absent.indexOf(n) < 0 && rots[n] === side) countOnSide++;
+      });
+      if (countOnSide >= maxOnField) {
+        showToast('⚠️ Field is full! Max ' + maxOnField + ' on ' + (side === 'off' ? 'Offense' : 'Defense'));
+        playRotSound('out');
+        return; // Don't send — head coach would reject it anyway
+      }
+    }
+
     channel.send({
       type: 'broadcast',
       event: 'rotation_event',
       payload: { name: playerName, side: side }
     });
+
     // Optimistic local update
-    var rots = gameState.rots || {};
-    if (rots[playerName] === side) {
-      // Removing — player was on this side, now going to bench
+    if (removing) {
       rots[playerName] = null;
       showToast(firstName(playerName) + ' → Bench');
       playRotSound('out');
     } else {
+      // If player was on the other side, clear that first
       rots[playerName] = side;
       showToast(firstName(playerName) + ' → ' + (side === 'off' ? '⚡ Offense' : '🛡 Defense'));
       playRotSound('in');
