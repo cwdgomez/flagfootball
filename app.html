@@ -7043,10 +7043,46 @@ function startCocoachChannel(){
       if(G.tab==='summary')renderSummary();
       scheduleAutoSave();
     })
+    .on('broadcast',{event:'rotation_event'},function(msg){
+      var p=msg.payload;
+      if(!p||!p.name||!p.side)return;
+      if(!G.rots[p.name]||!G.rots[p.name][G.cq])return;
+      // Apply the same toggle logic as rotToggle() in the head coach UI
+      var r=G.rots[p.name][G.cq];
+      var removing=r.onField===p.side;
+      if(!removing){
+        // Enforce MAX_ON_FIELD limit
+        var presentPlayers=ALL_PLAYERS.filter(function(n){return !isAbsent(n);});
+        var currentOnSide=presentPlayers.filter(function(n){
+          return G.rots[n][G.cq].onField===p.side;
+        }).length;
+        if(currentOnSide>=MAX_ON_FIELD){
+          // Silently reject — rotation manager will get the updated state showing it didn't change
+          broadcastGameStateToCoach();
+          return;
+        }
+      }
+      if(removing){
+        r.onField=null;
+        if(p.side==='off')r.offSnaps++;else r.defSnaps++;
+        r.history.push(p.side);
+        G.last={type:'rotout',name:p.name,side:p.side,q:G.cq};
+        showToast('🤝 '+firstName(p.name)+' off '+(p.side==='off'?'Offense':'Defense'));
+      } else {
+        if(r.onField){var pv=r.onField;if(pv==='off')r.offSnaps++;else r.defSnaps++;r.history.push(pv);}
+        r.onField=p.side;
+        G.last={type:'rotin',name:p.name,side:p.side,q:G.cq};
+        showToast('🤝 '+firstName(p.name)+' → '+(p.side==='off'?'⚡ Offense':'🛡 Defense'));
+      }
+      renderRots();
+      if(G.tab==='summary')renderSummary();
+      scheduleAutoSave();
+      broadcastGameStateToCoach();
+    })
     .on('broadcast',{event:'stat_coach_joined'},function(){
       // Stat coach just connected — send them current state immediately
       broadcastGameStateToCoach();
-      showToast('🤝 Stat coach connected!');
+      showToast('🤝 Assistant connected!');
     })
     .subscribe(function(status){
       if(status==='SUBSCRIBED'){
@@ -7070,9 +7106,25 @@ function startCocoachChannel(){
 function broadcastGameStateToCoach(){
   if(!cocoachChannel)return;
   var rotsCurrent={};
+  var snapCounts={};
   ALL_PLAYERS.forEach(function(n){
-    if(G.rots[n]&&G.rots[n][G.cq])rotsCurrent[n]=G.rots[n][G.cq].onField;
+    if(G.rots[n]&&G.rots[n][G.cq]){
+      rotsCurrent[n]=G.rots[n][G.cq].onField;
+      // Cumulative snap counts — same formula as finalizeGame()
+      var totalOff=0,totalDef=0;
+      for(var q=1;q<=G.cq;q++){
+        var rq=G.rots[n][q];
+        if(rq){
+          totalOff+=rq.offSnaps+(rq.onField==='off'?1:0);
+          totalDef+=rq.defSnaps+(rq.onField==='def'?1:0);
+        }
+      }
+      snapCounts[n]={off:totalOff,def:totalDef};
+    }
   });
+  // Build jersey number map
+  var nums={};
+  ALL_PLAYERS.forEach(function(n){nums[n]=jerseyNum(n);});
   cocoachChannel.send({
     type:'broadcast',
     event:'game_state',
@@ -7086,6 +7138,9 @@ function broadcastGameStateToCoach(){
       opp:G.opp,
       scores:G.scores,
       rots:rotsCurrent,
+      snaps:snapCounts,
+      nums:nums,
+      maxOnField:MAX_ON_FIELD,
       tc:{primary:TC.primary,secondary:TC.secondary}
     }
   });

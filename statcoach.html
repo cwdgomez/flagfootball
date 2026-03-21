@@ -6,9 +6,9 @@
 <meta name="theme-color" content="#080808">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Stat Coach · CGMax FFTP</title>
-<meta property="og:title" content="Stat Coach · CGMax FFTP">
-<meta property="og:description" content="Live stat logging for your assistant coach — CGMax Flag Football Tracker Pro">
+<title>Game Assistant · CGMax FFTP</title>
+<meta property="og:title" content="Game Assistant · CGMax FFTP">
+<meta property="og:description" content="Stat tracking & rotation management for your assistant coach — CGMax Flag Football Tracker Pro">
 <meta property="og:image" content="https://cgmaxfftp.com/og-statcoach.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -16,14 +16,14 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --bg:#080808;--sur:#111;--dark2:#141414;--dark3:#1a1a1a;--dark4:#222;--dark5:#2a2a2a;
   --txt:#f2f2f2;--dim:#888;--dimmer:#444;
-  --green:#22c55e;--red:#ef4444;--teal:#14b8a6;--gold:#FFD700;
+  --green:#22c55e;--blue:#3b82f6;--red:#ef4444;--teal:#14b8a6;--gold:#FFD700;--orange:#f59e0b;
   --p:#CC0000;--s:#FFD700;
 }
 html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Barlow',sans-serif;overscroll-behavior:none;}
@@ -42,7 +42,9 @@ body{display:flex;flex-direction:column;}
 .sc-conn-dot{width:7px;height:7px;border-radius:50%;background:var(--dimmer);flex-shrink:0;}
 .sc-conn-dot.live{background:var(--green);}
 .sc-conn-dot.error{background:var(--red);}
-.sc-mode-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;color:var(--teal);background:rgba(20,184,166,.1);border:1px solid rgba(20,184,166,.25);border-radius:4px;padding:2px 6px;}
+.sc-mode-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;border-radius:4px;padding:2px 6px;}
+.sc-mode-badge.stats{color:var(--teal);background:rgba(20,184,166,.1);border:1px solid rgba(20,184,166,.25);}
+.sc-mode-badge.rotations{color:var(--orange);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);}
 
 /* ── JOIN SCREEN ── */
 .join-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:32px 24px;text-align:center;}
@@ -62,7 +64,22 @@ body{display:flex;flex-direction:column;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .connecting-txt{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:var(--dim);}
 
-/* ── GAME SCREEN ── */
+/* ── ROLE SELECTION SCREEN ── */
+.role-screen{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:32px 24px;text-align:center;gap:20px;}
+.role-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;color:var(--txt);}
+.role-hint{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:var(--dim);max-width:300px;}
+.role-cards{display:flex;flex-direction:column;gap:14px;width:100%;max-width:320px;}
+.role-card{background:var(--sur);border:2px solid var(--dark4);border-radius:16px;padding:20px 18px;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:left;transition:border-color .15s,transform .1s;}
+.role-card:active{transform:scale(.97);}
+.role-card.rc-stats{border-color:rgba(20,184,166,.4);}
+.role-card.rc-stats:hover{border-color:var(--teal);}
+.role-card.rc-rots{border-color:rgba(245,158,11,.4);}
+.role-card.rc-rots:hover{border-color:var(--orange);}
+.rc-icon{font-size:28px;margin-bottom:8px;}
+.rc-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--txt);}
+.rc-desc{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:var(--dim);letter-spacing:.5px;margin-top:4px;line-height:1.4;}
+
+/* ── GAME SCREEN (STATS MODE) ── */
 .game-screen{display:none;flex-direction:column;flex:1;overflow:hidden;}
 .player-list{flex:1;overflow-y:auto;padding:8px 10px 20px;}
 .player-card{background:var(--sur);border:1px solid var(--dark4);border-radius:14px;overflow:hidden;margin-bottom:8px;transition:border-color .15s;}
@@ -70,7 +87,6 @@ body{display:flex;flex-direction:column;}
 .player-card.on-def{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.04);}
 .player-card.is-qb{border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.04);}
 .player-card.absent{opacity:.35;}
-/* ── collapsed by default — tap header to expand ── */
 .pc-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;}
 .pc-header:active{background:rgba(255,255,255,.03);}
 .pc-body{display:none;padding:0 12px 12px;}
@@ -99,6 +115,48 @@ body{display:flex;flex-direction:column;}
 .stb-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--dim);}
 .stb-count{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:var(--txt);}
 
+/* ── ROTATION MANAGER SCREEN ── */
+.rot-screen{display:none;flex-direction:column;flex:1;overflow:hidden;}
+.rot-content{flex:1;overflow-y:auto;padding:8px 10px 20px;-webkit-overflow-scrolling:touch;}
+
+/* Suggestion banner */
+.sub-suggest{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.sub-suggest-icon{font-size:20px;flex-shrink:0;}
+.sub-suggest-text{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--orange);line-height:1.3;}
+.sub-suggest-btn{background:var(--orange);color:#000;border:none;border-radius:8px;padding:6px 12px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:1px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.sub-suggest-btn:active{opacity:.8;}
+
+/* Section headers */
+.rot-section-hdr{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;padding:8px 4px 6px;display:flex;align-items:center;gap:8px;}
+.rot-section-hdr .rsh-count{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--dimmer);}
+.rsh-off{color:var(--green);}
+.rsh-def{color:var(--blue);}
+.rsh-bench{color:var(--dim);}
+
+/* Rotation player cards */
+.rp-card{background:var(--sur);border:1px solid var(--dark4);border-radius:12px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;transition:transform .1s,border-color .15s;}
+.rp-card:active{transform:scale(.97);}
+.rp-card.rp-off{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.04);}
+.rp-card.rp-def{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.04);}
+.rp-card.rp-bench{border-color:var(--dark4);}
+.rp-card.rp-absent{opacity:.3;pointer-events:none;}
+.rp-card.rp-suggest{border-color:rgba(245,158,11,.5);box-shadow:0 0 8px rgba(245,158,11,.15);}
+.rp-num{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--dim);min-width:28px;text-align:center;}
+.rp-info{flex:1;min-width:0;}
+.rp-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;letter-spacing:.5px;color:var(--txt);}
+.rp-snaps{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--dim);margin-top:2px;display:flex;gap:10px;}
+.rp-snap-val{color:var(--txt);font-weight:700;}
+.rp-snap-bar{height:3px;border-radius:2px;background:var(--dark4);margin-top:4px;position:relative;overflow:hidden;}
+.rp-snap-fill{height:100%;border-radius:2px;position:absolute;left:0;top:0;transition:width .3s;}
+.rp-snap-fill.off-fill{background:var(--green);}
+.rp-snap-fill.def-fill{background:var(--blue);}
+.rp-actions{display:flex;gap:6px;flex-shrink:0;}
+.rp-btn{border:none;border-radius:8px;padding:8px 14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:1px;cursor:pointer;text-transform:uppercase;transition:opacity .1s;}
+.rp-btn:active{opacity:.7;}
+.rp-btn-off{background:rgba(34,197,94,.2);color:var(--green);border:1px solid rgba(34,197,94,.3);}
+.rp-btn-def{background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.3);}
+.rp-btn-remove{background:rgba(255,255,255,.06);color:var(--dim);border:1px solid var(--dark5);}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:50%;transform:translateX(-50%) translateY(20px);background:rgba(30,30,30,.97);border:1px solid var(--dark5);border-radius:10px;padding:10px 18px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;color:var(--txt);z-index:9999;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -124,14 +182,14 @@ body{display:flex;flex-direction:column;}
       <div class="sc-conn-dot" id="sc-conn-dot"></div>
       <span id="sc-conn-txt">Connecting</span>
     </div>
-    <div class="sc-mode-badge">STAT COACH</div>
+    <div class="sc-mode-badge stats" id="sc-mode-badge">STAT TRACKER</div>
   </div>
 </div>
 
 <!-- JOIN SCREEN -->
 <div class="join-screen" id="join-screen">
   <div class="join-logo">CG<span>MAX</span> FFTP</div>
-  <div class="join-subtitle">Stat Coach Mode</div>
+  <div class="join-subtitle">Game Assistant</div>
   <div class="join-label">Enter Game Code</div>
   <input type="text" class="join-input" id="join-code-input" maxlength="6" placeholder="A3F9K2" autocomplete="off" autocorrect="off" spellcheck="false" oninput="this.value=this.value.toUpperCase()">
   <button type="button" class="join-btn" onclick="joinGame()">Join Game</button>
@@ -144,10 +202,35 @@ body{display:flex;flex-direction:column;}
   <div class="connecting-txt">Connecting to game…</div>
 </div>
 
-<!-- GAME SCREEN -->
+<!-- ROLE SELECTION SCREEN -->
+<div class="role-screen" id="role-screen">
+  <div class="role-title">Choose Your Role</div>
+  <div class="role-hint">Your head coach shared this game with you. What would you like to manage?</div>
+  <div class="role-cards">
+    <div class="role-card rc-stats" id="role-stats">
+      <div class="rc-icon">📊</div>
+      <div class="rc-name">Stat Tracker</div>
+      <div class="rc-desc">Log catches, TDs, flag pulls, and other stats for each player during the game.</div>
+    </div>
+    <div class="role-card rc-rots" id="role-rots">
+      <div class="rc-icon">🔄</div>
+      <div class="rc-name">Rotation Manager</div>
+      <div class="rc-desc">Move players on and off the field for offense and defense. Track snap counts and get sub suggestions.</div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME SCREEN — STATS MODE -->
 <div class="game-screen" id="game-screen">
   <div class="player-list" id="player-list">
     <div class="waiting-msg" id="waiting-msg">⏳ Waiting for game state from primary coach…</div>
+  </div>
+</div>
+
+<!-- ROTATION MANAGER SCREEN -->
+<div class="rot-screen" id="rot-screen">
+  <div class="rot-content" id="rot-content">
+    <div class="waiting-msg" id="rot-waiting-msg">⏳ Waiting for game state from primary coach…</div>
   </div>
 </div>
 
@@ -162,11 +245,11 @@ body{display:flex;flex-direction:column;}
   var sb = null;
   var channel = null;
   var gameCode = null;
-  var gameState = null; // latest state from primary
-  var localStats = {}; // track counts locally for display
+  var gameState = null;
+  var localStats = {};
+  var selectedRole = null; // 'stats' or 'rotations'
 
   /* ── STAT DEFINITIONS ── */
-  /* ── STAT KEYS — icons match app.html renderPlayer exactly ── */
   var STAT_KEYS = [
     { key:'catches', icon:'🏈', label:'Catch'    },
     { key:'tds',     icon:'⭐', label:'TD'        },
@@ -199,9 +282,39 @@ body{display:flex;flex-direction:column;}
 
   // Auto-join if code is in URL
   var urlCode = new URLSearchParams(window.location.search).get('code');
+  var urlRole = new URLSearchParams(window.location.search).get('role');
   if (urlCode && urlCode.length === 6) {
     document.getElementById('join-code-input').value = urlCode.toUpperCase();
     joinGame();
+  }
+
+  /* ── ROLE SELECTION ── */
+  document.getElementById('role-stats').addEventListener('click', function() {
+    selectedRole = 'stats';
+    enterGame();
+  });
+  document.getElementById('role-rots').addEventListener('click', function() {
+    selectedRole = 'rotations';
+    enterGame();
+  });
+
+  function enterGame() {
+    // Update badge
+    var badge = document.getElementById('sc-mode-badge');
+    if (selectedRole === 'rotations') {
+      badge.textContent = 'ROTATIONS';
+      badge.className = 'sc-mode-badge rotations';
+    } else {
+      badge.textContent = 'STAT TRACKER';
+      badge.className = 'sc-mode-badge stats';
+    }
+    showScreen(selectedRole === 'rotations' ? 'rotations' : 'game');
+    // Render current state if we already have it
+    if (gameState) {
+      updateHeader(gameState);
+      if (selectedRole === 'rotations') renderRotations(gameState);
+      else renderPlayers(gameState);
+    }
   }
 
   /* ── JOIN ── */
@@ -234,21 +347,26 @@ body{display:flex;flex-direction:column;}
         handleGameState(msg.payload);
       })
       .on('broadcast', { event: 'coach_ping' }, function() {
-        // Primary coach sent a ping — we're still connected
         setConnected(true);
       })
       .subscribe(function(status) {
         if (status === 'SUBSCRIBED') {
           setConnected(true);
-          showScreen('game');
-          // Ask primary to send state immediately, then retry every 3s until received
+          // If role was passed via URL, skip role selection
+          if (urlRole === 'stats' || urlRole === 'rotations') {
+            selectedRole = urlRole;
+            enterGame();
+          } else {
+            showScreen('role');
+          }
           requestState();
           retryTimer = setInterval(requestState, 3000);
-          // After 30 s with no state, show guidance so user isn't stuck indefinitely
           waitTimeoutTimer = setTimeout(function() {
             if (!gameState) {
               var wm = document.getElementById('waiting-msg');
-              if (wm) wm.innerHTML = '⚠️ Can\'t reach primary coach.<br>Ask your head coach to resend the Stat Coach link.';
+              if (wm) wm.innerHTML = '⚠️ Can\'t reach primary coach.<br>Ask your head coach to resend the link.';
+              var rwm = document.getElementById('rot-waiting-msg');
+              if (rwm) rwm.innerHTML = '⚠️ Can\'t reach primary coach.<br>Ask your head coach to resend the link.';
               if (retryTimer) { clearInterval(retryTimer); retryTimer = null; }
             }
           }, 30000);
@@ -268,8 +386,12 @@ body{display:flex;flex-direction:column;}
     gameState = state;
     setConnected(true);
     updateHeader(state);
-    renderPlayers(state);
-    showScreen('game');
+    if (selectedRole === 'rotations') {
+      renderRotations(state);
+    } else if (selectedRole === 'stats') {
+      renderPlayers(state);
+    }
+    // If still on role screen with no role selected, just store state
   }
 
   /* ── SEND STAT EVENT ── */
@@ -281,23 +403,43 @@ body{display:flex;flex-direction:column;}
       event: 'stat_event',
       payload: { name: playerName, key: statKey, q: q }
     });
-    // Track locally for instant UI feedback
     if (!localStats[playerName]) localStats[playerName] = {};
     localStats[playerName][statKey] = (localStats[playerName][statKey] || 0) + 1;
-    // Update just that button's count
     var btnId = 'stb-' + safeid(playerName) + '-' + statKey;
     var countEl = document.getElementById(btnId + '-count');
     if (countEl) countEl.textContent = localStats[playerName][statKey];
-    // Pop animation
     var btn = document.getElementById(btnId);
     if (btn) { btn.classList.remove('popped'); void btn.offsetWidth; btn.classList.add('popped'); }
-    // Audio feedback
     playStatSound(statKey);
     var lbl = { catches:'Catch', tds:'TD', flags:'Flag Pull', ints:'INT', fumbles:'Fumble', blocks:'Deflect', qbTDs:'TD Pass', qbInts:'INT Thrown', qbConvs:'Conv Pass' };
     showToast(firstName(playerName) + ' · ' + (lbl[statKey] || statKey));
   }
 
-  /* ── RENDER ── */
+  /* ── SEND ROTATION EVENT ── */
+  function sendRotation(playerName, side) {
+    if (!channel || !gameState) { showToast('⚠️ Not connected yet'); return; }
+    channel.send({
+      type: 'broadcast',
+      event: 'rotation_event',
+      payload: { name: playerName, side: side }
+    });
+    // Optimistic local update
+    var rots = gameState.rots || {};
+    if (rots[playerName] === side) {
+      // Removing — player was on this side, now going to bench
+      rots[playerName] = null;
+      showToast(firstName(playerName) + ' → Bench');
+      playRotSound('out');
+    } else {
+      rots[playerName] = side;
+      showToast(firstName(playerName) + ' → ' + (side === 'off' ? '⚡ Offense' : '🛡 Defense'));
+      playRotSound('in');
+    }
+    gameState.rots = rots;
+    renderRotations(gameState);
+  }
+
+  /* ── RENDER HEADER ── */
   function updateHeader(state) {
     var header = document.getElementById('sc-header');
     header.style.display = 'flex';
@@ -307,17 +449,17 @@ body{display:flex;flex-direction:column;}
     var us = (state.scores && state.scores.us) ? state.scores.us.reduce(function(a,b){return a+b;},0) : 0;
     var them = (state.scores && state.scores.them) ? state.scores.them.reduce(function(a,b){return a+b;},0) : 0;
     document.getElementById('sc-score').textContent = us + ' – ' + them;
-    // Apply team colors to CSS vars
     if (state.tc) {
       document.documentElement.style.setProperty('--p', state.tc.primary || '#CC0000');
       document.documentElement.style.setProperty('--s', state.tc.secondary || '#FFD700');
     }
   }
 
-  /* Track which cards are expanded */
+  /* ══════════════════════════════════════════════════════
+     STAT TRACKER — player cards (existing behavior)
+     ══════════════════════════════════════════════════════ */
   var expandedCards = {};
 
-  /* Format name as "First L." matching app.html convention */
   function displayName(name) {
     var parts = (name || '').trim().split(/\s+/);
     if (parts.length === 1) return parts[0];
@@ -354,9 +496,7 @@ body{display:flex;flex-direction:column;}
       else if (onField === 'def') tagHtml = '<span class="pc-tag def">DEF</span>';
       else tagHtml = '<span class="pc-tag bench">Bench</span>';
 
-      // Use htmlEsc for data-* attributes to prevent injection from crafted player names
       var safeAttr = htmlEsc(name);
-
       var bodyHtml = '';
 
       if (isQB) {
@@ -365,20 +505,14 @@ body{display:flex;flex-direction:column;}
           var count = (localStats[name] && localStats[name][s.key]) ? localStats[name][s.key] : 0;
           var btnId = 'stb-' + safeid(name) + '-' + s.key;
           qbBtnHtml += '<button type="button" class="stb js-stat-btn" id="'+btnId+'" data-player="'+safeAttr+'" data-key="'+s.key+'">'
-            +'<div class="stb-icon">'+s.icon+'</div>'
-            +'<div class="stb-label">'+s.label+'</div>'
-            +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'
-            +'</button>';
+            +'<div class="stb-icon">'+s.icon+'</div><div class="stb-label">'+s.label+'</div><div class="stb-count" id="'+btnId+'-count">'+count+'</div></button>';
         });
         var recBtnHtml = '';
         QB_STAT_KEYS.slice(3).forEach(function(s) {
           var count = (localStats[name] && localStats[name][s.key]) ? localStats[name][s.key] : 0;
           var btnId = 'stb-' + safeid(name) + '-' + s.key;
           recBtnHtml += '<button type="button" class="stb js-stat-btn" id="'+btnId+'" data-player="'+safeAttr+'" data-key="'+s.key+'">'
-            +'<div class="stb-icon">'+s.icon+'</div>'
-            +'<div class="stb-label">'+s.label+'</div>'
-            +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'
-            +'</button>';
+            +'<div class="stb-icon">'+s.icon+'</div><div class="stb-label">'+s.label+'</div><div class="stb-count" id="'+btnId+'-count">'+count+'</div></button>';
         });
         bodyHtml = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,215,0,.6);text-transform:uppercase;margin-bottom:6px;">⚡ QB Stats</div>'
           +'<div class="stat-btns" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px;">'+qbBtnHtml+'</div>'
@@ -390,21 +524,14 @@ body{display:flex;flex-direction:column;}
           var count = (localStats[name] && localStats[name][s.key]) ? localStats[name][s.key] : 0;
           var btnId = 'stb-' + safeid(name) + '-' + s.key;
           btnHtml += '<button type="button" class="stb js-stat-btn" id="'+btnId+'" data-player="'+safeAttr+'" data-key="'+s.key+'">'
-            +'<div class="stb-icon">'+s.icon+'</div>'
-            +'<div class="stb-label">'+s.label+'</div>'
-            +'<div class="stb-count" id="'+btnId+'-count">'+count+'</div>'
-            +'</button>';
+            +'<div class="stb-icon">'+s.icon+'</div><div class="stb-label">'+s.label+'</div><div class="stb-count" id="'+btnId+'-count">'+count+'</div></button>';
         });
         bodyHtml = '<div class="stat-btns">'+btnHtml+'</div>';
       }
 
-      // pc-header uses data-player (not onclick) to prevent " injection from player names
       html += '<div class="'+cardClass+'" id="card-'+safeid(name)+'">'
         +'<div class="pc-header js-toggle-card" data-player="'+safeAttr+'">'
-          +'<div class="pc-top">'
-            +'<div class="pc-name">'+htmlEsc(displayName(name))+'</div>'
-            +tagHtml
-          +'</div>'
+          +'<div class="pc-top"><div class="pc-name">'+htmlEsc(displayName(name))+'</div>'+tagHtml+'</div>'
           +'<div class="pc-chevron">▼</div>'
         +'</div>'
         +'<div class="pc-body">'+bodyHtml+'</div>'
@@ -412,7 +539,6 @@ body{display:flex;flex-direction:column;}
     });
     list.innerHTML = html;
 
-    // Attach event listeners — safe against injection, no inline onclick needed
     list.querySelectorAll('.js-toggle-card').forEach(function(el) {
       el.addEventListener('click', function() { toggleCard(el.getAttribute('data-player')); });
     });
@@ -428,12 +554,188 @@ body{display:flex;flex-direction:column;}
     if (expandedCards[name]) card.classList.add('expanded');
     else card.classList.remove('expanded');
   };
+
+  /* ══════════════════════════════════════════════════════
+     ROTATION MANAGER — offense / defense / bench view
+     ══════════════════════════════════════════════════════ */
+
+  function renderRotations(state) {
+    var content = document.getElementById('rot-content');
+    var roster = state.roster || [];
+    var absent = state.absent || [];
+    var rots = state.rots || {};
+    var snaps = state.snaps || {};
+    var nums = state.nums || {};
+    var maxOnField = state.maxOnField || 6;
+
+    if (roster.length === 0) {
+      content.innerHTML = '<div class="waiting-msg">⏳ Waiting for game state…</div>';
+      return;
+    }
+
+    // Group players
+    var onOff = [], onDef = [], bench = [], absentList = [];
+    roster.forEach(function(name) {
+      if (absent.indexOf(name) >= 0) { absentList.push(name); return; }
+      var pos = rots[name] || null;
+      if (pos === 'off') onOff.push(name);
+      else if (pos === 'def') onDef.push(name);
+      else bench.push(name);
+    });
+
+    // Find max snaps for snap bar scaling
+    var maxSnap = 1;
+    roster.forEach(function(name) {
+      var s = snaps[name];
+      if (s) {
+        var total = (s.off || 0) + (s.def || 0);
+        if (total > maxSnap) maxSnap = total;
+      }
+    });
+
+    // Substitution suggestion — find bench player with fewest total snaps
+    var suggestion = null;
+    if (bench.length > 0) {
+      var sorted = bench.slice().sort(function(a, b) {
+        var sa = snaps[a] || { off: 0, def: 0 };
+        var sb2 = snaps[b] || { off: 0, def: 0 };
+        return (sa.off + sa.def) - (sb2.off + sb2.def);
+      });
+      var sugPlayer = sorted[0];
+      var sugSnaps = snaps[sugPlayer] || { off: 0, def: 0 };
+      var sugTotal = sugSnaps.off + sugSnaps.def;
+      // Only show if there's a meaningful gap (someone on field has more)
+      var avgOnField = 0;
+      var onFieldCount = onOff.length + onDef.length;
+      if (onFieldCount > 0) {
+        var totalFieldSnaps = 0;
+        onOff.concat(onDef).forEach(function(n) {
+          var s = snaps[n] || { off: 0, def: 0 };
+          totalFieldSnaps += s.off + s.def;
+        });
+        avgOnField = totalFieldSnaps / onFieldCount;
+      }
+      if (sugTotal < avgOnField || onFieldCount === 0) {
+        suggestion = { name: sugPlayer, snaps: sugSnaps, total: sugTotal };
+      }
+    }
+
+    var html = '';
+
+    // Suggestion banner
+    if (suggestion) {
+      var sn = suggestion.snaps;
+      html += '<div class="sub-suggest">'
+        + '<div class="sub-suggest-icon">💡</div>'
+        + '<div class="sub-suggest-text">'
+          + '<strong>' + htmlEsc(displayName(suggestion.name)) + '</strong> has fewest snaps'
+          + ' (' + sn.off + ' off, ' + sn.def + ' def)'
+          + ' — consider subbing them in'
+        + '</div>'
+        + '</div>';
+    }
+
+    // OFFENSE section
+    html += '<div class="rot-section-hdr rsh-off">⚡ ON OFFENSE <span class="rsh-count">' + onOff.length + '/' + maxOnField + '</span></div>';
+    if (onOff.length === 0) {
+      html += '<div style="padding:8px 4px;font-size:12px;color:var(--dimmer);font-style:italic;">No players on offense</div>';
+    }
+    onOff.forEach(function(name) {
+      html += buildRotCard(name, 'off', nums, snaps, maxSnap, false);
+    });
+
+    // DEFENSE section
+    html += '<div class="rot-section-hdr rsh-def" style="margin-top:12px;">🛡 ON DEFENSE <span class="rsh-count">' + onDef.length + '/' + maxOnField + '</span></div>';
+    if (onDef.length === 0) {
+      html += '<div style="padding:8px 4px;font-size:12px;color:var(--dimmer);font-style:italic;">No players on defense</div>';
+    }
+    onDef.forEach(function(name) {
+      html += buildRotCard(name, 'def', nums, snaps, maxSnap, false);
+    });
+
+    // BENCH section
+    html += '<div class="rot-section-hdr rsh-bench" style="margin-top:12px;">🪑 BENCH <span class="rsh-count">' + bench.length + '</span></div>';
+    if (bench.length === 0 && absentList.length === 0) {
+      html += '<div style="padding:8px 4px;font-size:12px;color:var(--dimmer);font-style:italic;">All players are on the field!</div>';
+    }
+    bench.forEach(function(name) {
+      var isSuggested = suggestion && suggestion.name === name;
+      html += buildRotCard(name, 'bench', nums, snaps, maxSnap, isSuggested);
+    });
+
+    // Absent players (grayed out)
+    if (absentList.length > 0) {
+      html += '<div class="rot-section-hdr" style="margin-top:12px;color:var(--dimmer);">🚫 ABSENT <span class="rsh-count">' + absentList.length + '</span></div>';
+      absentList.forEach(function(name) {
+        html += buildRotCard(name, 'absent', nums, snaps, maxSnap, false);
+      });
+    }
+
+    content.innerHTML = html;
+
+    // Attach rotation button listeners
+    content.querySelectorAll('.js-rot-btn').forEach(function(el) {
+      el.addEventListener('click', function(e) {
+        e.stopPropagation();
+        sendRotation(el.getAttribute('data-player'), el.getAttribute('data-side'));
+      });
+    });
+  }
+
+  function buildRotCard(name, position, nums, snaps, maxSnap, isSuggested) {
+    var s = snaps[name] || { off: 0, def: 0 };
+    var num = nums[name] || '';
+    var safeAttr = htmlEsc(name);
+    var totalSnaps = s.off + s.def;
+    var offPct = maxSnap > 0 ? Math.round((s.off / maxSnap) * 100) : 0;
+    var defPct = maxSnap > 0 ? Math.round((s.def / maxSnap) * 100) : 0;
+
+    var cardClass = 'rp-card'
+      + (position === 'off' ? ' rp-off' : position === 'def' ? ' rp-def' : position === 'absent' ? ' rp-absent' : ' rp-bench')
+      + (isSuggested ? ' rp-suggest' : '');
+
+    var actionsHtml = '';
+    if (position === 'off') {
+      actionsHtml = '<div class="rp-actions"><button type="button" class="rp-btn rp-btn-remove js-rot-btn" data-player="' + safeAttr + '" data-side="off">✕ OFF</button></div>';
+    } else if (position === 'def') {
+      actionsHtml = '<div class="rp-actions"><button type="button" class="rp-btn rp-btn-remove js-rot-btn" data-player="' + safeAttr + '" data-side="def">✕ DEF</button></div>';
+    } else if (position === 'bench') {
+      actionsHtml = '<div class="rp-actions">'
+        + '<button type="button" class="rp-btn rp-btn-off js-rot-btn" data-player="' + safeAttr + '" data-side="off">⚡ OFF</button>'
+        + '<button type="button" class="rp-btn rp-btn-def js-rot-btn" data-player="' + safeAttr + '" data-side="def">🛡 DEF</button>'
+        + '</div>';
+    }
+
+    return '<div class="' + cardClass + '">'
+      + '<div class="rp-num">' + htmlEsc(String(num)) + '</div>'
+      + '<div class="rp-info">'
+        + '<div class="rp-name">' + htmlEsc(displayName(name)) + '</div>'
+        + '<div class="rp-snaps">'
+          + '<span>Off: <span class="rp-snap-val">' + s.off + '</span></span>'
+          + '<span>Def: <span class="rp-snap-val">' + s.def + '</span></span>'
+          + '<span style="color:var(--dimmer)">Total: <span class="rp-snap-val">' + totalSnaps + '</span></span>'
+        + '</div>'
+        + '<div class="rp-snap-bar">'
+          + '<div class="rp-snap-fill off-fill" style="width:' + offPct + '%"></div>'
+          + '<div class="rp-snap-fill def-fill" style="width:' + defPct + '%;left:' + offPct + '%"></div>'
+        + '</div>'
+      + '</div>'
+      + actionsHtml
+      + '</div>';
+  }
+
   /* ── HELPERS ── */
   function showScreen(name) {
     document.getElementById('join-screen').style.display = name === 'join' ? 'flex' : 'none';
     document.getElementById('connecting-screen').style.display = name === 'connecting' ? 'flex' : 'none';
+    document.getElementById('role-screen').style.display = name === 'role' ? 'flex' : 'none';
     document.getElementById('game-screen').style.display = name === 'game' ? 'flex' : 'none';
-    if (name !== 'game') document.getElementById('sc-header').style.display = 'none';
+    document.getElementById('rot-screen').style.display = name === 'rotations' ? 'flex' : 'none';
+    if (name === 'game' || name === 'rotations') {
+      document.getElementById('sc-header').style.display = 'flex';
+    } else {
+      document.getElementById('sc-header').style.display = 'none';
+    }
   }
 
   function setConnected(ok) {
@@ -459,9 +761,7 @@ body{display:flex;flex-direction:column;}
   }
 
   function firstName(name) { return (name || '').split(' ')[0]; }
-
   function safeid(name) { return (name || '').replace(/[^a-zA-Z0-9]/g, '_'); }
-
   function htmlEsc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   /* ── WEB AUDIO — STAT BUTTON SOUNDS ── */
@@ -475,7 +775,6 @@ body{display:flex;flex-direction:column;}
     }
     return _scAudioCtx;
   }
-  // Unlock audio context on first user tap (required by browsers)
   document.addEventListener('touchstart', getScAudioCtx, { once: true, passive: true });
   document.addEventListener('mousedown',  getScAudioCtx, { once: true, passive: true });
 
@@ -496,21 +795,31 @@ body{display:flex;flex-direction:column;}
     var ctx = getScAudioCtx(); if (!ctx) return;
     var now = ctx.currentTime;
     if (statKey === 'tds' || statKey === 'qbTDs') {
-      // Mini TD fanfare — ascending C-E-G
       scPlayTone(523, now,       0.12, 0.22);
       scPlayTone(659, now + 0.1, 0.12, 0.22);
       scPlayTone(784, now + 0.2, 0.18, 0.25);
     } else if (statKey === 'fumbles' || statKey === 'qbInts') {
-      // Penalty buzz
       scPlayTone(180, now, 0.08, 0.18, 'sawtooth');
       scPlayTone(160, now + 0.09, 0.12, 0.14, 'sawtooth');
     } else if (statKey === 'ints' || statKey === 'flags') {
-      // Defensive play — higher sharp click
       scPlayTone(880, now, 0.06, 0.16);
       scPlayTone(660, now + 0.07, 0.08, 0.10);
     } else {
-      // Standard stat — soft click
       scPlayTone(660, now, 0.05, 0.15);
+    }
+  }
+
+  function playRotSound(type) {
+    var ctx = getScAudioCtx(); if (!ctx) return;
+    var now = ctx.currentTime;
+    if (type === 'in') {
+      // Player put on field — ascending chirp
+      scPlayTone(440, now, 0.08, 0.18);
+      scPlayTone(587, now + 0.08, 0.10, 0.15);
+    } else {
+      // Player taken off — descending
+      scPlayTone(587, now, 0.08, 0.15);
+      scPlayTone(440, now + 0.08, 0.10, 0.12);
     }
   }
 
