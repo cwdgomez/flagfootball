@@ -828,14 +828,6 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .qr-url{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--dim);margin-top:10px;word-break:break-all;}
 .qr-close{width:100%;margin-top:14px;border:1px solid var(--dark5);border-radius:10px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--dim);background:var(--dark3);cursor:pointer;text-transform:uppercase;}
 
-/* ── INSTALL BANNER ── */
-.install-banner{position:fixed;bottom:0;left:0;right:0;z-index:800;background:linear-gradient(90deg,var(--p),var(--p2));padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;transform:translateY(100%);transition:transform .4s cubic-bezier(.34,1.56,.64,1);box-shadow:0 -4px 24px rgba(0,0,0,.6);}
-.install-banner.show{transform:translateY(0);}
-.install-banner-txt{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--s);flex:1;}
-.install-banner-sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:rgba(255,255,255,.65);letter-spacing:1px;display:block;}
-.install-btn-yes{background:var(--s);color:#111;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;padding:9px 18px;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;}
-.install-btn-no{background:none;border:none;color:rgba(255,255,255,.62);font-size:20px;cursor:pointer;padding:4px;}
-
 /* ── VIBRATION FEEDBACK FLASH ── */
 @keyframes tapFlash{0%{opacity:.35}100%{opacity:0}}
 .tap-flash{position:fixed;inset:0;background:rgba(255,255,255,.08);pointer-events:none;z-index:999;animation:tapFlash .15s ease-out forwards;}
@@ -1915,17 +1907,6 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
     <button type="button" class="qr-close" onclick="closeQR()">Close</button>
   </div>
 </div>
-
-<!-- INSTALL BANNER -->
-<div class="install-banner" id="install-banner">
-  <div>
-    <div class="install-banner-txt">⚡ Add to Home Screen</div>
-    <span class="install-banner-sub">Install as app for offline use</span>
-  </div>
-  <button type="button" class="install-btn-yes" id="install-btn-yes">Install</button>
-  <button type="button" class="install-btn-no" onclick="dismissInstall()">✕</button>
-</div>
-
 
 <!-- VOICE LOGGING MODAL -->
 <div class="voice-overlay" id="voice-overlay">
@@ -5661,34 +5642,6 @@ if('serviceWorker' in navigator){
     }
   },{passive:true});
 })();
-
-/* ════════════════════════════════════════════════════
-   INSTALL PROMPT (Android Chrome / Edge)
-════════════════════════════════════════════════════ */
-var deferredInstall=null;
-window.addEventListener('beforeinstallprompt',function(e){
-  e.preventDefault();
-  deferredInstall=e;
-  // Only show if not already installed and not dismissed
-  if(!localStorage.getItem('ff_install_dismissed')){
-    setTimeout(function(){
-      document.getElementById('install-banner').classList.add('show');
-    },3000);
-  }
-});
-document.getElementById('install-btn-yes').addEventListener('click',function(){
-  if(deferredInstall){
-    deferredInstall.prompt();
-    deferredInstall.userChoice.then(function(){
-      deferredInstall=null;
-      document.getElementById('install-banner').classList.remove('show');
-    });
-  }
-});
-function dismissInstall(){
-  document.getElementById('install-banner').classList.remove('show');
-  localStorage.setItem('ff_install_dismissed','1');
-}
 
 /* ════════════════════════════════════════════════════
    VIBRATION + AUDIO FEEDBACK
