@@ -3179,7 +3179,16 @@ function finalizeGame(){
   if(isPro()){
     var gamesAfter=loadSeason();
     var _endQb=G.qb,_endQbSt=playerStats[G.qb]||null;
-    setTimeout(function(){openRecapCard(us,them,mvps,gamesAfter,{qb:_endQb,qbStats:_endQbSt});},600);
+    var _recapGame=game,_recapStats=playerStats;
+    setTimeout(function(){
+      openRecapCard(us,them,mvps,gamesAfter,{qb:_endQb,qbStats:_endQbSt});
+      // Auto-send AI recap emails to parents (background, non-blocking)
+      // Wait a beat for the canvas to fully render before capturing
+      setTimeout(function(){
+        var scoreCardImg=captureRecapCanvas();
+        sendPostGameRecap(_recapGame,_recapStats,scoreCardImg);
+      },800);
+    },600);
   } else {
     setTimeout(function(){openSeason();},900);
   }
@@ -3494,7 +3503,15 @@ function endAndSave(){
   // Show recap card for Pro users, then open Season
   if(isPro()){
     var _eas_qb=G.qb,_eas_qbSt=playerStats[G.qb]||null;
-    setTimeout(function(){openRecapCard(us,them,mvps,games,{qb:_eas_qb,qbStats:_eas_qbSt});},600);
+    var _easGame=game,_easStats=playerStats;
+    setTimeout(function(){
+      openRecapCard(us,them,mvps,games,{qb:_eas_qb,qbStats:_eas_qbSt});
+      // Auto-send AI recap emails to parents (background, non-blocking)
+      setTimeout(function(){
+        var scoreCardImg=captureRecapCanvas();
+        sendPostGameRecap(_easGame,_easStats,scoreCardImg);
+      },800);
+    },600);
   } else {
     setTimeout(function(){openSeason();},800);
   }
@@ -8726,5 +8743,111 @@ window.addEventListener('storage',function(e){
     }catch(err){}
   }
 });
+
+/* ══════════════════════════════════════════════════════════════
+   POST-GAME AI RECAP — Auto-send personalized emails to parents
+   Fires in background after game save. Pro-only. Consent-gated.
+   ══════════════════════════════════════════════════════════════ */
+
+var RECAP_API_URL=SYNC_API_BASE+'/generate-game-recap';
+
+// Check if recaps are enabled (default: true for Pro)
+function isRecapEnabled(){
+  var v=localStorage.getItem('ff_recap_enabled');
+  // Default to true if never set
+  return v===null?true:v==='true';
+}
+function setRecapEnabled(val){
+  localStorage.setItem('ff_recap_enabled',val?'true':'false');
+}
+
+// Capture the recap canvas as a base64 PNG data URL
+function captureRecapCanvas(){
+  try{
+    var canvas=document.getElementById('recap-canvas');
+    if(!canvas)return null;
+    return canvas.toDataURL('image/png');
+  }catch(e){
+    console.warn('[game-recap] Canvas capture failed:',e);
+    return null;
+  }
+}
+
+// Determine current season name from the date
+function inferSeasonName(){
+  var d=new Date();
+  var month=d.getMonth(); // 0-indexed
+  var year=d.getFullYear();
+  var season;
+  if(month>=2&&month<=4) season='Spring';
+  else if(month>=5&&month<=7) season='Summer';
+  else if(month>=8&&month<=10) season='Fall';
+  else season='Winter';
+  return season+' '+year;
+}
+
+// Main function — called automatically after game save + recap card render
+function sendPostGameRecap(gameData,playerStats,scoreCardBase64){
+  // Guards: Pro + signed in + recaps enabled
+  if(!isPro()||!CURRENT_USER||!AUTH_SESSION)return;
+  if(!isRecapEnabled())return;
+
+  var teamId=ACTIVE_TEAM_ID||'default';
+  var teamName=getActiveTeamName();
+  var seasonName=inferSeasonName();
+  var token=AUTH_SESSION.access_token;
+
+  if(!token){console.warn('[game-recap] No auth token');return;}
+
+  // Find the game index (0 = most recent, which we just saved)
+  var gameIndex=0;
+
+  var payload={
+    team_id:teamId,
+    team_name:teamName,
+    season_name:seasonName,
+    opponent:gameData.opp||'Opponent',
+    game_date:gameData.date||new Date().toISOString().split('T')[0],
+    score_us:gameData.us||0,
+    score_them:gameData.them||0,
+    game_index:gameIndex,
+    player_stats:playerStats,
+    score_card_base64:scoreCardBase64||null
+  };
+
+  console.log('[game-recap] Sending recap for '+teamName+' vs '+payload.opponent+'...');
+
+  fetch(RECAP_API_URL,{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+token
+    },
+    body:JSON.stringify(payload)
+  })
+  .then(function(resp){return resp.json();})
+  .then(function(data){
+    if(data.success){
+      if(data.skipped){
+        console.log('[game-recap] Skipped: '+data.reason);
+        if(data.reason==='no_consented_parents'){
+          // Don't show toast for this — coach may not have parents set up
+        }
+      } else if(data.cached){
+        console.log('[game-recap] Already sent for this game');
+      } else {
+        var count=data.emails_sent||0;
+        showToast('\u{1F4E8} Game recaps sent to '+count+' parent'+(count!==1?'s':'')+'!');
+        console.log('[game-recap] Success: '+count+' emails sent');
+      }
+    } else {
+      console.warn('[game-recap] API returned error:',data.error);
+    }
+  })
+  .catch(function(err){
+    console.error('[game-recap] Network error:',err);
+    // Silent fail — don't disrupt the coach's post-game flow
+  });
+}
 </script>
 </html>
