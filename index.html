@@ -699,6 +699,98 @@ footer{
   padding:0 4px 20px;}
 .faq-a-inner a{color:var(--gold);text-decoration:none;}
 .faq-a-inner a:hover{text-decoration:underline;}
+
+/* ── APP SHOWCASE ── */
+.showcase-sec{position:relative;z-index:10;padding:80px 20px 60px;overflow:hidden;}
+.showcase-inner{max-width:900px;margin:0 auto;text-align:center;}
+
+/* Carousel wrapper */
+.showcase-carousel{position:relative;margin:48px auto 0;max-width:820px;display:flex;align-items:center;gap:8px;}
+
+/* Viewport clips overflow */
+.sc-viewport{overflow:hidden;border-radius:20px;flex:1;min-width:0;}
+.sc-track{display:flex;transition:transform .45s cubic-bezier(.4,0,.2,1);will-change:transform;}
+.sc-slide{min-width:100%;display:flex;flex-direction:column;align-items:center;padding:0 12px;box-sizing:border-box;}
+
+/* Phone frame */
+.phone-frame{
+  position:relative;width:280px;max-width:72vw;aspect-ratio:9/19.5;
+  border-radius:32px;overflow:hidden;
+  border:3px solid rgba(255,255,255,.12);
+  background:#0a0a0a;
+  box-shadow:0 12px 60px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05),
+             0 0 80px rgba(170,0,0,.12),0 0 40px rgba(255,215,0,.06);
+}
+.phone-notch{
+  position:absolute;top:6px;left:50%;transform:translateX(-50%);z-index:5;
+  width:80px;height:22px;background:#0a0a0a;border-radius:0 0 14px 14px;
+  border:1px solid rgba(255,255,255,.06);border-top:none;
+}
+.phone-frame img{
+  width:100%;height:100%;object-fit:cover;object-position:top;
+  display:block;pointer-events:none;user-select:none;-webkit-user-select:none;
+}
+
+/* Captions */
+.sc-caption{margin-top:20px;max-width:380px;text-align:center;}
+.sc-cap-tag{
+  display:inline-block;font-family:'Barlow Condensed',sans-serif;
+  font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+  padding:3px 10px;border-radius:20px;margin-bottom:8px;
+  background:rgba(255,215,0,.1);color:rgba(255,215,0,.75);border:1px solid rgba(255,215,0,.2);
+}
+.sc-cap-title{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;
+  color:var(--txt);margin-bottom:6px;
+}
+.sc-cap-body{
+  font-family:'Barlow',sans-serif;font-size:13px;line-height:1.65;
+  color:rgba(255,255,255,.48);
+}
+
+/* Arrows */
+.sc-arrow{
+  flex-shrink:0;width:42px;height:42px;border-radius:50%;border:1.5px solid rgba(255,215,0,.22);
+  background:rgba(255,215,0,.06);color:rgba(255,215,0,.7);font-size:24px;line-height:1;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent;
+}
+.sc-arrow:hover{background:rgba(255,215,0,.14);border-color:rgba(255,215,0,.4);color:var(--gold);}
+.sc-arrow:active{transform:scale(.92);}
+
+/* Dots */
+.sc-dots{display:flex;justify-content:center;gap:8px;margin-top:24px;}
+.sc-dot{
+  width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);
+  border:none;cursor:pointer;transition:all .25s;padding:0;
+  -webkit-tap-highlight-color:transparent;
+}
+.sc-dot.active{background:var(--gold);box-shadow:0 0 12px rgba(255,215,0,.5);transform:scale(1.25);}
+
+/* Counter */
+.sc-counter{
+  margin-top:14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;
+  font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.22);
+}
+
+/* Touch / swipe area */
+.sc-viewport{cursor:grab;}
+.sc-viewport:active{cursor:grabbing;}
+
+/* Mobile adjustments */
+@media(max-width:640px){
+  .showcase-sec{padding:60px 12px 40px;}
+  .sc-arrow{width:34px;height:34px;font-size:20px;}
+  .phone-frame{width:240px;border-radius:26px;}
+  .phone-notch{width:64px;height:18px;border-radius:0 0 10px 10px;}
+  .sc-cap-title{font-size:19px;}
+  .sc-cap-body{font-size:12px;}
+  .showcase-carousel{gap:4px;}
+}
+@media(max-width:380px){
+  .phone-frame{width:200px;border-radius:22px;}
+  .sc-arrow{width:28px;height:28px;font-size:16px;}
+}
 </style>
 <script type="application/ld+json">
 {
@@ -767,6 +859,7 @@ footer{
 <nav aria-label="Site Navigation">
   <div class="nav-logo">CGMax <span>·</span> FFTP</div>
   <div class="nav-links">
+    <a href="#showcase" class="nav-link">Showcase</a>
     <a href="#features" class="nav-link">Features</a>
     <a href="#plans" class="nav-link">Pricing</a>
     <a href="./help.html" class="nav-link">Help</a>
@@ -868,6 +961,182 @@ footer{
     <div class="ti"><span class="ti-icon">🤖</span><span class="ti-val">AI</span><span class="ti-lbl">Report Cards</span></div>
   </div>
 </div>
+
+<!-- APP SHOWCASE -->
+<section class="showcase-sec" id="showcase">
+  <div class="showcase-inner">
+    <div class="reveal">
+      <div class="sec-eyebrow">See It In Action</div>
+      <h2 class="sec-title">Built for<br><span class="acc">Game Day</span></h2>
+      <div class="sec-rule"></div>
+    </div>
+
+    <!-- Phone carousel -->
+    <div class="showcase-carousel reveal">
+      <button class="sc-arrow sc-prev" onclick="scNav(-1)" aria-label="Previous screenshot">&#8249;</button>
+
+      <div class="sc-viewport">
+        <div class="sc-track" id="scTrack">
+
+          <div class="sc-slide">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <img src="screenshots/team-setup.png" alt="Team setup screen" loading="lazy" draggable="false">
+            </div>
+            <div class="sc-caption">
+              <div class="sc-cap-tag">Setup</div>
+              <div class="sc-cap-title">Build Your Team</div>
+              <div class="sc-cap-body">Set your team name, coach name, and team colors in seconds. Multi-team support lets you manage every team you coach.</div>
+            </div>
+          </div>
+
+          <div class="sc-slide">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <img src="screenshots/stat-tracking.png" alt="Live stat tracking interface" loading="lazy" draggable="false">
+            </div>
+            <div class="sc-caption">
+              <div class="sc-cap-tag">Core</div>
+              <div class="sc-cap-title">Live Stat Tracking</div>
+              <div class="sc-cap-body">Tap to log flag pulls, catches, TDs, INTs, and more for every player. QB-specific stats built right in.</div>
+            </div>
+          </div>
+
+          <div class="sc-slide">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <img src="screenshots/live-active.png" alt="Live scoreboard and stat coach active" loading="lazy" draggable="false">
+            </div>
+            <div class="sc-caption">
+              <div class="sc-cap-tag">Pro</div>
+              <div class="sc-cap-title">Go Live + Stat Coach</div>
+              <div class="sc-cap-body">Broadcast the game to parents in real time and invite an assistant coach to log stats from their own device.</div>
+            </div>
+          </div>
+
+          <div class="sc-slide">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <img src="screenshots/stats-detail.png" alt="Detailed player stats mid-game" loading="lazy" draggable="false">
+            </div>
+            <div class="sc-caption">
+              <div class="sc-cap-tag">Core</div>
+              <div class="sc-cap-title">Deep Player Stats</div>
+              <div class="sc-cap-body">Every stat — flags, catches, TDs, INTs, conversions, deflections — tracked per player per quarter in real time.</div>
+            </div>
+          </div>
+
+          <div class="sc-slide">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <img src="screenshots/rotations.png" alt="Smart rotation management" loading="lazy" draggable="false">
+            </div>
+            <div class="sc-caption">
+              <div class="sc-cap-tag">Core</div>
+              <div class="sc-cap-title">Smart Rotations</div>
+              <div class="sc-cap-body">See who needs field time at a glance. Offense and defense play counts with automatic recommendations.</div>
+            </div>
+          </div>
+
+          <div class="sc-slide">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <img src="screenshots/game-summary.png" alt="Post-game summary with MVP podium" loading="lazy" draggable="false">
+            </div>
+            <div class="sc-caption">
+              <div class="sc-cap-tag">Core</div>
+              <div class="sc-cap-title">Game Summary & MVP</div>
+              <div class="sc-cap-body">Auto-calculated MVP podium, score-by-quarter breakdown, and a full player stats table after every game.</div>
+            </div>
+          </div>
+
+          <div class="sc-slide">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <img src="screenshots/season-history.png" alt="Season history and leaderboard" loading="lazy" draggable="false">
+            </div>
+            <div class="sc-caption">
+              <div class="sc-cap-tag">Pro</div>
+              <div class="sc-cap-title">Season Leaderboard</div>
+              <div class="sc-cap-body">Cumulative stats, season MVP awards, game history with results, and clickable player trend charts.</div>
+            </div>
+          </div>
+
+          <div class="sc-slide">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <img src="screenshots/parent-live.png" alt="Live parent scoreboard view" loading="lazy" draggable="false">
+            </div>
+            <div class="sc-caption">
+              <div class="sc-cap-tag">Pro</div>
+              <div class="sc-cap-title">Live Parent Scoreboard</div>
+              <div class="sc-cap-body">Parents follow the game from anywhere. Real-time score, player stats, and MVP rankings — no app needed.</div>
+            </div>
+          </div>
+
+          <div class="sc-slide">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <img src="screenshots/stat-coach-join.png" alt="Stat coach role selection" loading="lazy" draggable="false">
+            </div>
+            <div class="sc-caption">
+              <div class="sc-cap-tag">Pro</div>
+              <div class="sc-cap-title">Stat Coach Mode</div>
+              <div class="sc-cap-body">Share a link with your assistant coach. They pick Stat Tracker or Rotation Manager and help log the game live.</div>
+            </div>
+          </div>
+
+          <div class="sc-slide">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <img src="screenshots/stat-coach-rotations.png" alt="Stat coach rotation manager view" loading="lazy" draggable="false">
+            </div>
+            <div class="sc-caption">
+              <div class="sc-cap-tag">Pro</div>
+              <div class="sc-cap-title">Rotation Manager</div>
+              <div class="sc-cap-body">Your assistant manages subs from their own phone. Snap counts, sub suggestions, and field status in real time.</div>
+            </div>
+          </div>
+
+          <div class="sc-slide">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <img src="screenshots/player-card.png" alt="Individual player stat card" loading="lazy" draggable="false">
+            </div>
+            <div class="sc-caption">
+              <div class="sc-cap-tag">Pro</div>
+              <div class="sc-cap-title">Player Stat Cards</div>
+              <div class="sc-cap-body">Beautiful 1080x1350 shareable cards with individual stats, performance rating, and your team branding.</div>
+            </div>
+          </div>
+
+          <div class="sc-slide">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <img src="screenshots/share-card.png" alt="Game share card for social media" loading="lazy" draggable="false">
+            </div>
+            <div class="sc-caption">
+              <div class="sc-cap-tag">Pro</div>
+              <div class="sc-cap-title">Game Share Cards</div>
+              <div class="sc-cap-body">One-tap share cards with the final score, MVP podium, and team stats — built for group chats and social.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <button class="sc-arrow sc-next" onclick="scNav(1)" aria-label="Next screenshot">&#8250;</button>
+    </div>
+
+    <!-- Dots -->
+    <div class="sc-dots" id="scDots"></div>
+
+    <!-- Counter -->
+    <div class="sc-counter reveal">
+      <span id="scCur">1</span> / <span id="scTotal">12</span>
+    </div>
+  </div>
+</section>
 
 <!-- FEATURES -->
 <section class="sec" id="features">
@@ -1709,6 +1978,68 @@ footer{
 </footer>
 
 <script>
+// ── SHOWCASE CAROUSEL ──
+(function(){
+  var track=document.getElementById('scTrack');
+  var dotsWrap=document.getElementById('scDots');
+  var curEl=document.getElementById('scCur');
+  var totalEl=document.getElementById('scTotal');
+  if(!track) return;
+  var slides=track.querySelectorAll('.sc-slide');
+  var total=slides.length;
+  var idx=0;
+  totalEl.textContent=total;
+
+  // Build dots
+  for(var i=0;i<total;i++){
+    var d=document.createElement('button');
+    d.className='sc-dot'+(i===0?' active':'');
+    d.setAttribute('aria-label','Go to slide '+(i+1));
+    d.dataset.i=i;
+    d.onclick=function(){goTo(+this.dataset.i);};
+    dotsWrap.appendChild(d);
+  }
+  var dots=dotsWrap.querySelectorAll('.sc-dot');
+
+  function goTo(n){
+    if(n<0) n=total-1;
+    if(n>=total) n=0;
+    idx=n;
+    track.style.transform='translateX(-'+idx*100+'%)';
+    curEl.textContent=idx+1;
+    dots.forEach(function(d,i){d.classList.toggle('active',i===idx);});
+  }
+
+  window.scNav=function(dir){goTo(idx+dir);};
+
+  // Touch/swipe support
+  var sx=0,dx=0,swiping=false;
+  var vp=track.parentElement;
+  vp.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;dx=0;swiping=true;},{passive:true});
+  vp.addEventListener('touchmove',function(e){if(swiping) dx=e.touches[0].clientX-sx;},{passive:true});
+  vp.addEventListener('touchend',function(){
+    if(!swiping) return;
+    swiping=false;
+    if(Math.abs(dx)>40){goTo(dx<0?idx+1:idx-1);}
+  });
+
+  // Keyboard support
+  document.addEventListener('keydown',function(e){
+    var sec=document.getElementById('showcase');
+    if(!sec) return;
+    var r=sec.getBoundingClientRect();
+    if(r.top>window.innerHeight||r.bottom<0) return;
+    if(e.key==='ArrowLeft') goTo(idx-1);
+    if(e.key==='ArrowRight') goTo(idx+1);
+  });
+
+  // Auto-advance every 5s, pause on hover/touch
+  var timer=setInterval(function(){goTo(idx+1);},5000);
+  vp.addEventListener('mouseenter',function(){clearInterval(timer);});
+  vp.addEventListener('mouseleave',function(){timer=setInterval(function(){goTo(idx+1);},5000);});
+  vp.addEventListener('touchstart',function(){clearInterval(timer);},{passive:true});
+})();
+
 // FAQ accordion
 function toggleFaq(btn){
   var item=btn.closest('.faq-item');

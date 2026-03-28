@@ -59,7 +59,12 @@ html,body{height:100%;background:#080808;color:#f2f2f2;font-family:'Helvetica Ne
     var urlError = urlParams.get('error') || hashParams.get('error');
     var urlErrorDesc = urlParams.get('error_description') || hashParams.get('error_description');
     if (urlError) {
-      showError('Sign-in failed: ' + (urlErrorDesc ? decodeURIComponent(urlErrorDesc).split(':')[0] : urlError));
+      // Sanitize URL-sourced error strings — cap length, strip anything suspicious.
+      // showError uses .textContent (safe from XSS) but we harden the input anyway.
+      var safeDesc = urlErrorDesc
+        ? decodeURIComponent(urlErrorDesc).split(':')[0].replace(/[<>"'&]/g, '').slice(0, 120)
+        : String(urlError).replace(/[<>"'&]/g, '').slice(0, 60);
+      showError('Sign-in failed: ' + safeDesc);
       return;
     }
 
