@@ -713,22 +713,22 @@ footer{
 .sc-slide{min-width:100%;display:flex;flex-direction:column;align-items:center;padding:0 12px;box-sizing:border-box;}
 
 /* Phone frame */
-.phone-frame{
-  position:relative;width:280px;max-width:72vw;aspect-ratio:9/19.5;
-  border-radius:32px;overflow:hidden;
+.showcase-sec .phone-frame{
+  position:relative;width:280px;max-width:72vw;
+  border-radius:28px;overflow:hidden;
   border:3px solid rgba(255,255,255,.12);
   background:#0a0a0a;
   box-shadow:0 12px 60px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05),
              0 0 80px rgba(170,0,0,.12),0 0 40px rgba(255,215,0,.06);
 }
-.phone-notch{
-  position:absolute;top:6px;left:50%;transform:translateX(-50%);z-index:5;
-  width:80px;height:22px;background:#0a0a0a;border-radius:0 0 14px 14px;
+.showcase-sec .phone-notch{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:5;
+  width:80px;height:20px;background:#0a0a0a;border-radius:0 0 14px 14px;
   border:1px solid rgba(255,255,255,.06);border-top:none;
 }
-.phone-frame img{
-  width:100%;height:100%;object-fit:cover;object-position:top;
-  display:block;pointer-events:none;user-select:none;-webkit-user-select:none;
+.showcase-sec .phone-frame img{
+  width:100%;height:auto;display:block;
+  pointer-events:none;user-select:none;-webkit-user-select:none;
 }
 
 /* Captions */
@@ -781,14 +781,14 @@ footer{
 @media(max-width:640px){
   .showcase-sec{padding:60px 12px 40px;}
   .sc-arrow{width:34px;height:34px;font-size:20px;}
-  .phone-frame{width:240px;border-radius:26px;}
-  .phone-notch{width:64px;height:18px;border-radius:0 0 10px 10px;}
+  .showcase-sec .phone-frame{width:240px;border-radius:22px;}
+  .showcase-sec .phone-notch{width:64px;height:16px;border-radius:0 0 10px 10px;}
   .sc-cap-title{font-size:19px;}
   .sc-cap-body{font-size:12px;}
   .showcase-carousel{gap:4px;}
 }
 @media(max-width:380px){
-  .phone-frame{width:200px;border-radius:22px;}
+  .showcase-sec .phone-frame{width:200px;border-radius:18px;}
   .sc-arrow{width:28px;height:28px;font-size:16px;}
 }
 </style>
@@ -1005,30 +1005,6 @@ footer{
           <div class="sc-slide">
             <div class="phone-frame">
               <div class="phone-notch"></div>
-              <img src="screenshots/live-active.png" alt="Live scoreboard and stat coach active" loading="lazy" draggable="false">
-            </div>
-            <div class="sc-caption">
-              <div class="sc-cap-tag">Pro</div>
-              <div class="sc-cap-title">Go Live + Stat Coach</div>
-              <div class="sc-cap-body">Broadcast the game to parents in real time and invite an assistant coach to log stats from their own device.</div>
-            </div>
-          </div>
-
-          <div class="sc-slide">
-            <div class="phone-frame">
-              <div class="phone-notch"></div>
-              <img src="screenshots/stats-detail.png" alt="Detailed player stats mid-game" loading="lazy" draggable="false">
-            </div>
-            <div class="sc-caption">
-              <div class="sc-cap-tag">Core</div>
-              <div class="sc-cap-title">Deep Player Stats</div>
-              <div class="sc-cap-body">Every stat — flags, catches, TDs, INTs, conversions, deflections — tracked per player per quarter in real time.</div>
-            </div>
-          </div>
-
-          <div class="sc-slide">
-            <div class="phone-frame">
-              <div class="phone-notch"></div>
               <img src="screenshots/rotations.png" alt="Smart rotation management" loading="lazy" draggable="false">
             </div>
             <div class="sc-caption">
@@ -1133,7 +1109,7 @@ footer{
 
     <!-- Counter -->
     <div class="sc-counter reveal">
-      <span id="scCur">1</span> / <span id="scTotal">12</span>
+      <span id="scCur">1</span> / <span id="scTotal">10</span>
     </div>
   </div>
 </section>
