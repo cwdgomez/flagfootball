@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flag Football Coaching Tips & Guides — CGMax FFTP Blog</title>
+    <meta name="description" content="Explore flag football coaching tips, youth flag football guides, and best practices for running youth sports programs with CGMax FFTP.">
+    <meta name="keywords" content="flag football coaching tips, youth flag football guide, flag football strategies, coaching app">
+    <link rel="canonical" href="https://cgmaxfftp.com/blog/">
+
+    <!-- Open Graph Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Flag Football Coaching Tips & Guides — CGMax FFTP Blog">
+    <meta property="og:description" content="Explore flag football coaching tips, youth flag football guides, and best practices for running youth sports programs.">
+    <meta property="og:url" content="https://cgmaxfftp.com/blog/">
+    <meta property="og:image" content="https://cgmaxfftp.com/og-banner.png">
+    <meta property="og:site_name" content="CGMax FFTP">
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Flag Football Coaching Tips & Guides — CGMax FFTP Blog">
+    <meta name="twitter:description" content="Explore flag football coaching tips, youth flag football guides, and best practices for running youth sports programs.">
+    <meta name="twitter:image" content="https://cgmaxfftp.com/og-banner.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #080808;
+            color: #ffffff;
+            font-family: 'Barlow', sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: #0d0d0d;
+            border-bottom: 2px solid #FFD700;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.8rem;
+            color: #FFD700;
+            text-decoration: none;
+            letter-spacing: 2px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .nav-logo:hover {
+            color: #FFF;
+        }
+
+        .nav-back {
+            color: #FFD700;
+            text-decoration: none;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-back:hover {
+            color: #FFF;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .hero h1 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 3.5rem;
+            color: #FFD700;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: #ccc;
+            max-width: 700px;
+            margin: 0 auto;
+            font-family: 'Barlow Condensed', sans-serif;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Article Grid */
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        /* Article Card */
+        .article-card {
+            background-color: #0d0d0d;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .article-card:hover {
+            border-color: #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .article-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 3px;
+            background-color: #FFD700;
+            transition: left 0.3s ease;
+        }
+
+        .article-card:hover::before {
+            left: 0;
+        }
+
+        .article-category {
+            display: inline-block;
+            background-color: rgba(170, 0, 0, 0.8);
+            color: #FFD700;
+            padding: 0.4rem 1rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: 'Barlow Condensed', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            width: fit-content;
+        }
+
+        .article-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.5rem;
+            color: #FFD700;
+            margin-bottom: 0.8rem;
+            line-height: 1.2;
+            letter-spacing: 1px;
+        }
+
+        .article-teaser {
+            color: #bbb;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+            font-family: 'Barlow', sans-serif;
+        }
+
+        .article-link {
+            color: #FFD700;
+            text-decoration: none;
+            font-weight: 600;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .article-link:hover {
+            color: #FFF;
+            margin-left: 5px;
+        }
+
+        .article-link::after {
+            content: '→';
+            margin-left: 0.5rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #0d0d0d;
+            border-top: 2px solid #FFD700;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.5rem;
+            color: #FFD700;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .footer-text {
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            font-family: 'Barlow', sans-serif;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-link {
+            color: #FFD700;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-family: 'Barlow Condensed', sans-serif;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: #FFF;
+        }
+
+        .footer-copyright {
+            color: #666;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+            padding-top: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .articles-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-logo {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="../" class="nav-logo">CGMax FFTP</a>
+        <a href="../" class="nav-back">← Back to App</a>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Coaching Tips & Guides</h1>
+        <p>Master flag football strategy, stats tracking, tournament management, and everything you need to run a successful youth program with CGMax FFTP.</p>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Articles Grid -->
+        <div class="articles-grid">
+            <!-- Article 1 -->
+            <article class="article-card">
+                <span class="article-category">Stats Guide</span>
+                <h2 class="article-title">How to Track Flag Football Stats Like a Pro Coach</h2>
+                <p class="article-teaser">Master the essential statistics every flag football coach should track. Learn which metrics matter most and how to use data to improve team performance and player development.</p>
+                <a href="how-to-track-flag-football-stats.html" class="article-link">Read</a>
+            </article>
+
+            <!-- Article 2 -->
+            <article class="article-card">
+                <span class="article-category">Strategy</span>
+                <h2 class="article-title">Smart Rotation Strategies for Youth Flag Football</h2>
+                <p class="article-teaser">Keep every player engaged and develop your entire roster with proven rotation strategies. Discover how to balance playing time, skill development, and competitive success.</p>
+                <a href="flag-football-rotation-strategies.html" class="article-link">Read</a>
+            </article>
+
+            <!-- Article 3 -->
+            <article class="article-card">
+                <span class="article-category">App Review</span>
+                <h2 class="article-title">Best Youth Flag Football Coaching App in 2026</h2>
+                <p class="article-teaser">Find out why CGMax FFTP is leading the way in youth flag football coaching technology. See how modern coaches are streamlining roster management, stats tracking, and parent communication.</p>
+                <a href="best-flag-football-coaching-app-2026.html" class="article-link">Read</a>
+            </article>
+
+            <!-- Article 4 -->
+            <article class="article-card">
+                <span class="article-category">Rules</span>
+                <h2 class="article-title">Youth Flag Football Rules & First-Time Coaching Guide</h2>
+                <p class="article-teaser">New to flag football coaching? Get up to speed with an essential guide to the rules, field dimensions, and game fundamentals that will make you confident on day one.</p>
+                <a href="youth-flag-football-rules-guide.html" class="article-link">Read</a>
+            </article>
+
+            <!-- Article 5 -->
+            <article class="article-card">
+                <span class="article-category">Tournaments</span>
+                <h2 class="article-title">How to Run a Flag Football Tournament</h2>
+                <p class="article-teaser">Planning a tournament? Learn how to structure bracket formats, manage scheduling, coordinate officials, and create an unforgettable competitive experience for your youth athletes.</p>
+                <a href="how-to-run-flag-football-tournament.html" class="article-link">Read</a>
+            </article>
+
+            <!-- Article 6 -->
+            <article class="article-card">
+                <span class="article-category">Parents</span>
+                <h2 class="article-title">Live Scoreboards: How Parents Can Follow Youth Games in Real Time</h2>
+                <p class="article-teaser">Keep parents connected and engaged with live scoring updates. Discover how real-time scoreboards enhance the fan experience and strengthen your youth sports community.</p>
+                <a href="live-scoreboard-parents-youth-games.html" class="article-link">Read</a>
+            </article>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">CGMax FFTP</div>
+            <p class="footer-text">The complete youth flag football coaching platform for coaches, players, and parents.</p>
+            <div class="footer-links">
+                <a href="../" class="footer-link">Home</a>
+                <a href="https://cgmaxfftp.com" class="footer-link">Visit Site</a>
+                <a href="#" class="footer-link">Contact</a>
+                <a href="#" class="footer-link">Privacy</a>
+            </div>
+            <div class="footer-copyright">
+                © 2026 CGMax FFTP. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

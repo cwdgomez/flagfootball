@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /auth-callback.html
+Disallow: /app.html
 
 Sitemap: https://cgmaxfftp.com/sitemap.xml
