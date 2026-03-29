@@ -90,9 +90,27 @@ nav{
   text-transform:uppercase;transition:transform .15s,box-shadow .15s;white-space:nowrap;
   box-shadow:0 2px 16px rgba(255,215,0,.35);}
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(255,215,0,.55);}
+/* ── Hamburger button ── */
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;z-index:501;}
+.hamburger span{display:block;width:22px;height:2px;background:var(--gold);margin:5px 0;
+  border-radius:2px;transition:transform .3s,opacity .3s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
 @media(max-width:640px){
-  .nav-links .nav-link{display:none;}
-  nav{padding:10px 16px;}
+  .hamburger{display:block;}
+  .nav-links{
+    display:none;flex-direction:column;position:absolute;top:100%;right:0;left:0;
+    background:rgba(10,10,10,.97);border-top:1px solid rgba(255,215,0,.12);
+    padding:12px 20px 16px;gap:4px;
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  }
+  .nav-links.open{display:flex;}
+  .nav-links .nav-link{display:block;padding:10px 8px;font-size:14px;
+    border-bottom:1px solid rgba(255,255,255,.06);}
+  .nav-links .nav-cta{margin-top:8px;text-align:center;display:block;}
+  nav{padding:10px 16px;position:relative;}
   .nav-cta{font-size:12px;padding:6px 12px;letter-spacing:1px;}
 }
 
@@ -858,6 +876,9 @@ footer{
 <!-- NAV -->
 <nav aria-label="Site Navigation">
   <div class="nav-logo">CGMax <span>·</span> FFTP</div>
+  <button class="hamburger" aria-label="Menu" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+    <span></span><span></span><span></span>
+  </button>
   <div class="nav-links">
     <a href="#showcase" class="nav-link">Showcase</a>
     <a href="#features" class="nav-link">Features</a>
