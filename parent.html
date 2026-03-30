@@ -159,6 +159,68 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
 /* ── FOCUS RINGS (WCAG 2.4.7) ── */
 :focus-visible{outline:2px solid var(--s);outline-offset:3px;border-radius:4px;}
 .hdr-refresh:focus-visible{border-radius:8px;}
+
+/* ── SUN MODE TOGGLE ── */
+.sun-toggle{
+  background:none;border:1px solid rgba(255,255,255,.1);border-radius:8px;
+  color:var(--dim);font-size:18px;width:34px;height:34px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:color .2s,border-color .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.sun-toggle:active{color:var(--s);border-color:var(--s);}
+
+/* ═══ SUN / LIGHT MODE ═══ */
+body.sun{
+  --dark:#f5f5f0;--dark2:#eaeae5;--dark3:#ddddd8;--dark4:#d0d0cb;--sur:#ffffff;
+  --txt:#111;--dim:#555;--dimmer:#777;
+}
+body.sun,body.sun html{background:#f5f5f0;color:#111;}
+body.sun .bg-grid{opacity:.08;}
+body.sun .live-header{background:rgba(245,245,240,.96);border-bottom-color:#cc8800;}
+body.sun .live-badge{background:rgba(220,0,0,.08);border-color:rgba(220,0,0,.3);color:#cc0000;}
+body.sun .live-dot{background:#cc0000;}
+body.sun .final-badge{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.15);color:#555;}
+body.sun .hdr-brand{color:#aa8800;}
+body.sun .hdr-refresh{border-color:rgba(0,0,0,.15);color:#555;}
+body.sun .sun-toggle{border-color:rgba(0,0,0,.15);color:#555;}
+body.sun .score-num{color:#333;}
+body.sun .score-num.us{color:#996600;}
+body.sun .score-sep{color:#999;}
+body.sun .score-name{color:#555;}
+body.sun .q-pip{background:#ddd;border-color:#bbb;}
+body.sun .q-pip.done{background:rgba(170,136,0,.25);border-color:rgba(170,136,0,.5);}
+body.sun .q-pip.current{background:#cc8800;border-color:#cc8800;box-shadow:0 0 8px rgba(204,136,0,.4);}
+body.sun .q-label{color:#996600;}
+body.sun .last-update{color:#777;}
+body.sun .section-div{border-top-color:#ddd;}
+body.sun .section-lbl{color:#996600;}
+body.sun .stat-card{background:#fff;border-color:#ddd;}
+body.sun .stat-row{border-bottom-color:#eee;}
+body.sun .stat-pname{color:#111;}
+body.sun .stat-qb-tag{color:#996600;}
+body.sun .stat-rank{color:#999;}
+body.sun .stat-rank.g1{color:#b8860b;}
+body.sun .stat-rank.g2{color:#808080;}
+body.sun .stat-rank.g3{color:#8B4513;}
+body.sun .pill{font-weight:800;}
+body.sun .pill-td{background:rgba(22,163,74,.12);color:#15803d;border-color:rgba(22,163,74,.3);}
+body.sun .pill-f{background:rgba(37,99,235,.12);color:#1d4ed8;border-color:rgba(37,99,235,.3);}
+body.sun .pill-c{background:rgba(147,51,234,.12);color:#7c3aed;border-color:rgba(147,51,234,.3);}
+body.sun .pill-int{background:rgba(234,88,12,.12);color:#c2410c;border-color:rgba(234,88,12,.3);}
+body.sun .pill-cv{background:rgba(13,148,136,.12);color:#0f766e;border-color:rgba(13,148,136,.3);}
+body.sun .pill-qbt{background:rgba(22,163,74,.12);color:#15803d;border-color:rgba(22,163,74,.3);}
+body.sun .pill-qbi{background:rgba(225,29,72,.12);color:#be123c;border-color:rgba(225,29,72,.3);}
+body.sun .pill-blank{color:#bbb;border-color:#ddd;}
+body.sun .q-us{color:#996600;}
+body.sun .q-them{color:#555;}
+body.sun .q-sep{color:#bbb;}
+body.sun .error-banner{background:rgba(234,88,12,.08);border-color:rgba(234,88,12,.25);color:#c2410c;}
+body.sun .center-title{color:#111;}
+body.sun .center-sub{color:#555;}
+body.sun .center-sub a{color:#996600;}
+body.sun .live-footer{background:rgba(245,245,240,.94);border-top-color:#ddd;color:#777;}
+body.sun .live-footer a{color:#996600;}
+body.sun .matchup-date{color:#777;}
 </style>
 </head>
 <body>
@@ -172,7 +234,10 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
       <div class="live-dot"></div>LIVE
     </div>
     <div class="hdr-brand">CGMax FFTP</div>
-    <button class="hdr-refresh" onclick="manualRefresh()" title="Refresh">⟳</button>
+    <div style="display:flex;gap:6px;">
+      <button class="sun-toggle" id="sun-toggle" onclick="toggleSun()" title="Sun Mode">☀️</button>
+      <button class="hdr-refresh" onclick="manualRefresh()" title="Refresh">⟳</button>
+    </div>
   </div>
 
   <!-- ERROR BANNER -->
@@ -195,6 +260,20 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;padding-
   Powered by <a href="./index.html">CGMax FFTP</a> &mdash; Live Parent View
 </div>
 
+<script>
+/* ── Sun Mode Toggle ── */
+function toggleSun(){
+  document.body.classList.toggle('sun');
+  var on=document.body.classList.contains('sun');
+  var btn=document.getElementById('sun-toggle');
+  btn.textContent=on?'🌙':'☀️';
+  btn.title=on?'Dark Mode':'Sun Mode';
+  var meta=document.getElementById('meta-theme');
+  if(meta)meta.content=on?'#f5f5f0':'#080808';
+  try{localStorage.setItem('cgmax-sun',on?'1':'0');}catch(e){}
+}
+(function(){try{if(localStorage.getItem('cgmax-sun')==='1'){document.body.classList.add('sun');var b=document.getElementById('sun-toggle');if(b){b.textContent='🌙';b.title='Dark Mode';}var m=document.getElementById('meta-theme');if(m)m.content='#f5f5f0';}}catch(e){}})();
+</script>
 <script>
 /* ═══════════════════════════════════════════════
    CGMax FFTP — Live Parent Scoreboard

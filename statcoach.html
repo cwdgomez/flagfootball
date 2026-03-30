@@ -165,6 +165,102 @@ body{display:flex;flex-direction:column;}
 
 /* ── WAITING ── */
 .waiting-msg{text-align:center;padding:40px 20px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:var(--dim);}
+
+/* ── SUN MODE TOGGLE ── */
+.sun-toggle{
+  background:none;border:1px solid rgba(255,255,255,.12);border-radius:8px;
+  color:var(--dim);font-size:16px;width:30px;height:30px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:color .2s,border-color .2s;
+  -webkit-tap-highlight-color:transparent;flex-shrink:0;
+}
+.sun-toggle:active{color:var(--gold);border-color:var(--gold);}
+
+/* ═══ SUN / LIGHT MODE ═══ */
+body.sun{
+  --bg:#f5f5f0;--sur:#ffffff;--dark2:#eaeae5;--dark3:#ddddd8;--dark4:#d0d0cb;--dark5:#c5c5c0;
+  --txt:#111;--dim:#555;--dimmer:#888;
+  background:#f5f5f0;color:#111;
+}
+
+/* Join screen */
+body.sun .join-screen{background:#f5f5f0;}
+body.sun .join-logo{color:#996600;}
+body.sun .join-logo span{color:#cc0000;}
+body.sun .join-subtitle{color:#777;}
+body.sun .join-label{color:#555;}
+body.sun .join-input{background:#fff;border-color:#ccc;color:#111;}
+body.sun .join-input:focus{border-color:#0f766e;}
+body.sun .join-btn{background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;}
+
+/* Header */
+body.sun .sc-header{background:#fff;border-bottom-color:#ddd;}
+body.sun .sc-team-name{color:#111;}
+body.sun .sc-vs{color:#777;}
+body.sun .sc-quarter{color:#555;}
+body.sun .sc-score{color:#111;}
+body.sun .sc-conn-dot.live{background:#16a34a;}
+body.sun .sun-toggle{border-color:rgba(0,0,0,.15);color:#555;}
+
+/* Role screen */
+body.sun .role-screen{background:#f5f5f0;}
+body.sun .role-title{color:#111;}
+body.sun .role-hint{color:#555;}
+body.sun .role-card{background:#fff;border-color:#ddd;}
+body.sun .role-card.rc-stats{border-color:rgba(15,118,110,.4);}
+body.sun .role-card.rc-stats:hover{border-color:#0f766e;}
+body.sun .role-card.rc-rots{border-color:rgba(217,119,6,.4);}
+body.sun .role-card.rc-rots:hover{border-color:#d97706;}
+body.sun .rc-name{color:#111;}
+body.sun .rc-desc{color:#555;}
+
+/* Game screen — stat cards */
+body.sun .player-list{background:#f5f5f0;}
+body.sun .player-card{background:#fff;border-color:#ddd;}
+body.sun .player-card.on-off{border-color:rgba(22,163,74,.35);background:rgba(22,163,74,.06);}
+body.sun .player-card.on-def{border-color:rgba(37,99,235,.35);background:rgba(37,99,235,.06);}
+body.sun .player-card.is-qb{border-color:rgba(180,130,0,.35);background:rgba(180,130,0,.06);}
+body.sun .pc-name{color:#111;}
+body.sun .pc-tag.qb{background:rgba(180,130,0,.12);color:#92600a;}
+body.sun .pc-tag.off{background:rgba(22,163,74,.12);color:#15803d;}
+body.sun .pc-tag.def{background:rgba(37,99,235,.12);color:#1d4ed8;}
+body.sun .pc-tag.bench{background:rgba(0,0,0,.05);color:#888;}
+body.sun .pc-chevron{color:#bbb;}
+body.sun .pc-header:active{background:rgba(0,0,0,.03);}
+body.sun .stb{background:#f0f0eb;border-color:#ddd;}
+body.sun .stb:active{background:#e5e5e0;}
+body.sun .stb-label{color:#555;}
+body.sun .stb-count{color:#111;}
+
+/* Rotation screen */
+body.sun .rot-content{background:#f5f5f0;}
+body.sun .rot-section-hdr .rsh-count{color:#999;}
+body.sun .rsh-off{color:#15803d;}
+body.sun .rsh-def{color:#1d4ed8;}
+body.sun .rsh-bench{color:#888;}
+body.sun .rp-card{background:#fff;border-color:#ddd;}
+body.sun .rp-card.rp-off{border-color:rgba(22,163,74,.35);background:rgba(22,163,74,.06);}
+body.sun .rp-card.rp-def{border-color:rgba(37,99,235,.35);background:rgba(37,99,235,.06);}
+body.sun .rp-card.rp-bench{border-color:#ddd;}
+body.sun .rp-card.rp-suggest{border-color:rgba(217,119,6,.5);box-shadow:0 0 8px rgba(217,119,6,.15);}
+body.sun .rp-num{color:#999;}
+body.sun .rp-name{color:#111;}
+body.sun .rp-snaps{color:#777;}
+body.sun .rp-snap-val{color:#111;}
+body.sun .rp-snap-bar{background:#e5e5e0;}
+body.sun .rp-btn-off{background:rgba(22,163,74,.12);color:#15803d;border-color:rgba(22,163,74,.3);}
+body.sun .rp-btn-def{background:rgba(37,99,235,.12);color:#1d4ed8;border-color:rgba(37,99,235,.3);}
+body.sun .rp-btn-remove{background:rgba(0,0,0,.05);color:#888;border-color:#ccc;}
+body.sun .sub-suggest{background:rgba(217,119,6,.08);border-color:rgba(217,119,6,.25);}
+body.sun .sub-suggest-text{color:#92400e;}
+body.sun .sub-suggest-btn{background:#d97706;color:#fff;}
+
+/* Toast */
+body.sun .toast{background:rgba(255,255,255,.97);border-color:#ddd;color:#111;}
+
+/* Connecting screen */
+body.sun .connecting-screen{background:#f5f5f0;}
+body.sun .spinner{border-color:rgba(0,0,0,.1);border-top-color:#0f766e;}
+body.sun .connecting-txt{color:#555;}
 </style>
 </head>
 <body>
@@ -185,11 +281,13 @@ body{display:flex;flex-direction:column;}
       <span id="sc-conn-txt">Connecting</span>
     </div>
     <div class="sc-mode-badge stats" id="sc-mode-badge">STAT TRACKER</div>
+    <button class="sun-toggle" id="sun-toggle" onclick="toggleSun()" title="Sun Mode">☀️</button>
   </div>
 </div>
 
 <!-- JOIN SCREEN -->
 <div class="join-screen" id="join-screen">
+  <button class="sun-toggle" id="sun-toggle-join" onclick="toggleSun()" title="Sun Mode" style="position:absolute;top:16px;right:16px;">☀️</button>
   <div class="join-logo">CG<span>MAX</span> FFTP</div>
   <div class="join-subtitle">Game Assistant</div>
   <div class="join-label">Enter Game Code</div>
@@ -239,6 +337,18 @@ body{display:flex;flex-direction:column;}
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script>
+/* ── Sun Mode Toggle ── */
+function toggleSun(){
+  document.body.classList.toggle('sun');
+  var on=document.body.classList.contains('sun');
+  var icon=on?'🌙':'☀️';
+  var title=on?'Dark Mode':'Sun Mode';
+  document.querySelectorAll('.sun-toggle').forEach(function(b){b.textContent=icon;b.title=title;});
+  try{localStorage.setItem('cgmax-sun',on?'1':'0');}catch(e){}
+}
+(function(){try{if(localStorage.getItem('cgmax-sun')==='1'){document.body.classList.add('sun');document.querySelectorAll('.sun-toggle').forEach(function(b){b.textContent='🌙';b.title='Dark Mode';});}}catch(e){}})();
+</script>
 <script>
 (function(){
   var SUPABASE_URL = 'https://auth.cgmaxfftp.com';
