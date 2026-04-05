@@ -7169,9 +7169,8 @@ function deactivateStatCoach(){
 // Open consent form — passes team name, season, and coach uid for pre-fill + ownership
 async function openConsentForm(){
   var team=encodeURIComponent(G.team||'');
-  var now=new Date();
-  var seasons=['Spring','Spring','Spring','Spring','Summer','Summer','Summer','Fall','Fall','Fall','Winter','Winter'];
-  var season=encodeURIComponent(seasons[now.getMonth()]+' '+now.getFullYear());
+  // Use inferSeasonName() so consent form season matches the recap API season exactly
+  var season=encodeURIComponent(inferSeasonName());
   var uid='';
   try{
     if(sbClient){
@@ -8799,8 +8798,9 @@ function sendPostGameRecap(gameData,playerStats,scoreCardBase64){
 
   if(!token){console.warn('[game-recap] No auth token');return;}
 
-  // Find the game index (0 = most recent, which we just saved)
-  var gameIndex=0;
+  // Use the game's unique timestamp ID so each game gets its own recap
+  // (previous hardcoded 0 caused every game after the first to hit duplicate detection)
+  var gameIndex=gameData.id||Date.now();
 
   var payload={
     team_id:teamId,
