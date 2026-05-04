@@ -1227,6 +1227,69 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
 .ptr-indicator.releasing{transition:height .3s ease;}
 .ptr-spinner{width:18px;height:18px;border:2px solid rgba(255,215,0,.3);border-top-color:var(--s,#FFD700);border-radius:50%;animation:spin .6s linear infinite;margin-right:8px;}
 @keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── Player Season Card Screen ─────────────────────────────── */
+#screen-player-card{display:flex;flex-direction:column;height:100%;background:var(--bg);overflow:hidden;}
+.psc-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 10px;min-height:50px;background:var(--bg);border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;gap:8px;}
+.psc-back-btn{display:flex;align-items:center;gap:4px;background:none;border:none;color:rgba(255,255,255,.6);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;padding:6px 4px;-webkit-tap-highlight-color:transparent;}
+.psc-back-btn:active{color:rgba(255,255,255,.9);}
+.psc-topbar-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:rgba(255,255,255,.5);flex:1;text-align:center;}
+.psc-share-top-btn{background:none;border:none;color:rgba(255,255,255,.55);cursor:pointer;padding:6px 8px;display:flex;align-items:center;-webkit-tap-highlight-color:transparent;}
+.psc-share-top-btn:active{color:rgba(255,255,255,.9);}
+
+/* Hero banner */
+.psc-hero{position:relative;padding:28px 20px 24px;text-align:center;overflow:hidden;}
+.psc-hero-bg{position:absolute;inset:0;z-index:0;}
+.psc-hero-content{position:relative;z-index:1;}
+.psc-avatar-wrap{display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;position:relative;}
+.psc-nickname-badge{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:3px 12px;border-radius:20px;margin-bottom:8px;}
+.psc-player-name{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;line-height:1;margin-bottom:4px;}
+.psc-player-sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.45);}
+.psc-title-label{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;margin-top:10px;line-height:1.1;}
+
+/* Stat counters grid */
+.psc-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:4px 14px 0;}
+.psc-stat-box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 8px 10px;text-align:center;position:relative;overflow:hidden;}
+.psc-stat-box.highlight-stat{border-color:rgba(255,215,0,.35);background:rgba(255,215,0,.06);}
+.psc-stat-val{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;line-height:1;display:block;}
+.psc-stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.38);display:block;margin-top:2px;}
+.psc-stat-bar{position:absolute;bottom:0;left:0;height:3px;border-radius:0 0 0 0;transition:width .8s ease;}
+
+/* Badges */
+.psc-badges-wrap{padding:14px 14px 0;}
+.psc-badges-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;}
+.psc-badges-row{display:flex;flex-wrap:wrap;gap:7px;}
+.psc-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:30px;padding:6px 12px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.75);}
+.psc-badge.gold-badge{background:rgba(255,215,0,.10);border-color:rgba(255,215,0,.35);color:#FFD700;}
+.psc-badge.green-badge{background:rgba(34,197,94,.10);border-color:rgba(34,197,94,.35);color:#4ade80;}
+.psc-badge.blue-badge{background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.35);color:#a5b4fc;}
+.psc-badge.red-badge{background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.3);color:#f87171;}
+
+/* Best game card */
+.psc-best-game{margin:14px 14px 0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:14px 16px;}
+.psc-section-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;}
+.psc-best-game-vs{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1.5px;color:rgba(255,255,255,.9);}
+.psc-best-game-stats{display:flex;gap:14px;margin-top:6px;flex-wrap:wrap;}
+.psc-best-game-stat{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,.55);}
+.psc-best-game-stat span{color:rgba(255,255,255,.9);}
+
+/* Narrative */
+.psc-narrative{margin:14px 14px 0;background:rgba(255,255,255,.04);border-left:3px solid var(--s);border-radius:0 12px 12px 0;padding:12px 14px;}
+.psc-narrative-text{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:500;line-height:1.5;color:rgba(255,255,255,.65);font-style:italic;}
+
+/* Share button */
+.psc-share-btn{margin:18px 14px 0;width:calc(100% - 28px);background:linear-gradient(135deg,var(--p),var(--p2,#880000));border:none;border-radius:14px;padding:15px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2.5px;color:var(--s);cursor:pointer;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent;}
+.psc-share-btn:active{opacity:.85;}
+.psc-trend-btn{margin:10px 14px 0;width:calc(100% - 28px);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:13px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.55);cursor:pointer;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent;}
+
+/* Season record mini bar in hero */
+.psc-record-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;}
+.psc-record-item{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;}
+.psc-record-divider{width:1px;height:18px;background:rgba(255,255,255,.18);}
+
+/* Count-up animation */
+@keyframes pscCountUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.psc-stat-val{animation:pscCountUp .4s ease both;}
 </style>
 </head>
 <body>
@@ -1902,6 +1965,22 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
     <div class="trend-player-grid" id="trend-player-grid"></div>
     <div id="trend-detail"></div>
   </div>
+</div>
+
+<!-- PLAYER SEASON CARD SCREEN -->
+<div id="screen-player-card" class="screen" role="region" aria-label="Player Season Card">
+  <div class="psc-topbar">
+    <button type="button" class="psc-back-btn" onclick="closePlayerSeasonCard()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Season
+    </button>
+    <div class="psc-topbar-title">Player Card</div>
+    <button type="button" class="psc-share-top-btn" id="psc-share-top-btn" onclick="sharePlayerSeasonCard()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    </button>
+  </div>
+  <div id="psc-body" style="overflow-y:auto;flex:1;padding:0 0 40px 0;-webkit-overflow-scrolling:touch;"></div>
+  <canvas id="player-card-canvas" style="display:none"></canvas>
 </div>
 
 <!-- QR CODE MODAL -->
@@ -4070,7 +4149,7 @@ function renderTrophyPodium(ranked){
     // Medal badge
     html+='<span class="podium-rank-badge">'+medalEmoji[rank]+'</span>';
     html+='</div>';// .podium-figure
-    html+='<div class="podium-player-name">'+esc(dispName(player.name))+'</div>';
+    html+='<div class="podium-player-name" style="cursor:pointer" onclick="openPlayerSeasonCard(\'' + esc(player.name) + '\')">'+esc(dispName(player.name))+'</div>';
     html+='<div class="podium-player-pts"><span style="color:'+mc+'">'+player.score+'</span> pts · '+player.tds+' TDs</div>';
     html+='<div class="podium-block '+bcls+'"><div class="podium-block-lbl '+bcls+'">'+rankLbl[rank]+'</div></div>';
     html+='</div>';// .podium-slot
@@ -8247,6 +8326,469 @@ function generateSeasonReport(){
     primary:TC.primary||'#AA0000',
     secondary:TC.secondary||'#FFD700'
   };
+}
+
+/* ── Player Season Card ─────────────────────────────────── */
+var _pscCurrentPlayer = null;
+
+function openPlayerSeasonCard(name){
+  _pscCurrentPlayer = name;
+  ['screen-season','screen-main','screen-setup','screen-roster','screen-trend'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.classList.remove('active');
+  });
+  document.getElementById('screen-player-card').classList.add('active');
+  renderPlayerSeasonCard(name);
+}
+
+function closePlayerSeasonCard(){
+  document.getElementById('screen-player-card').classList.remove('active');
+  document.getElementById('screen-season').classList.add('active');
+  renderSeasonScreen();
+}
+
+function getPlayerPhoto(playerName){
+  try{return localStorage.getItem('ff_photo_'+ACTIVE_TEAM_ID+'_'+playerName)||null;}catch(e){return null;}
+}
+
+function renderPlayerSeasonCard(name){
+  var body=document.getElementById('psc-body');
+  if(!body)return;
+  var games=loadSeason();
+  var p=TC.primary||'#CC0000', s=TC.secondary||'#FFD700';
+
+  // ── Aggregate stats ───────────────────────────────────────
+  var totals={tds:0,qbTDs:0,catches:0,flags:0,ints:0,blocks:0,conv:0,score:0,snapO:0,snapD:0,fumbles:0,mvp:0,gp:0,wins:0,losses:0,ties:0};
+  var playerGames=[]; // games where player appeared
+  var bestGame=null, bestScore=-1;
+  var hatTrickGames=0; // 3+ TDs in single game
+
+  games.forEach(function(g){
+    var ps=g.playerStats&&g.playerStats[name];
+    if(!ps)return;
+    totals.gp++;
+    var gScore=(ps.score||0)+(ps.qbTDs||0)*6+(ps.tds||0)*6+(ps.catches||0)*1+(ps.flags||0)*1+(ps.ints||0)*2+(ps.blocks||0)*1+(ps.conv||0)*1;
+    var statScore=ps.score||(ps.tds||0)*6+(ps.catches||0)*1+(ps.flags||0)*1+(ps.ints||0)*2+(ps.blocks||0)*1;
+    totals.tds+=(ps.tds||0);
+    totals.qbTDs+=(ps.qbTDs||0);
+    totals.catches+=(ps.catches||0);
+    totals.flags+=(ps.flags||0);
+    totals.ints+=(ps.ints||0);
+    totals.blocks+=(ps.blocks||0);
+    totals.conv+=(ps.conv||0)+(ps.conv1||0)+(ps.conv2||0)+(ps.qbConvs||0);
+    totals.score+=(ps.score||0);
+    totals.snapO+=(ps.snapO||0);
+    totals.snapD+=(ps.snapD||0);
+    totals.fumbles+=(ps.fumbles||0);
+    if(g.mvp===name) totals.mvp++;
+
+    // Win/loss for games this player appeared in
+    var us=(g.scores&&g.scores.us)?g.scores.us.reduce(function(a,b){return a+b;},0):0;
+    var them=(g.scores&&g.scores.them)?g.scores.them.reduce(function(a,b){return a+b;},0):0;
+    if(us>them)totals.wins++;else if(them>us)totals.losses++;else totals.ties++;
+
+    if((ps.tds||0)>=3) hatTrickGames++;
+
+    var thisBestStat=(ps.tds||0)*6+(ps.catches||0)+(ps.flags||0)+(ps.score||0);
+    if(thisBestStat>bestScore){
+      bestScore=thisBestStat;
+      bestGame={opp:g.opp||'Opponent',date:g.date||'',ps:ps,us:us,them:them,won:us>them};
+    }
+    playerGames.push({g:g,ps:ps,us:us,them:them});
+  });
+
+  var allTDs = totals.tds + totals.qbTDs;
+
+  // ── Nickname / Title ──────────────────────────────────────
+  function getTitle(){
+    if(totals.mvp>=3) return 'THE MVP';
+    if(allTDs>=10) return 'TOUCHDOWN MACHINE';
+    if(totals.flags>=8) return 'FLAG PULLER';
+    if(totals.ints>=3) return 'THE SHUTDOWN';
+    if(totals.catches>=10) return 'SURE HANDS';
+    if(totals.blocks>=5) return 'THE WALL';
+    if(totals.mvp>=2) return 'BACK-TO-BACK MVP';
+    if(allTDs>=5) return 'SCORING MACHINE';
+    if(totals.catches>=6) return 'THE PLAYMAKER';
+    if(totals.flags>=5) return 'PRESSURE KING';
+    if(totals.gp>=1) return 'TEAM PLAYER';
+    return 'ROOKIE RISING';
+  }
+  var title = getTitle();
+
+  // ── Dominant stat (for highlight) ────────────────────────
+  var statWeights=[
+    {key:'tds', val:allTDs, weight:allTDs*3},
+    {key:'catches', val:totals.catches, weight:totals.catches*1.2},
+    {key:'flags', val:totals.flags, weight:totals.flags*1.1},
+    {key:'ints', val:totals.ints, weight:totals.ints*2},
+    {key:'blocks', val:totals.blocks, weight:totals.blocks*1.5},
+  ];
+  statWeights.sort(function(a,b){return b.weight-a.weight;});
+  var dominantStat = statWeights[0].key;
+
+  // ── Badges ────────────────────────────────────────────────
+  var badges=[];
+  if(totals.mvp>0) badges.push({icon:'⭐',label:'MVP x'+totals.mvp,cls:'gold-badge'});
+  if(hatTrickGames>0) badges.push({icon:'🔥',label:'Hat Trick'+(hatTrickGames>1?' x'+hatTrickGames:''),cls:'red-badge'});
+  if(totals.gp>=games.length&&games.length>0) badges.push({icon:'💪',label:'Perfect Attendance',cls:'green-badge'});
+  if(allTDs>=10) badges.push({icon:'🏆',label:'10 TD Club',cls:'gold-badge'});
+  if(allTDs>=5&&allTDs<10) badges.push({icon:'🎯',label:'5 TD Club',cls:'blue-badge'});
+  if(totals.ints>=3) badges.push({icon:'🛡️',label:'Shutdown Corner',cls:'blue-badge'});
+  if(totals.flags>=8) badges.push({icon:'🚩',label:'Flag Machine',cls:'green-badge'});
+  if(totals.catches>=10) badges.push({icon:'🙌',label:'Sure Hands',cls:'green-badge'});
+  if(totals.wins===totals.gp&&totals.gp>=3) badges.push({icon:'🔐',label:'Undefeated',cls:'gold-badge'});
+
+  // ── Narrative sentence ────────────────────────────────────
+  function buildNarrative(){
+    var fn=firstName(name);
+    if(totals.gp===0) return fn+' is ready to light it up — season stats will appear once games are saved.';
+    var lines=[];
+    lines.push(fn+' played in '+totals.gp+' game'+(totals.gp!==1?'s':'')+' this season');
+    if(allTDs>0) lines.push('found the end zone '+allTDs+' time'+(allTDs!==1?'s':''));
+    if(totals.flags>0) lines.push('ripped '+totals.flags+' flag'+(totals.flags!==1?'s':'')+' on defense');
+    if(totals.mvp>0) lines.push('earned MVP '+(totals.mvp===1?'once':totals.mvp+' times'));
+    var record=totals.wins+'-'+totals.losses+(totals.ties?'-'+totals.ties:'');
+    lines.push('and went '+record+' when on the field');
+    return lines.join(', ')+'.';
+  }
+
+  // ── Avatar / Photo ────────────────────────────────────────
+  var photo=getPlayerPhoto(name);
+  var avatarHtml;
+  if(photo){
+    avatarHtml='<div style="width:96px;height:96px;border-radius:50%;overflow:hidden;border:3px solid '+s+';box-shadow:0 0 28px '+s+'44;margin:0 auto">'
+      +'<img src="'+escHtml(photo)+'" style="width:100%;height:100%;object-fit:cover;filter:saturate(140%) brightness(108%)" alt="'+escHtml(firstName(name))+'">'
+      +'</div>';
+  } else {
+    avatarHtml='<div style="margin:0 auto;filter:drop-shadow(0 0 16px '+s+'66)">'+buildCartoonAvatarSVG(name,p,s,true)+'</div>';
+  }
+
+  // ── Luma for text color on primary ───────────────────────
+  var rr=parseInt(p.slice(1,3)||'0',16),gg=parseInt(p.slice(3,5)||'0',16),bb=parseInt(p.slice(5,7)||'0',16);
+  var lum=(0.299*rr+0.587*gg+0.114*bb)/255;
+  var textOnP=lum>0.55?'#111':'#fff';
+
+  // ── Build HTML ────────────────────────────────────────────
+  var html='';
+
+  // Hero
+  var darkP;try{darkP=darken(p,60);}catch(e){darkP='#1a0000';}
+  html+='<div class="psc-hero">'
+    +'<div class="psc-hero-bg" style="background:linear-gradient(180deg,'+darkP+' 0%,rgba(10,10,10,0) 100%)"></div>'
+    +'<div class="psc-hero-content">'
+    +'<div class="psc-nickname-badge" style="background:'+s+';color:'+textOnP+'">'+jerseyNum(name)?('#'+jerseyNum(name)+' · '+title):title+'</div>'
+    +'<div class="psc-avatar-wrap">'+avatarHtml+'</div>'
+    +'<div class="psc-player-name" style="color:'+s+'">'+escHtml(dispName(name))+'</div>'
+    +(jerseyNum(name)?'<div class="psc-player-sub">#'+jerseyNum(name)+(name===G.qb?' · QB · ':'· ')+(getActiveTeamName()||'Player')+'</div>':'<div class="psc-player-sub">'+(getActiveTeamName()||'Player')+'</div>')
+    +'<div class="psc-record-row">'
+    +'<div class="psc-record-item" style="color:#4ade80">'+totals.wins+' <span style="font-size:12px;letter-spacing:1px;color:rgba(255,255,255,.35);font-family:'Barlow Condensed',sans-serif;font-weight:700">W</span></div>'
+    +'<div class="psc-record-divider"></div>'
+    +'<div class="psc-record-item" style="color:#f87171">'+totals.losses+' <span style="font-size:12px;letter-spacing:1px;color:rgba(255,255,255,.35);font-family:'Barlow Condensed',sans-serif;font-weight:700">L</span></div>'
+    +(totals.ties?'<div class="psc-record-divider"></div><div class="psc-record-item" style="color:rgba(255,255,255,.5)">'+totals.ties+' <span style="font-size:12px;letter-spacing:1px;color:rgba(255,255,255,.35);font-family:'Barlow Condensed',sans-serif;font-weight:700">T</span></div>':'')
+    +'<div class="psc-record-divider"></div>'
+    +'<div class="psc-record-item" style="color:rgba(255,255,255,.55)">'+totals.gp+' <span style="font-size:12px;letter-spacing:1px;color:rgba(255,255,255,.35);font-family:'Barlow Condensed',sans-serif;font-weight:700">GP</span></div>'
+    +'</div>'
+    +'</div></div>';
+
+  // Stat boxes
+  var statDefs=[
+    {label:'TOUCHDOWNS',val:allTDs,color:s,key:'tds'},
+    {label:'CATCHES',val:totals.catches,color:'#60a5fa',key:'catches'},
+    {label:'FLAGS',val:totals.flags,color:'#4ade80',key:'flags'},
+    {label:'INTS',val:totals.ints,color:'#a78bfa',key:'ints'},
+    {label:'BLOCKS',val:totals.blocks,color:'#fb923c',key:'blocks'},
+    {label:'CONVERSIONS',val:totals.conv,color:'#f472b6',key:'conv'},
+  ];
+  // Find max for bar sizing
+  var maxStatVal=Math.max(1, allTDs, totals.catches, totals.flags, totals.ints, totals.blocks, totals.conv);
+
+  html+='<div class="psc-stats-grid">';
+  statDefs.forEach(function(sd){
+    var isTop=(sd.key===dominantStat);
+    var barW=Math.round((sd.val/maxStatVal)*100);
+    html+='<div class="psc-stat-box'+(isTop?' highlight-stat':'')+'">'
+      +'<span class="psc-stat-val" style="color:'+sd.color+'" id="psc-sv-'+sd.key+'">'+sd.val+'</span>'
+      +'<span class="psc-stat-lbl">'+sd.label+'</span>'
+      +'<div class="psc-stat-bar" style="width:'+barW+'%;background:'+sd.color+';opacity:0.35"></div>'
+      +'</div>';
+  });
+  html+='</div>';
+
+  // Badges
+  if(badges.length){
+    html+='<div class="psc-badges-wrap">'
+      +'<div class="psc-badges-title">Achievements</div>'
+      +'<div class="psc-badges-row">';
+    badges.forEach(function(b){
+      html+='<div class="psc-badge '+b.cls+'"><span>'+b.icon+'</span>'+escHtml(b.label)+'</div>';
+    });
+    html+='</div></div>';
+  }
+
+  // Best game
+  if(bestGame){
+    var bgPs=bestGame.ps;
+    var bgStatParts=[];
+    if((bgPs.tds||0)+(bgPs.qbTDs||0)>0) bgStatParts.push('<span>'+((bgPs.tds||0)+(bgPs.qbTDs||0))+'</span> TD'+(((bgPs.tds||0)+(bgPs.qbTDs||0))!==1?'s':''));
+    if(bgPs.catches>0) bgStatParts.push('<span>'+bgPs.catches+'</span> catch'+(bgPs.catches!==1?'es':''));
+    if(bgPs.flags>0) bgStatParts.push('<span>'+bgPs.flags+'</span> flag'+(bgPs.flags!==1?'s':''));
+    if(bgPs.ints>0) bgStatParts.push('<span>'+bgPs.ints+'</span> INT'+(bgPs.ints!==1?'s':''));
+    if(bgPs.blocks>0) bgStatParts.push('<span>'+bgPs.blocks+'</span> block'+(bgPs.blocks!==1?'s':''));
+    html+='<div class="psc-best-game">'
+      +'<div class="psc-section-label">⚡ Best Performance</div>'
+      +'<div class="psc-best-game-vs">vs. '+escHtml(bestGame.opp)
+        +(bestGame.date?' <span style="font-size:13px;color:rgba(255,255,255,.35);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:1px">'+escHtml(bestGame.date)+'</span>':'')+'</div>'
+      +(bestGame.us!==undefined?'<div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;color:'+(bestGame.won?'#4ade80':'#f87171')+';margin:3px 0 6px">'+(bestGame.won?'WIN':'LOSS')+' · '+bestGame.us+'–'+bestGame.them+'</div>':'')
+      +'<div class="psc-best-game-stats">'+bgStatParts.join('<span style="color:rgba(255,255,255,.2);margin:0 2px">·</span>')+'</div>'
+      +'</div>';
+  }
+
+  // Narrative
+  html+='<div class="psc-narrative"><div class="psc-narrative-text">'+escHtml(buildNarrative())+'</div></div>';
+
+  // Trend button
+  html+='<button type="button" class="psc-trend-btn" onclick="openTrendFromPlayerCard(''+esc(name)+'')">'
+    +'<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>'
+    +' View Full Trends</button>';
+
+  // Share button
+  html+='<button type="button" class="psc-share-btn" onclick="sharePlayerSeasonCard()">'
+    +'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>'
+    +' Share Card</button>';
+
+  body.innerHTML=html;
+
+  // Stash data for share canvas
+  window._pscData={
+    name:name, firstName:firstName(name), dispName:dispName(name),
+    jerseyNum:jerseyNum(name)||'', title:title,
+    tds:allTDs, catches:totals.catches, flags:totals.flags,
+    ints:totals.ints, blocks:totals.blocks, conv:totals.conv,
+    score:totals.score, gp:totals.gp, mvp:totals.mvp,
+    wins:totals.wins, losses:totals.losses, ties:totals.ties,
+    badges:badges, bestGame:bestGame,
+    primary:p, secondary:s, teamName:getActiveTeamName()||'My Team',
+    photo:photo, narrative:buildNarrative()
+  };
+
+  // Animate stat counters
+  setTimeout(function(){
+    statDefs.forEach(function(sd){
+      var el2=document.getElementById('psc-sv-'+sd.key);
+      if(!el2||sd.val===0) return;
+      var start=0, end=sd.val, dur=700, t0=null;
+      function step(ts){
+        if(!t0) t0=ts;
+        var prog=Math.min((ts-t0)/dur,1);
+        var ease=1-Math.pow(1-prog,3);
+        el2.textContent=Math.round(start+(end-start)*ease);
+        if(prog<1) requestAnimationFrame(step);
+        else el2.textContent=end;
+      }
+      requestAnimationFrame(step);
+    });
+  }, 80);
+}
+
+function openTrendFromPlayerCard(name){
+  document.getElementById('screen-player-card').classList.remove('active');
+  trendFromScreen='season';
+  document.getElementById('screen-trend').classList.add('active');
+  trendSelectedPlayer=name;
+  renderTrendScreen();
+}
+
+/* ── Player Season Card Share Canvas ────────────────────────── */
+function sharePlayerSeasonCard(){
+  var d=window._pscData;
+  if(!d){showToast('Open a player card first');return;}
+  var canvas=document.getElementById('player-card-canvas');
+  if(!canvas){showToast('Canvas not ready');return;}
+  showToast('🎨 Building share card for '+d.firstName+'...');
+
+  var W=720,H=1080;
+  canvas.width=W;canvas.height=H;
+  var ctx=canvas.getContext('2d');
+  var pri=d.primary||'#AA0000',sec=d.secondary||'#FFD700';
+
+  function rr(x,y,w,h,r){
+    ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+    ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+    ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+    ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+  }
+
+  // Background gradient
+  var bg=ctx.createLinearGradient(0,0,0,H);
+  var darkP;try{darkP=shadeColor(pri,-65);}catch(e){darkP='#1a0000';}
+  bg.addColorStop(0,darkP);bg.addColorStop(0.6,'#0d0d0d');bg.addColorStop(1,'#000');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  // Subtle grid
+  ctx.strokeStyle='rgba(255,255,255,0.022)';ctx.lineWidth=1;
+  for(var gx=0;gx<W;gx+=40){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
+  for(var gy=0;gy<H;gy+=40){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();}
+
+  // Top accent bar
+  var topGrad=ctx.createLinearGradient(0,0,W,0);
+  topGrad.addColorStop(0,sec);topGrad.addColorStop(0.5,pri);topGrad.addColorStop(1,sec);
+  ctx.fillStyle=topGrad;ctx.fillRect(0,0,W,5);
+
+  // Jersey/number badge top-right
+  rr(ctx,W-110,14,90,44,10);
+  ctx.fillStyle='rgba(255,255,255,0.06)';ctx.fill();
+  rr(ctx,W-110,14,90,44,10);ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1.2;ctx.stroke();
+  if(d.jerseyNum){
+    ctx.textAlign='center';ctx.fillStyle=sec;
+    ctx.font='bold 28px "Bebas Neue",Arial Black,sans-serif';ctx.fillText('#'+d.jerseyNum,W-65,48);
+  }
+
+  // Avatar area (photo or placeholder circle)
+  var avatarCY=175,avatarR=80;
+  if(d.photo){
+    var img=new Image();
+    img.src=d.photo;
+    // Draw circle clip for photo
+    ctx.save();
+    ctx.beginPath();ctx.arc(W/2,avatarCY,avatarR,0,Math.PI*2);ctx.closePath();ctx.clip();
+    ctx.fillStyle='rgba(255,255,255,.1)';ctx.fillRect(W/2-avatarR,avatarCY-avatarR,avatarR*2,avatarR*2);
+    try{ctx.drawImage(img,W/2-avatarR,avatarCY-avatarR,avatarR*2,avatarR*2);}catch(e){}
+    ctx.restore();
+  } else {
+    // Gradient circle placeholder
+    var circGrad=ctx.createRadialGradient(W/2,avatarCY,0,W/2,avatarCY,avatarR);
+    circGrad.addColorStop(0,pri);circGrad.addColorStop(1,darkP);
+    ctx.fillStyle=circGrad;
+    ctx.beginPath();ctx.arc(W/2,avatarCY,avatarR,0,Math.PI*2);ctx.fill();
+    // Jersey number inside
+    ctx.textAlign='center';ctx.fillStyle=sec;
+    ctx.font='bold 60px "Bebas Neue",Arial Black,sans-serif';
+    ctx.fillText(d.jerseyNum||'?',W/2,avatarCY+20);
+  }
+  // Circle border
+  ctx.strokeStyle=sec;ctx.lineWidth=3;
+  ctx.beginPath();ctx.arc(W/2,avatarCY,avatarR+3,0,Math.PI*2);ctx.stroke();
+  // Glow
+  ctx.shadowColor=sec;ctx.shadowBlur=30;
+  ctx.beginPath();ctx.arc(W/2,avatarCY,avatarR+3,0,Math.PI*2);ctx.stroke();
+  ctx.shadowBlur=0;
+
+  // Title badge
+  var tbY=avatarCY+avatarR+22;
+  var titleTxt=d.jerseyNum?('#'+d.jerseyNum+' · '+d.title):d.title;
+  ctx.font='700 14px "Barlow Condensed",Arial,sans-serif';
+  var titleW=ctx.measureText(titleTxt).width+32;
+  rr(ctx,(W-titleW)/2,tbY,titleW,28,14);ctx.fillStyle=sec;ctx.fill();
+  ctx.textAlign='center';ctx.fillStyle='#000';
+  ctx.font='bold 14px "Barlow Condensed",Arial,sans-serif';ctx.fillText(titleTxt,W/2,tbY+19);
+
+  // Player name
+  ctx.textAlign='center';ctx.fillStyle=sec;
+  ctx.font='bold 72px "Bebas Neue",Arial Black,sans-serif';
+  ctx.fillText(d.dispName.toUpperCase(),W/2,tbY+90);
+
+  // Team
+  ctx.fillStyle='rgba(255,255,255,0.3)';
+  ctx.font='600 18px "Barlow Condensed",Arial,sans-serif';
+  ctx.fillText(d.teamName.toUpperCase()+' · '+d.wins+'-'+d.losses+(d.ties?'-'+d.ties:'')+' RECORD',W/2,tbY+115);
+
+  // Stats grid (6 boxes, 3 per row)
+  var statDefs2=[
+    {l:'TOUCHDOWNS',v:d.tds,c:sec},
+    {l:'CATCHES',v:d.catches,c:'#60a5fa'},
+    {l:'FLAGS',v:d.flags,c:'#4ade80'},
+    {l:'INTERCEPTIONS',v:d.ints,c:'#a78bfa'},
+    {l:'BLOCKS',v:d.blocks,c:'#fb923c'},
+    {l:'CONVERSIONS',v:d.conv,c:'#f472b6'},
+  ];
+  var sgY=tbY+132, sgW=(W-80-16)/3, sgH=78;
+  statDefs2.forEach(function(sd,i){
+    var sx=40+(i%3)*(sgW+8);
+    var sy=sgY+Math.floor(i/3)*(sgH+8);
+    rr(ctx,sx,sy,sgW,sgH,10);
+    ctx.fillStyle=sd.v>0?'rgba(255,255,255,0.06)':'rgba(255,255,255,0.03)';ctx.fill();
+    ctx.textAlign='center';
+    ctx.fillStyle=sd.v>0?sd.c:'rgba(255,255,255,0.2)';
+    ctx.font='bold 44px "Bebas Neue",Arial Black,sans-serif';ctx.fillText(sd.v,sx+sgW/2,sy+52);
+    ctx.fillStyle='rgba(255,255,255,0.28)';
+    ctx.font='600 11px "Barlow Condensed",Arial,sans-serif';ctx.fillText(sd.l,sx+sgW/2,sy+68);
+  });
+
+  // Badges row
+  var bdY=sgY+sgH*2+8*2+16;
+  if(d.badges&&d.badges.length){
+    ctx.textAlign='left';ctx.fillStyle='rgba(255,255,255,0.22)';
+    ctx.font='700 11px "Barlow Condensed",Arial,sans-serif';ctx.fillText('ACHIEVEMENTS',40,bdY);
+    bdY+=14;
+    var bx=40,by=bdY;
+    d.badges.forEach(function(b){
+      var btxt=b.icon+' '+b.label;
+      ctx.font='700 13px "Barlow Condensed",Arial,sans-serif';
+      var bw2=ctx.measureText(btxt).width+20;
+      if(bx+bw2>W-40){bx=40;by+=36;}
+      rr(ctx,bx,by,bw2,26,13);ctx.fillStyle='rgba(255,255,255,0.07)';ctx.fill();
+      rr(ctx,bx,by,bw2,26,13);ctx.strokeStyle='rgba(255,255,255,0.14)';ctx.lineWidth=1;ctx.stroke();
+      ctx.fillStyle='rgba(255,255,255,0.75)';ctx.fillText(btxt,bx+10,by+18);
+      bx+=bw2+8;
+    });
+    bdY=by+38;
+  }
+
+  // Best game
+  if(d.bestGame){
+    var bg2=d.bestGame;
+    rr(ctx,40,bdY,W-80,54,10);ctx.fillStyle='rgba(255,255,255,0.04)';ctx.fill();
+    ctx.textAlign='left';ctx.fillStyle='rgba(255,255,255,0.26)';
+    ctx.font='700 10px "Barlow Condensed",Arial,sans-serif';ctx.fillText('⚡  BEST GAME',52,bdY+16);
+    ctx.fillStyle='rgba(255,255,255,0.85)';ctx.font='700 18px "Barlow Condensed",Arial,sans-serif';ctx.fillText('vs. '+bg2.opp,52,bdY+36);
+    if(bg2.us!==undefined){
+      ctx.textAlign='right';
+      ctx.fillStyle=bg2.won?'#4ade80':'#f87171';
+      ctx.font='800 18px "Barlow Condensed",Arial,sans-serif';ctx.fillText((bg2.won?'W':'L')+' '+bg2.us+'–'+bg2.them,W-52,bdY+36);
+    }
+    bdY+=62;
+  }
+
+  // Narrative quote
+  if(d.narrative){
+    ctx.fillStyle='rgba(255,255,255,0.12)';ctx.fillRect(40,bdY,3,40);
+    ctx.textAlign='left';ctx.fillStyle='rgba(255,255,255,0.45)';
+    ctx.font='500 italic 15px "Barlow Condensed",Arial,sans-serif';
+    var words=d.narrative.split(' ');
+    var line='',lineY=bdY+16,lineH=19;
+    words.forEach(function(w){
+      var test=line?line+' '+w:w;
+      if(ctx.measureText(test).width>W-106){
+        ctx.fillText(line,50,lineY);line=w;lineY+=lineH;
+      } else {line=test;}
+    });
+    if(line)ctx.fillText(line,50,lineY);
+    bdY=lineY+28;
+  }
+
+  // Footer
+  ctx.fillStyle='rgba(255,255,255,0.08)';ctx.fillRect(40,H-46,W-80,1);
+  ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,0.2)';
+  ctx.font='600 14px "Barlow Condensed",Arial,sans-serif';
+  ctx.fillText('CGMax FFTP • Flag Football Tracker Pro • cgmaxfftp.com',W/2,H-20);
+
+  setTimeout(function(){
+    canvas.toBlob(function(blob){
+      var fileName=d.firstName.replace(/\s+/g,'_')+'_Season_Card.png';
+      if(navigator.share&&navigator.canShare&&blob){
+        var file=new File([blob],fileName,{type:'image/png'});
+        if(navigator.canShare({files:[file]})){
+          navigator.share({title:d.firstName+''s Season Card — '+d.teamName,files:[file]}).catch(function(){});
+          return;
+        }
+      }
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');a.href=url;a.download=fileName;
+      document.body.appendChild(a);a.click();
+      setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1200);
+      showToast('📥 Card saved! Send it to '+d.firstName+''s parents.');
+    },'image/png');
+  },100);
 }
 
 /* ── Season Summary Share Card ── */
