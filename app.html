@@ -1777,6 +1777,11 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
   <div class="egm-card">
     <div class="egm-title" id="egm-title">Edit Game</div>
     <div class="egm-subtitle" id="egm-subtitle"></div>
+    <div class="egm-section">Opponent</div>
+    <div class="egm-score-row">
+      <div class="egm-score-label" style="min-width:80px">Name</div>
+      <input type="text" class="egm-score-input" id="egm-opp-name" maxlength="40" autocomplete="off" aria-label="Opponent name" style="font-size:15px;text-align:left;padding-left:10px;">
+    </div>
     <div class="egm-section">Score</div>
     <div class="egm-score-row">
       <div class="egm-score-label" id="egm-team-label">Team</div>
@@ -4178,6 +4183,7 @@ function openEditGame(id,ev){
   document.getElementById('egm-subtitle').textContent=game.team+' vs '+game.opp+' · '+(game.date||'');
   document.getElementById('egm-team-label').textContent=game.team;
   document.getElementById('egm-opp-label').textContent=game.opp;
+  document.getElementById('egm-opp-name').value=game.opp||'';
   document.getElementById('egm-score-us').value=game.us;
   document.getElementById('egm-score-them').value=game.them;
 
@@ -4492,6 +4498,10 @@ function saveEditedGame(){
   var game=null,gameIdx=-1;
   for(var i=0;i<games.length;i++){if(games[i].id===_editGameId){game=games[i];gameIdx=i;break;}}
   if(!game){showToast('Game not found');closeEditGame();return;}
+
+  // ── Update opponent name ──
+  var newOpp=(document.getElementById('egm-opp-name').value||'').trim();
+  if(newOpp)game.opp=newOpp;
 
   // ── Update scores ──
   game.us=Math.max(0,parseInt(document.getElementById('egm-score-us').value)||0);
@@ -8796,7 +8806,7 @@ function sendPostGameRecap(gameData,playerStats,scoreCardBase64){
   var seasonName=inferSeasonName();
   var token=AUTH_SESSION.access_token;
 
-  if(!token){console.warn('[game-recap] No auth token');return;}
+  if(!token){console.warn('[game-recap] No auth token');showToast('⚠️ Recap emails not sent — session expired. Sign out and back in, then try again.');return;}
 
   // Use the game's unique timestamp ID so each game gets its own recap
   // (previous hardcoded 0 caused every game after the first to hit duplicate detection)
@@ -8831,10 +8841,13 @@ function sendPostGameRecap(gameData,playerStats,scoreCardBase64){
       if(data.skipped){
         console.log('[game-recap] Skipped: '+data.reason);
         if(data.reason==='no_consented_parents'){
-          // Don't show toast for this — coach may not have parents set up
+          showToast('📋 No parent recap emails sent — no parents have completed the consent form yet. Go to Roster → Send Parent Consent Form.');
+        } else {
+          showToast('📋 Recap email skipped: '+(data.reason||'unknown reason'));
         }
       } else if(data.cached){
         console.log('[game-recap] Already sent for this game');
+        showToast('📧 Recap already sent for this game — parents were emailed earlier.');
       } else {
         var count=data.emails_sent||0;
         showToast('\u{1F4E8} Game recaps sent to '+count+' parent'+(count!==1?'s':'')+'!');
@@ -8842,10 +8855,12 @@ function sendPostGameRecap(gameData,playerStats,scoreCardBase64){
       }
     } else {
       console.warn('[game-recap] API returned error:',data.error);
+      showToast('⚠️ Recap email error: '+(data.error||'something went wrong. Check your connection and try again.'));
     }
   })
   .catch(function(err){
     console.error('[game-recap] Network error:',err);
+    showToast('⚠️ Could not send recap emails — network error. Try again when back online.');
     // Silent fail — don't disrupt the coach's post-game flow
   });
 }
