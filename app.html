@@ -641,6 +641,14 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .podium-block-lbl.third{color:rgba(205,127,50,.62);}
 .podium-stars{font-size:15px;margin-bottom:3px;animation:podStars 2s ease-in-out infinite alternate;}
 @keyframes podStars{0%{opacity:.5;transform:scale(.85);}100%{opacity:1;transform:scale(1.1);}}
+/* PLAYER CARDS GRID (Season Screen) */
+.sl-pcards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:4px 0;}
+.sl-pcard-chip{display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--dark3);border:1px solid var(--dark5);border-radius:12px;padding:12px 6px 10px;cursor:pointer;transition:border-color .2s,background .2s;-webkit-tap-highlight-color:transparent;}
+.sl-pcard-chip:active{background:rgba(255,215,0,.08);border-color:rgba(255,215,0,.3);}
+.sl-pcard-chip .pcc-photo{width:48px;height:48px;border-radius:50%;overflow:hidden;background:var(--dark4);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.35);}
+.sl-pcard-chip .pcc-photo img{width:100%;height:100%;object-fit:cover;}
+.sl-pcard-chip .pcc-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.85);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;}
+.sl-pcard-chip .pcc-pts{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,.4);}
 /* HALFTIME MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;}
 .modal-overlay.show{opacity:1;pointer-events:all;}
@@ -1913,6 +1921,8 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
     </table></div>
     <div class="season-sec">MVP Awards</div>
     <div id="sl-mvp-awards"></div>
+    <div class="season-sec">Player Cards</div>
+    <div id="sl-player-cards"></div>
     <div class="season-sec">Game History</div>
     <div id="sl-games"></div>
     <div class="season-sec">Data</div>
@@ -4100,7 +4110,7 @@ function buildRecapCanvas(us,them,mvps,games,gameCtx){
 /* ════════════════════════════════════════════════════════════
    TROPHY PODIUM — cartoon avatars + 1st/2nd/3rd stand
 ════════════════════════════════════════════════════════════ */
-function buildCartoonAvatarSVG(name,p,s,isLarge){
+function buildCartoonAvatarSVG(name,p,s,isLarge,role){
   var num=jerseyNum(name)||'';
   var w=isLarge?80:68;var h=isLarge?110:93;
   var leg;try{leg=darken(p,45);}catch(e){leg=p;}
@@ -4110,44 +4120,114 @@ function buildCartoonAvatarSVG(name,p,s,isLarge){
   var b=parseInt(p.slice(5,7)||'0',16);
   var nc=(0.299*r+0.587*g+0.114*b)/255>0.55?'#111111':s;
   var pL;try{pL=lighten(p,30);}catch(e){pL=p;}
+  // Unique gradient ID to avoid collisions when multiple avatars render
+  var gid='jG_'+Math.random().toString(36).slice(2,8);
   var sv='<svg viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">';
   // Defs
-  sv+='<defs><linearGradient id="jG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+pL+'" stop-opacity="0.15"/><stop offset="100%" stop-color="'+p+'" stop-opacity="0"/></linearGradient></defs>';
+  sv+='<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+pL+'" stop-opacity="0.15"/><stop offset="100%" stop-color="'+p+'" stop-opacity="0"/></linearGradient></defs>';
   // Ground shadow
   sv+='<ellipse cx="40" cy="117" rx="20" ry="3.5" fill="rgba(0,0,0,0.3)"/>';
-  // Left leg (back, stride)
-  sv+='<path d="M32,82 Q29,94 27,102 Q26,106 25,108" stroke="'+leg+'" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-  sv+='<ellipse cx="23" cy="110" rx="8" ry="4" fill="'+s+'"/><ellipse cx="23" cy="109" rx="7" ry="3" fill="white" opacity="0.15"/>';
-  // Right leg (front, stride)
-  sv+='<path d="M48,82 Q52,93 55,100 Q57,104 57,107" stroke="'+leg+'" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-  sv+='<ellipse cx="59" cy="109" rx="8" ry="4" fill="'+s+'"/><ellipse cx="59" cy="108" rx="7" ry="3" fill="white" opacity="0.15"/>';
+
+  // ── Legs — pose varies by role ──
+  if(role==='qb'){
+    // QB: planted stance, left leg forward, right back
+    sv+='<path d="M34,82 Q30,94 28,102 Q27,106 26,108" stroke="'+leg+'" stroke-width="10" stroke-linecap="round" fill="none"/>';
+    sv+='<ellipse cx="24" cy="110" rx="8" ry="4" fill="'+s+'"/><ellipse cx="24" cy="109" rx="7" ry="3" fill="white" opacity="0.15"/>';
+    sv+='<path d="M46,82 Q50,92 52,100 Q53,104 54,107" stroke="'+leg+'" stroke-width="10" stroke-linecap="round" fill="none"/>';
+    sv+='<ellipse cx="56" cy="109" rx="8" ry="4" fill="'+s+'"/><ellipse cx="56" cy="108" rx="7" ry="3" fill="white" opacity="0.15"/>';
+  } else if(role==='defender'){
+    // Defender: wide athletic stance, low center of gravity
+    sv+='<path d="M30,82 Q24,93 20,102 Q18,106 17,109" stroke="'+leg+'" stroke-width="10" stroke-linecap="round" fill="none"/>';
+    sv+='<ellipse cx="15" cy="111" rx="8" ry="4" fill="'+s+'"/><ellipse cx="15" cy="110" rx="7" ry="3" fill="white" opacity="0.15"/>';
+    sv+='<path d="M50,82 Q56,93 60,102 Q62,106 63,109" stroke="'+leg+'" stroke-width="10" stroke-linecap="round" fill="none"/>';
+    sv+='<ellipse cx="65" cy="111" rx="8" ry="4" fill="'+s+'"/><ellipse cx="65" cy="110" rx="7" ry="3" fill="white" opacity="0.15"/>';
+  } else if(role==='receiver'){
+    // Receiver: jumping/leaping up
+    sv+='<path d="M32,82 Q30,92 30,100 Q30,104 30,107" stroke="'+leg+'" stroke-width="10" stroke-linecap="round" fill="none"/>';
+    sv+='<ellipse cx="28" cy="109" rx="8" ry="4" fill="'+s+'"/><ellipse cx="28" cy="108" rx="7" ry="3" fill="white" opacity="0.15"/>';
+    sv+='<path d="M48,82 Q50,92 50,100 Q50,104 50,107" stroke="'+leg+'" stroke-width="10" stroke-linecap="round" fill="none"/>';
+    sv+='<ellipse cx="52" cy="109" rx="8" ry="4" fill="'+s+'"/><ellipse cx="52" cy="108" rx="7" ry="3" fill="white" opacity="0.15"/>';
+  } else {
+    // Default: running stride (original)
+    sv+='<path d="M32,82 Q29,94 27,102 Q26,106 25,108" stroke="'+leg+'" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+    sv+='<ellipse cx="23" cy="110" rx="8" ry="4" fill="'+s+'"/><ellipse cx="23" cy="109" rx="7" ry="3" fill="white" opacity="0.15"/>';
+    sv+='<path d="M48,82 Q52,93 55,100 Q57,104 57,107" stroke="'+leg+'" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+    sv+='<ellipse cx="59" cy="109" rx="8" ry="4" fill="'+s+'"/><ellipse cx="59" cy="108" rx="7" ry="3" fill="white" opacity="0.15"/>';
+  }
+
   // Flag belt
   sv+='<rect x="24" y="76" width="32" height="5" rx="2.5" fill="'+s+'"/>';
-  sv+='<path d="M26,81 Q22,90 18,98 Q17,100 19,99 L24,81" fill="'+s+'" opacity="0.9"/>';
-  sv+='<path d="M54,81 Q58,90 62,98 Q63,100 61,99 L56,81" fill="'+s+'" opacity="0.9"/>';
+  if(role!=='defender'){
+    sv+='<path d="M26,81 Q22,90 18,98 Q17,100 19,99 L24,81" fill="'+s+'" opacity="0.9"/>';
+    sv+='<path d="M54,81 Q58,90 62,98 Q63,100 61,99 L56,81" fill="'+s+'" opacity="0.9"/>';
+  } else {
+    // Defender: flags flapping more (wider stance movement)
+    sv+='<path d="M26,81 Q20,89 15,96 Q13,99 16,98 L24,81" fill="'+s+'" opacity="0.9"/>';
+    sv+='<path d="M54,81 Q60,89 65,96 Q67,99 64,98 L56,81" fill="'+s+'" opacity="0.9"/>';
+  }
   // Jersey / torso (athletic V-taper)
   sv+='<path d="M24,44 Q22,46 21,52 L23,78 Q24,82 30,82 L50,82 Q56,82 57,78 L59,52 Q58,46 56,44 Z" fill="'+p+'"/>';
-  sv+='<path d="M24,44 Q22,46 21,52 L23,78 Q24,82 30,82 L50,82 Q56,82 57,78 L59,52 Q58,46 56,44 Z" fill="url(#jG)"/>';
+  sv+='<path d="M24,44 Q22,46 21,52 L23,78 Q24,82 30,82 L50,82 Q56,82 57,78 L59,52 Q58,46 56,44 Z" fill="url(#'+gid+')"/>';
   sv+='<path d="M24,44 L24,48" stroke="'+s+'" stroke-width="3" stroke-linecap="round" opacity="0.5"/>';
   sv+='<path d="M56,44 L56,48" stroke="'+s+'" stroke-width="3" stroke-linecap="round" opacity="0.5"/>';
   sv+='<path d="M32,43 Q40,46 48,43" fill="none" stroke="'+s+'" stroke-width="1.5" opacity="0.4"/>';
   // Jersey number
   if(num)sv+='<text x="40" y="66" text-anchor="middle" dominant-baseline="middle" font-family="\'Bebas Neue\',Arial Black,sans-serif" font-size="20" font-weight="900" fill="'+nc+'" opacity="0.85">'+num+'</text>';
-  // Left arm (pumping back)
-  sv+='<path d="M24,46 L14,54 L10,60" stroke="'+p+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-  sv+='<circle cx="10" cy="60" r="4" fill="'+skin+'"/>';
-  // Right arm (carrying football high)
-  sv+='<path d="M56,46 L64,42 L70,36" stroke="'+p+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-  sv+='<circle cx="70" cy="36" r="4" fill="'+skin+'"/>';
-  // Football (tucked high)
-  sv+='<g transform="translate(73,32) rotate(-40)">';
-  sv+='<ellipse cx="0" cy="0" rx="8.5" ry="5" fill="#7D3C0F"/>';
-  sv+='<ellipse cx="-1" cy="-1" rx="5" ry="3" fill="#9B5523" opacity="0.25"/>';
-  sv+='<line x1="0" y1="-4" x2="0" y2="4" stroke="white" stroke-width="0.8" opacity="0.8"/>';
-  sv+='<line x1="-1.8" y1="-1.8" x2="1.8" y2="-1.8" stroke="white" stroke-width="0.5" opacity="0.6"/>';
-  sv+='<line x1="-1.8" y1="0" x2="1.8" y2="0" stroke="white" stroke-width="0.5" opacity="0.6"/>';
-  sv+='<line x1="-1.8" y1="1.8" x2="1.8" y2="1.8" stroke="white" stroke-width="0.5" opacity="0.6"/>';
-  sv+='</g>';
+
+  // ── Arms & equipment — pose varies by role ──
+  if(role==='qb'){
+    // QB: left arm forward (guide hand), right arm cocked back with football
+    sv+='<path d="M24,46 L16,50 L10,48" stroke="'+p+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+    sv+='<circle cx="10" cy="48" r="4" fill="'+skin+'"/>';
+    sv+='<path d="M56,46 L62,38 L68,28" stroke="'+p+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+    sv+='<circle cx="68" cy="28" r="4" fill="'+skin+'"/>';
+    // Football behind head (throwing motion)
+    sv+='<g transform="translate(72,24) rotate(-60)">';
+    sv+='<ellipse cx="0" cy="0" rx="8.5" ry="5" fill="#7D3C0F"/>';
+    sv+='<ellipse cx="-1" cy="-1" rx="5" ry="3" fill="#9B5523" opacity="0.25"/>';
+    sv+='<line x1="0" y1="-4" x2="0" y2="4" stroke="white" stroke-width="0.8" opacity="0.8"/>';
+    sv+='<line x1="-1.8" y1="-1.8" x2="1.8" y2="-1.8" stroke="white" stroke-width="0.5" opacity="0.6"/>';
+    sv+='<line x1="-1.8" y1="0" x2="1.8" y2="0" stroke="white" stroke-width="0.5" opacity="0.6"/>';
+    sv+='<line x1="-1.8" y1="1.8" x2="1.8" y2="1.8" stroke="white" stroke-width="0.5" opacity="0.6"/>';
+    sv+='</g>';
+  } else if(role==='defender'){
+    // Defender: both arms reaching out wide (flag-pulling stance)
+    sv+='<path d="M24,46 L12,50 L6,56" stroke="'+p+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+    sv+='<circle cx="6" cy="56" r="4" fill="'+skin+'"/>';
+    sv+='<path d="M56,46 L68,50 L74,56" stroke="'+p+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+    sv+='<circle cx="74" cy="56" r="4" fill="'+skin+'"/>';
+    // Torn flag in right hand
+    sv+='<path d="M74,56 L76,64 Q78,68 75,67 L73,60" fill="'+s+'" opacity="0.85"/>';
+  } else if(role==='receiver'){
+    // Receiver: both arms reaching up high (catching)
+    sv+='<path d="M24,46 L18,36 L14,26" stroke="'+p+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+    sv+='<circle cx="14" cy="26" r="4" fill="'+skin+'"/>';
+    sv+='<path d="M56,46 L62,36 L66,26" stroke="'+p+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+    sv+='<circle cx="66" cy="26" r="4" fill="'+skin+'"/>';
+    // Football above hands (about to catch)
+    sv+='<g transform="translate(40,16) rotate(-20)">';
+    sv+='<ellipse cx="0" cy="0" rx="8.5" ry="5" fill="#7D3C0F"/>';
+    sv+='<ellipse cx="-1" cy="-1" rx="5" ry="3" fill="#9B5523" opacity="0.25"/>';
+    sv+='<line x1="0" y1="-4" x2="0" y2="4" stroke="white" stroke-width="0.8" opacity="0.8"/>';
+    sv+='<line x1="-1.8" y1="-1.8" x2="1.8" y2="-1.8" stroke="white" stroke-width="0.5" opacity="0.6"/>';
+    sv+='<line x1="-1.8" y1="0" x2="1.8" y2="0" stroke="white" stroke-width="0.5" opacity="0.6"/>';
+    sv+='<line x1="-1.8" y1="1.8" x2="1.8" y2="1.8" stroke="white" stroke-width="0.5" opacity="0.6"/>';
+    sv+='</g>';
+  } else {
+    // Default: running with football (original)
+    sv+='<path d="M24,46 L14,54 L10,60" stroke="'+p+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+    sv+='<circle cx="10" cy="60" r="4" fill="'+skin+'"/>';
+    sv+='<path d="M56,46 L64,42 L70,36" stroke="'+p+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+    sv+='<circle cx="70" cy="36" r="4" fill="'+skin+'"/>';
+    sv+='<g transform="translate(73,32) rotate(-40)">';
+    sv+='<ellipse cx="0" cy="0" rx="8.5" ry="5" fill="#7D3C0F"/>';
+    sv+='<ellipse cx="-1" cy="-1" rx="5" ry="3" fill="#9B5523" opacity="0.25"/>';
+    sv+='<line x1="0" y1="-4" x2="0" y2="4" stroke="white" stroke-width="0.8" opacity="0.8"/>';
+    sv+='<line x1="-1.8" y1="-1.8" x2="1.8" y2="-1.8" stroke="white" stroke-width="0.5" opacity="0.6"/>';
+    sv+='<line x1="-1.8" y1="0" x2="1.8" y2="0" stroke="white" stroke-width="0.5" opacity="0.6"/>';
+    sv+='<line x1="-1.8" y1="1.8" x2="1.8" y2="1.8" stroke="white" stroke-width="0.5" opacity="0.6"/>';
+    sv+='</g>';
+  }
   // Neck
   sv+='<rect x="35" y="35" width="10" height="10" rx="4" fill="'+skin+'"/>';
   // Head — hair back
@@ -4244,7 +4324,7 @@ function renderTrophyPodium(ranked){
     // Medal badge
     html+='<span class="podium-rank-badge">'+medalEmoji[rank]+'</span>';
     html+='</div>';// .podium-figure
-    html+='<div class="podium-player-name" style="cursor:pointer" onclick="openPlayerSeasonCard(\'' + esc(player.name) + '\')">'+esc(dispName(player.name))+'</div>';
+    html+='<div class="podium-player-name" style="cursor:pointer" onclick="openTrendFromSeason(\''+esc(player.name)+'\')">'+esc(dispName(player.name))+'</div>';
     html+='<div class="podium-player-pts"><span style="color:'+mc+'">'+player.score+'</span> pts · '+player.tds+' TDs</div>';
     html+='<div class="podium-block '+bcls+'"><div class="podium-block-lbl '+bcls+'">'+rankLbl[rank]+'</div></div>';
     html+='</div>';// .podium-slot
@@ -4260,6 +4340,7 @@ function renderSeasonScreen(){
     document.getElementById('sl-table').innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--dimmer)">No games saved yet</td></tr>';
     document.getElementById('sl-games').innerHTML='<div class="no-games">No games saved yet.<br>Finish a game and tap Save to Season!</div>';
     document.getElementById('sl-mvp-awards').innerHTML='<div style="text-align:center;padding:16px;color:var(--dimmer);font-family:\'Barlow Condensed\',sans-serif;font-size:13px">No MVP awards yet</div>';
+    var pcEmpty=document.getElementById('sl-player-cards');if(pcEmpty)pcEmpty.innerHTML='<div style="text-align:center;padding:16px;color:var(--dimmer);font-family:\'Barlow Condensed\',sans-serif;font-size:13px">No player data yet</div>';
     renderTrophyPodium([]);
     var slbW=document.getElementById('sl-table-wrap');if(slbW)slbW.style.display='none';
     return;
@@ -4322,6 +4403,32 @@ function renderSeasonScreen(){
     }
     podHtml+='</div>';
     mvpEl.innerHTML=podHtml;
+  }
+
+  // ── Player Cards grid — tap any player to view their season card ──
+  var pcEl=document.getElementById('sl-player-cards');
+  if(pcEl){
+    if(ranked.length===0){
+      pcEl.innerHTML='<div style="text-align:center;padding:16px;color:var(--dimmer);font-family:\'Barlow Condensed\',sans-serif;font-size:13px">No player data yet</div>';
+    } else {
+      var pcHtml='<div class="sl-pcards-grid">';
+      ranked.forEach(function(pl){
+        var photo=getPlayerPhoto(pl.name);
+        var photoHtml;
+        if(photo){
+          photoHtml='<img src="'+escHtml(photo)+'" alt="'+escHtml(firstName(pl.name))+'">';
+        } else {
+          photoHtml='<div style="font-size:20px;color:var(--dimmer)">'+escHtml(firstName(pl.name).charAt(0))+'</div>';
+        }
+        pcHtml+='<div class="sl-pcard-chip" onclick="openPlayerSeasonCard(\''+esc(pl.name)+'\')">'
+          +'<div class="pcc-photo">'+photoHtml+'</div>'
+          +'<div class="pcc-name">'+escHtml(dispName(pl.name))+'</div>'
+          +'<div class="pcc-pts">'+pl.score+' pts</div>'
+          +'</div>';
+      });
+      pcHtml+='</div>';
+      pcEl.innerHTML=pcHtml;
+    }
   }
 
   var gamesHtml=games.map(function(g,idx){
@@ -8477,8 +8584,9 @@ function renderPlayerSeasonCard(name){
     if(g.mvp===name) totals.mvp++;
 
     // Win/loss for games this player appeared in
-    var us=(g.scores&&g.scores.us)?g.scores.us.reduce(function(a,b){return a+b;},0):0;
-    var them=(g.scores&&g.scores.them)?g.scores.them.reduce(function(a,b){return a+b;},0):0;
+    // Use g.us/g.them (totals) — g.scores arrays may be stale after edits
+    var us=g.us||0;
+    var them=g.them||0;
     if(us>them)totals.wins++;else if(them>us)totals.losses++;else totals.ties++;
 
     if((ps.tds||0)>=3) hatTrickGames++;
@@ -8580,11 +8688,17 @@ function renderPlayerSeasonCard(name){
 
   // ── Avatar / Photo ────────────────────────────────────────
   var photo=getPlayerPhoto(name);
+  // Determine avatar role from position/dominant stat
+  var avatarRole='scorer';
+  if(name===G.qb) avatarRole='qb';
+  else if(dominantStat==='flags'||dominantStat==='ints') avatarRole='defender';
+  else if(dominantStat==='catches') avatarRole='receiver';
+
   var avatarInner;
   if(photo){
     avatarInner='<img src="'+escHtml(photo)+'" alt="'+escHtml(firstName(name))+'">';
   } else {
-    avatarInner=buildCartoonAvatarSVG(name,p,s,true);
+    avatarInner=buildCartoonAvatarSVG(name,p,s,true,avatarRole);
   }
 
   // ── Stat icons (inline SVG) ───────────────────────────────
@@ -8621,7 +8735,8 @@ function renderPlayerSeasonCard(name){
     +'<div class="psc-hero-content">'
     + (domRank===1
         ? '<div class="psc-rank-chip"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6 6 1-4.5 4.5 1 6L12 17l-5.5 2.5 1-6L3 9l6-1z"/></svg>#1 ON TEAM · '+(domLabelMap[dominantStat]||'').toUpperCase()+'</div>'
-        : (domRank>=2&&domRank<=3 ? '<div class="psc-rank-chip" style="border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.78)">TOP 3 · '+(domLabelMap[dominantStat]||'').toUpperCase()+'</div>' : ''))
+        : (domRank>=2&&domRank<=3 ? '<div class="psc-rank-chip" style="border-color:rgba(255,215,0,.25);color:rgba(255,215,0,.85)"><svg viewBox="0 0 24 24" fill="currentColor" style="width:11px;height:11px"><path d="M12 2l3 6 6 1-4.5 4.5 1 6L12 17l-5.5 2.5 1-6L3 9l6-1z"/></svg>RANKED #'+domRank+' · '+(domLabelMap[dominantStat]||'').toUpperCase()+'</div>'
+        : (domRank>3 ? '<div class="psc-rank-chip" style="border-color:rgba(255,255,255,.12);color:rgba(255,255,255,.6)">RANKED #'+domRank+' · '+(domLabelMap[dominantStat]||'').toUpperCase()+'</div>' : '')))
     +'<div class="psc-avatar-wrap">'
       +'<svg class="psc-avatar-ring" viewBox="0 0 148 148" aria-hidden="true">'
         +'<circle class="ring-track" cx="74" cy="74" r="68"></circle>'
