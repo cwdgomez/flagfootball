@@ -1369,6 +1369,8 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
 .psc-share-btn:active{transform:scale(.98);opacity:.92;}
 .psc-trend-btn{margin-top:10px;width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:13px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:2.5px;color:rgba(255,255,255,.68);cursor:pointer;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent;transition:background .2s,color .2s;}
 .psc-trend-btn:active{background:rgba(255,255,255,.08);color:#fff;}
+.psc-send-parents-btn{width:100%;background:linear-gradient(135deg,rgba(34,197,94,.18),rgba(34,197,94,.08));border:1px solid rgba(34,197,94,.4);border-radius:14px;padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:2px;color:#4ade80;cursor:pointer;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent;transition:background .2s,transform .1s;position:relative;overflow:hidden;}
+.psc-send-parents-btn:active{transform:scale(.98);background:linear-gradient(135deg,rgba(34,197,94,.3),rgba(34,197,94,.15));}
 
 /* ── Animations ───────────────────────────────────────────── */
 @keyframes pscFoil{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
@@ -8569,9 +8571,7 @@ function closePlayerSeasonCard(){
   renderSeasonScreen();
 }
 
-function getPlayerPhoto(playerName){
-  try{return localStorage.getItem('ff_photo_'+ACTIVE_TEAM_ID+'_'+playerName)||null;}catch(e){return null;}
-}
+// getPlayerPhoto is defined above (line ~6703) using loadPhotos() — do not duplicate
 
 function renderPlayerSeasonCard(name){
   var body=document.getElementById('psc-body');
@@ -8869,6 +8869,14 @@ function renderPlayerSeasonCard(name){
     +'</button>'
     +'</div>';
 
+  // ── Send to Parents CTA ──
+  html+='<div style="padding:0 20px;margin-top:6px;">'
+    +'<button type="button" class="psc-send-parents-btn" onclick="sendSeasonRecap()">'
+      +'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>'
+      +' Send Season Recap to Parents'
+    +'</button>'
+  +'</div>';
+
   body.innerHTML=html;
 
   // Stash data for share canvas
@@ -8921,14 +8929,14 @@ function openTrendFromPlayerCard(name){
 }
 
 /* ── Player Season Card Share Canvas ────────────────────────── */
-function sharePlayerSeasonCard(){
+function sharePlayerSeasonCard(recapText){
   var d=window._pscData;
   if(!d){showToast('Open a player card first');return;}
   var canvas=document.getElementById('player-card-canvas');
   if(!canvas){showToast('Canvas not ready');return;}
-  showToast('🎨 Building share card for '+d.firstName+'...');
+  showToast(recapText?'📨 Building season recap for '+d.firstName+'...':'🎨 Building share card for '+d.firstName+'...');
 
-  var W=720;
+  var W=720, DPR=2; // 2x resolution for crisp images on retina screens
   // ── Pre-calculate dynamic height ──
   // We need a temp canvas context just to measure text for narrative word-wrap
   canvas.width=W;canvas.height=100;
@@ -8937,7 +8945,7 @@ function sharePlayerSeasonCard(){
   // Fixed layout positions
   var avatarCY=200, avatarR=92;
   var tY=avatarCY+avatarR+38;       // title pill top
-  var nameY=tY+70;                   // player name baseline
+  var nameY=tY+100;                  // player name baseline (extra gap so title pill is visible)
   var subY=nameY+34;                 // subhead baseline
   var sbY=subY+20, sbH=72;           // scoreboard
   var eyY=sbY+sbH+34;               // "SEASON STATS" label
@@ -8977,8 +8985,11 @@ function sharePlayerSeasonCard(){
   // Footer needs ~70px
   var H=Math.max(1080, bdY+70);
 
-  canvas.width=W;canvas.height=H;
+  // Set canvas to 2x physical pixels for retina-crisp output
+  canvas.width=W*DPR;canvas.height=H*DPR;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
   var ctx=canvas.getContext('2d');
+  ctx.scale(DPR,DPR); // all drawing stays in logical coords, output is 2x sharp
   var pri=d.primary||'#AA0000',sec=d.secondary||'#FFD700';
   var darkP;try{darkP=shadeColor(pri,-70);}catch(e){darkP='#170303';}
   var midP;try{midP=shadeColor(pri,-40);}catch(e){midP='#440000';}
@@ -9370,21 +9381,30 @@ function sharePlayerSeasonCard(){
 
     // Export
     canvas.toBlob(function(blob){
-      if(!blob){showToast('⚠️ Export failed');return;}
-      var fileName=d.firstName.replace(/\s+/g,'_')+'_Season_Card.png';
+      if(!blob){showToast(‘⚠️ Export failed’);return;}
+      var isRecap=!!recapText;
+      var fileName=d.firstName.replace(/\s+/g,’_’)+(isRecap?’_Season_Recap’:’_Season_Card’)+’.png’;
       if(navigator.share&&navigator.canShare){
-        var file=new File([blob],fileName,{type:'image/png'});
-        if(navigator.canShare({files:[file]})){
-          navigator.share({title:d.firstName+'’s Season Card — '+d.teamName,files:[file]}).catch(function(){});
+        var file=new File([blob],fileName,{type:’image/png’});
+        var shareData={title:d.firstName+(isRecap?’\’s Season Recap’:’’s Season Card’)+’ — ‘+d.teamName,files:[file]};
+        if(isRecap) shareData.text=recapText;
+        if(navigator.canShare(shareData)){
+          navigator.share(shareData).catch(function(){});
           return;
         }
       }
+      // Fallback: copy recap text to clipboard if available, then download image
+      if(isRecap&&navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(recapText).then(function(){
+          showToast(‘Message copied to clipboard!’);
+        }).catch(function(){});
+      }
       var url=URL.createObjectURL(blob);
-      var a=document.createElement('a');a.href=url;a.download=fileName;
+      var a=document.createElement(‘a’);a.href=url;a.download=fileName;
       document.body.appendChild(a);a.click();
       setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1200);
-      showToast('📥 Card saved! Send it to '+d.firstName+'’s parents.');
-    },'image/png');
+      if(!isRecap) showToast(‘📥 Card saved! Send it to ‘+d.firstName+’’s parents.’);
+    },’image/png’);
   }
 
   // Preload photo if any
@@ -9398,6 +9418,44 @@ function sharePlayerSeasonCard(){
   } else {
     drawCard(null);
   }
+}
+
+/* ── Send Season Recap to Parents ── */
+function sendSeasonRecap(){
+  var d=window._pscData;
+  if(!d){showToast('Open a player card first');return;}
+
+  // Build a friendly recap message
+  var lines=[];
+  lines.push('Here\'s '+d.firstName+'\'s season recap with '+d.teamName+'!');
+  lines.push('');
+
+  var highlights=[];
+  if(d.gp) highlights.push(d.gp+' game'+(d.gp>1?'s':''));
+  if(d.tds) highlights.push(d.tds+' TD'+(d.tds>1?'s':''));
+  if(d.catches) highlights.push(d.catches+' catch'+(d.catches>1?'es':''));
+  if(d.flags) highlights.push(d.flags+' flag pull'+(d.flags>1?'s':''));
+  if(d.ints) highlights.push(d.ints+' INT'+(d.ints>1?'s':''));
+  if(d.blocks) highlights.push(d.blocks+' block'+(d.blocks>1?'s':''));
+  if(d.mvp) highlights.push(d.mvp+' MVP'+(d.mvp>1?'s':''));
+  if(highlights.length) lines.push(highlights.join(' · '));
+
+  // W-L record
+  var record=[];
+  if(d.wins) record.push(d.wins+'W');
+  if(d.losses) record.push(d.losses+'L');
+  if(d.ties) record.push(d.ties+'T');
+  if(record.length) lines.push('Team record: '+record.join('-')+' ('+d.winPct+'% win rate)');
+
+  // Title
+  if(d.title) lines.push(d.title);
+  lines.push('');
+  lines.push('Great season, '+d.firstName+'!');
+
+  var msgText=lines.join('\n');
+
+  // Generate the share card with the recap text attached
+  sharePlayerSeasonCard(msgText);
 }
 
 /* ── Season Summary Share Card ── */
