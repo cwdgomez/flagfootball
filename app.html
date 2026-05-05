@@ -9381,12 +9381,12 @@ function sharePlayerSeasonCard(recapText){
 
     // Export
     canvas.toBlob(function(blob){
-      if(!blob){showToast(‘⚠️ Export failed’);return;}
+      if(!blob){showToast('Export failed');return;}
       var isRecap=!!recapText;
-      var fileName=d.firstName.replace(/\s+/g,’_’)+(isRecap?’_Season_Recap’:’_Season_Card’)+’.png’;
+      var fileName=d.firstName.replace(/\s+/g,'_')+(isRecap?'_Season_Recap':'_Season_Card')+'.png';
       if(navigator.share&&navigator.canShare){
-        var file=new File([blob],fileName,{type:’image/png’});
-        var shareData={title:d.firstName+(isRecap?’\’s Season Recap’:’’s Season Card’)+’ — ‘+d.teamName,files:[file]};
+        var file=new File([blob],fileName,{type:'image/png'});
+        var shareData={title:d.firstName+(isRecap?'\'s Season Recap':'\'s Season Card')+' — '+d.teamName,files:[file]};
         if(isRecap) shareData.text=recapText;
         if(navigator.canShare(shareData)){
           navigator.share(shareData).catch(function(){});
@@ -9396,15 +9396,15 @@ function sharePlayerSeasonCard(recapText){
       // Fallback: copy recap text to clipboard if available, then download image
       if(isRecap&&navigator.clipboard&&navigator.clipboard.writeText){
         navigator.clipboard.writeText(recapText).then(function(){
-          showToast(‘Message copied to clipboard!’);
+          showToast('Message copied to clipboard!');
         }).catch(function(){});
       }
       var url=URL.createObjectURL(blob);
-      var a=document.createElement(‘a’);a.href=url;a.download=fileName;
+      var a=document.createElement('a');a.href=url;a.download=fileName;
       document.body.appendChild(a);a.click();
       setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1200);
-      if(!isRecap) showToast(‘📥 Card saved! Send it to ‘+d.firstName+’’s parents.’);
-    },’image/png’);
+      if(!isRecap) showToast('Card saved! Send it to '+d.firstName+'\'s parents.');
+    },'image/png');
   }
 
   // Preload photo if any
