@@ -8623,23 +8623,7 @@ function renderPlayerSeasonCard(name){
   var allTDs = totals.tds + totals.qbTDs;
 
   // ── Nickname / Title ──────────────────────────────────────
-  function getTitle(){
-    if(totals.mvp>=3) return 'THE MVP';
-    if(allTDs>=10) return 'TOUCHDOWN MACHINE';
-    if(totals.flags>=8) return 'FLAG PULLER';
-    if(totals.ints>=3) return 'THE SHUTDOWN';
-    if(totals.catches>=10) return 'SURE HANDS';
-    if(totals.blocks>=5) return 'THE WALL';
-    if(totals.mvp>=2) return 'BACK-TO-BACK MVP';
-    if(allTDs>=5) return 'SCORING MACHINE';
-    if(totals.catches>=6) return 'THE PLAYMAKER';
-    if(totals.flags>=5) return 'PRESSURE KING';
-    if(totals.gp>=1) return 'TEAM PLAYER';
-    return 'ROOKIE RISING';
-  }
-  var title = getTitle();
-
-  // ── Dominant stat (for highlight) ────────────────────────
+  // ── Dominant stat (for highlight) — computed first so title can use it ──
   var statWeights=[
     {key:'tds', val:allTDs, weight:allTDs*3},
     {key:'catches', val:totals.catches, weight:totals.catches*1.2},
@@ -8649,6 +8633,41 @@ function renderPlayerSeasonCard(name){
   ];
   statWeights.sort(function(a,b){return b.weight-a.weight;});
   var dominantStat = statWeights[0].key;
+
+  // ── Title — driven by dominant stat so the title always matches ──
+  function getTitle(){
+    // Special MVP titles first
+    if(totals.mvp>=3) return 'THE MVP';
+    if(totals.mvp>=2) return 'BACK-TO-BACK MVP';
+
+    // Title based on what they actually do best (dominant stat)
+    if(dominantStat==='tds'){
+      if(allTDs>=10) return 'TOUCHDOWN MACHINE';
+      if(allTDs>=5) return 'SCORING MACHINE';
+      return 'ENDZONE THREAT';
+    }
+    if(dominantStat==='catches'){
+      if(totals.catches>=10) return 'SURE HANDS';
+      if(totals.catches>=6) return 'THE PLAYMAKER';
+      return 'PASS CATCHER';
+    }
+    if(dominantStat==='flags'){
+      if(totals.flags>=8) return 'FLAG PULLER';
+      if(totals.flags>=5) return 'PRESSURE KING';
+      return 'DEFENSIVE FORCE';
+    }
+    if(dominantStat==='ints'){
+      if(totals.ints>=3) return 'THE SHUTDOWN';
+      return 'BALL HAWK';
+    }
+    if(dominantStat==='blocks'){
+      if(totals.blocks>=5) return 'THE WALL';
+      return 'SHOT BLOCKER';
+    }
+    if(totals.gp>=1) return 'TEAM PLAYER';
+    return 'ROOKIE RISING';
+  }
+  var title = getTitle();
 
   // ── Badges ────────────────────────────────────────────────
   var badges=[];
