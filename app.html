@@ -1237,7 +1237,7 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
 /* ── Player Season Card Screen — Premium Trading Card ──────── */
-#screen-player-card{display:flex;flex-direction:column;height:100%;background:#06070a;overflow:hidden;position:relative;}
+#screen-player-card{flex-direction:column;height:100%;background:#06070a;overflow:hidden;position:relative;}
 #screen-player-card::before{content:"";position:absolute;inset:0;background:
   radial-gradient(1200px 480px at 50% -120px, var(--psc-glow,rgba(204,0,0,.55)) 0%, rgba(204,0,0,0) 60%),
   radial-gradient(800px 600px at 100% 100%, rgba(255,215,0,.05) 0%, rgba(0,0,0,0) 70%),
@@ -1696,6 +1696,17 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
           <div style="text-align:left;">
             <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.9);">Season Stats &amp; History</div>
             <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:rgba(255,255,255,.45);margin-top:1px;">View games, leaderboard &amp; player cards</div>
+          </div>
+        </div>
+        <span class="pro-badge" style="flex-shrink:0;">PRO</span>
+      </button>
+      <button type="button" onclick="proGate('season',function(){openSeasonToPlayerCards()})"
+        style="width:100%;display:flex;align-items:center;justify-content:space-between;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.3);border-radius:12px;padding:13px 16px;cursor:pointer;margin-bottom:8px;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">🃏</span>
+          <div style="text-align:left;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.9);">Player Cards</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:rgba(255,255,255,.45);margin-top:1px;" id="setup-pcards-team-hint">View player cards for your team</div>
           </div>
         </div>
         <span class="pro-badge" style="flex-shrink:0;">PRO</span>
@@ -2832,6 +2843,8 @@ function setActiveTeam(id){
   // Update team switcher label
   var lbl=document.getElementById('tsw-name');
   if(lbl)lbl.textContent=getActiveTeamName();
+  var pcHint=document.getElementById('setup-pcards-team-hint');
+  if(pcHint)pcHint.textContent='View player cards for '+getActiveTeamName();
 }
 
 /* Save current colors to active team */
@@ -3592,6 +3605,14 @@ function openSeason(from){
   document.getElementById('screen-setup').classList.remove('active');
   document.getElementById('screen-season').classList.add('active');
   renderSeasonScreen();
+}
+function openSeasonToPlayerCards(){
+  openSeason('setup');
+  // Scroll to the Player Cards section after render
+  setTimeout(function(){
+    var pcEl=document.getElementById('sl-player-cards');
+    if(pcEl) pcEl.scrollIntoView({behavior:'smooth',block:'start'});
+  },120);
 }
 function closeSeason(){
   document.getElementById('screen-season').classList.remove('active');
