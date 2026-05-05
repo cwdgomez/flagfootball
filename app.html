@@ -8928,7 +8928,55 @@ function sharePlayerSeasonCard(){
   if(!canvas){showToast('Canvas not ready');return;}
   showToast('🎨 Building share card for '+d.firstName+'...');
 
-  var W=720,H=1080;
+  var W=720;
+  // ── Pre-calculate dynamic height ──
+  // We need a temp canvas context just to measure text for narrative word-wrap
+  canvas.width=W;canvas.height=100;
+  var tmpCtx=canvas.getContext('2d');
+
+  // Fixed layout positions
+  var avatarCY=200, avatarR=92;
+  var tY=avatarCY+avatarR+38;       // title pill top
+  var nameY=tY+70;                   // player name baseline
+  var subY=nameY+34;                 // subhead baseline
+  var sbY=subY+20, sbH=72;           // scoreboard
+  var eyY=sbY+sbH+34;               // "SEASON STATS" label
+  var sgY=eyY+18, sgH=104;          // stat tile grid start
+  var bdY=sgY+sgH*2+10*2+36;        // after stat tiles
+
+  // Badges height
+  var badgeRowH=0;
+  if(d.badges&&d.badges.length){
+    var bShown=Math.min(d.badges.length,7);
+    var numRows=bShown>6?2:1;
+    badgeRowH=18+numRows*72+(numRows>1?10:0)+16; // header + rows + gap + spacing
+    bdY+=badgeRowH;
+  }
+
+  // Best performance height
+  if(d.bestGame){
+    bdY+=86+16;
+  }
+
+  // Narrative height (needs text measurement)
+  var narrativeLines=[];
+  if(d.narrative){
+    tmpCtx.font='italic 500 17px "Barlow Condensed",Arial,sans-serif';
+    var words=d.narrative.split(' ');
+    var line='', maxW=W-80-60;
+    words.forEach(function(w){
+      var test=line?line+' '+w:w;
+      if(tmpCtx.measureText(test).width>maxW){narrativeLines.push(line);line=w;}
+      else{line=test;}
+    });
+    if(line)narrativeLines.push(line);
+    var qH=Math.max(70,narrativeLines.length*22+30);
+    bdY+=qH+12;
+  }
+
+  // Footer needs ~70px
+  var H=Math.max(1080, bdY+70);
+
   canvas.width=W;canvas.height=H;
   var ctx=canvas.getContext('2d');
   var pri=d.primary||'#AA0000',sec=d.secondary||'#FFD700';
@@ -9006,7 +9054,7 @@ function sharePlayerSeasonCard(){
     }
 
     // ── Avatar with win-rate ring ──
-    var avatarCY=200,avatarR=92;
+    // avatarCY and avatarR are pre-calculated above
     // Track ring
     ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=6;
     ctx.beginPath();ctx.arc(W/2,avatarCY,avatarR+8,0,Math.PI*2);ctx.stroke();
@@ -9050,7 +9098,7 @@ function sharePlayerSeasonCard(){
     }
 
     // ── Foil title pill ──
-    var tY=avatarCY+avatarR+38;
+    // tY is pre-calculated above
     var titleTxt=(d.title||'').toUpperCase();
     ctx.font='900 16px "Barlow Condensed",Arial,sans-serif';
     var tW=ctx.measureText(titleTxt).width+76;
@@ -9064,7 +9112,7 @@ function sharePlayerSeasonCard(){
     ctx.fillText('★  '+titleTxt+'  ★',W/2,tY+22);
 
     // ── Player name ──
-    var nameY=tY+70;
+    // nameY is pre-calculated above
     var nameTxt=(d.dispName||'').toUpperCase();
     ctx.font='800 78px "Bebas Neue",Arial Black,sans-serif';
     ctx.fillStyle='rgba(0,0,0,.55)';
@@ -9080,7 +9128,7 @@ function sharePlayerSeasonCard(){
     ctx.beginPath();ctx.moveTo(W/2-nameW/2,ulY);ctx.lineTo(W/2+nameW/2,ulY);ctx.stroke();
 
     // Subhead
-    var subY=nameY+34;
+    // subY is pre-calculated above
     var subParts=[];
     if(d.jerseyNum) subParts.push('#'+d.jerseyNum);
     if(d.isQB) subParts.push('QB');
@@ -9091,7 +9139,7 @@ function sharePlayerSeasonCard(){
     ctx.fillText(subTxt,W/2,subY);
 
     // ── Scoreboard chip strip ──
-    var sbY=subY+20;
+    // sbY is pre-calculated above
     var sbCells=[
       {n:d.wins,l:'WINS',c:'#4ade80'},
       {n:d.losses,l:'LOSSES',c:'#f87171'}
@@ -9120,7 +9168,7 @@ function sharePlayerSeasonCard(){
     });
 
     // ── Stat tiles ──
-    var eyY=sbY+sbH+34;
+    // eyY is pre-calculated above
     ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.45)';
     ctx.font='800 11px "Barlow Condensed",Arial,sans-serif';
     ctx.fillText('— SEASON STATS —',W/2,eyY);
@@ -9133,7 +9181,7 @@ function sharePlayerSeasonCard(){
       {l:'BLOCKS',v:d.blocks,c:'#fb923c',k:'blocks'},
       {l:'CONVERSIONS',v:d.conv,c:'#f472b6',k:'conv'}
     ];
-    var sgY=eyY+18, sgW=(W-80-20)/3, sgH=104;
+    var sgW=(W-80-20)/3; // sgY and sgH are pre-calculated above
     var maxS=Math.max(1,d.tds,d.catches,d.flags,d.ints,d.blocks,d.conv);
     statDefs2.forEach(function(sd,i){
       var sx=40+(i%3)*(sgW+10);
@@ -9180,7 +9228,7 @@ function sharePlayerSeasonCard(){
     });
 
     // ── Achievement medals ──
-    var bdY=sgY+sgH*2+10*2+36;
+    var bdY=sgY+sgH*2+10*2+36; // running Y cursor for variable sections
     if(d.badges&&d.badges.length){
       ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.45)';
       ctx.font='800 11px "Barlow Condensed",Arial,sans-serif';
@@ -9188,21 +9236,25 @@ function sharePlayerSeasonCard(){
       bdY+=18;
       var bShown=Math.min(d.badges.length,7);
       var perRow=Math.min(bShown,6);
-      var bWid=80, bGap=8;
-      var rowW=perRow*bWid+(perRow-1)*bGap;
-      var bx=(W-rowW)/2, by=bdY;
+      var bWid=80, bGap=8, bRowH=72, bRowGap=10;
       var palMap={'gold-badge':{bg1:'rgba(255,215,0,.18)',bg2:'rgba(255,215,0,.04)',br:'rgba(255,215,0,.5)',tx:sec},
                   'green-badge':{bg1:'rgba(34,197,94,.18)',bg2:'rgba(34,197,94,.04)',br:'rgba(34,197,94,.5)',tx:'#4ade80'},
                   'blue-badge':{bg1:'rgba(99,102,241,.2)',bg2:'rgba(99,102,241,.04)',br:'rgba(99,102,241,.5)',tx:'#a5b4fc'},
                   'red-badge':{bg1:'rgba(239,68,68,.18)',bg2:'rgba(239,68,68,.04)',br:'rgba(239,68,68,.45)',tx:'#f87171'}};
       for(var bi=0;bi<bShown;bi++){
+        var row=Math.floor(bi/perRow);
+        var col=bi%perRow;
+        var itemsInRow=(row===0)?Math.min(bShown,perRow):(bShown-perRow);
+        var rowW2=itemsInRow*bWid+(itemsInRow-1)*bGap;
+        var bx=(W-rowW2)/2+col*(bWid+bGap);
+        var by=bdY+row*(bRowH+bRowGap);
         var b=d.badges[bi];
         var pal=palMap[b.cls]||palMap['gold-badge'];
-        rr(bx,by,bWid,72,12);
-        var bgGrad=ctx.createLinearGradient(bx,by,bx,by+72);
+        rr(bx,by,bWid,bRowH,12);
+        var bgGrad=ctx.createLinearGradient(bx,by,bx,by+bRowH);
         bgGrad.addColorStop(0,pal.bg1);bgGrad.addColorStop(1,pal.bg2);
         ctx.fillStyle=bgGrad;ctx.fill();
-        rr(bx,by,bWid,72,12);ctx.strokeStyle=pal.br;ctx.lineWidth=1;ctx.stroke();
+        rr(bx,by,bWid,bRowH,12);ctx.strokeStyle=pal.br;ctx.lineWidth=1;ctx.stroke();
         ctx.textAlign='center';
         ctx.fillStyle='#fff';
         ctx.font='30px "Apple Color Emoji","Segoe UI Emoji",sans-serif';
@@ -9215,9 +9267,9 @@ function sharePlayerSeasonCard(){
           lab=lab+'…';
         }
         ctx.fillText(lab,bx+bWid/2,by+58);
-        bx+=bWid+bGap;
       }
-      bdY=by+88;
+      var numRows=bShown>perRow?2:1;
+      bdY+=numRows*bRowH+(numRows>1?bRowGap:0)+16;
     }
 
     // ── Best Performance ──
