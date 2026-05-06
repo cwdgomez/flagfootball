@@ -7138,30 +7138,75 @@ function printReport(){
 function exportCSV(){
   var games=loadSeason();
   if(!games.length){showToast('No games to export yet');return;}
-  var rows=[['Date','Opponent','Result','Our Score','Their Score','Player','TDs','Catches','Flags','INTs','Deflections','Fumbles','Conv','Snaps (Off)','Snaps (Def)','MVP Score']];
+
+  // ── Section 1: Per-game per-player rows ─────────────────────
+  // Each stat field is broken out separately so you can audit
+  // exactly which raw value contributed to the trophy total.
+  var rows=[['Date','Opponent','Result','Our Score','Their Score','Player','Recv TDs','QB TDs','Total TDs','Catches','Flags','INTs','Blocks','Fumbles','Conv (1pt)','Conv (2pt)','Conv (other)','QB Convs','Total Conv','Snaps (Off)','Snaps (Def)','MVP Score']];
+  // Keep a per-player accumulator so we can append a season-totals
+  // block at the end that EXACTLY mirrors the trophy card aggregate.
+  var totals={}; // name → {recvTDs,qbTDs,catches,flags,ints,blocks,fumbles,conv,gp,wins,losses,ties,mvp,score}
   games.forEach(function(g){
     var result=g.us>g.them?'W':g.us<g.them?'L':'T';
     Object.keys(g.playerStats||{}).forEach(function(name){
-      var st=g.playerStats[name];
+      var st=g.playerStats[name]||{};
+      var recv=st.tds||0, qb=st.qbTDs||0;
+      var conv1=st.conv1||0, conv2=st.conv2||0, convOther=st.conv||0, qbConv=st.qbConvs||0;
+      var totalConv=conv1+conv2+convOther+qbConv;
       rows.push([
         g.date||'',g.opp||'',result,g.us,g.them,
         name,
-        (st.tds||0)+(st.qbTDs||0),
-        st.catches||0,st.flags||0,st.ints||0,
-        st.blocks||0,st.fumbles||0,
-        (st.conv||0)+(st.qbConvs||0),
-        st.snapO||0,st.snapD||0,
+        recv, qb, recv+qb,
+        st.catches||0, st.flags||0, st.ints||0,
+        st.blocks||0, st.fumbles||0,
+        conv1, conv2, convOther, qbConv, totalConv,
+        st.snapO||0, st.snapD||0,
         st.score||0
       ]);
+      // Accumulate season totals identically to renderPlayerSeasonCard
+      var t=totals[name]=totals[name]||{recvTDs:0,qbTDs:0,catches:0,flags:0,ints:0,blocks:0,fumbles:0,conv:0,gp:0,wins:0,losses:0,ties:0,mvp:0,score:0};
+      t.recvTDs+=recv; t.qbTDs+=qb;
+      t.catches+=(st.catches||0); t.flags+=(st.flags||0);
+      t.ints+=(st.ints||0); t.blocks+=(st.blocks||0);
+      t.fumbles+=(st.fumbles||0);
+      t.conv+=totalConv;
+      t.score+=(st.score||0);
+      t.gp+=1;
+      if(g.us>g.them) t.wins+=1; else if(g.us<g.them) t.losses+=1; else t.ties+=1;
+      if(g.mvp===name) t.mvp+=1;
     });
   });
+
+  // ── Section 2: Season totals block (mirrors trophy card) ───
+  // Empty rows + header so it's visually distinct in Excel/Numbers.
+  rows.push([]);
+  rows.push([]);
+  rows.push(['SEASON TOTALS — these numbers exactly match each player’s trophy card aggregate']);
+  rows.push(['Player','GP','W','L','T','Win %','Recv TDs','QB TDs','Total TDs','Catches','Flags','INTs','Blocks','Fumbles','Total Conv','MVP Awards','MVP Score']);
+  // Sort players by total TDs desc so leaders stay at top — same order as trophy emphasizes
+  var names=Object.keys(totals).sort(function(a,b){
+    var ta=totals[a], tb=totals[b];
+    return (tb.recvTDs+tb.qbTDs)-(ta.recvTDs+ta.qbTDs) || tb.score-ta.score;
+  });
+  names.forEach(function(n){
+    var t=totals[n];
+    var winPct=t.gp?Math.round((t.wins/t.gp)*100)+'%':'0%';
+    rows.push([
+      n,
+      t.gp, t.wins, t.losses, t.ties, winPct,
+      t.recvTDs, t.qbTDs, t.recvTDs+t.qbTDs,
+      t.catches, t.flags, t.ints, t.blocks, t.fumbles,
+      t.conv, t.mvp, t.score
+    ]);
+  });
+
   var csv=rows.map(function(r){return r.map(function(v){return '"'+(v+'').replace(/"/g,'""')+'"';}).join(',');}).join('\r\n');
   var blob=new Blob([csv],{type:'text/csv'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
   a.href=url;a.download=(G.team||'season')+'-stats-'+new Date().toISOString().split('T')[0]+'.csv';
   a.click();URL.revokeObjectURL(url);
-  showToast('📊 CSV exported!');
+  showToast('📊 CSV exported! Scroll to the bottom for season totals matching the trophy cards.');
 }
 
 /* ════════════════════════════════════════════════════════════
