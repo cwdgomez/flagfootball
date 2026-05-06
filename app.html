@@ -232,6 +232,8 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .team-switch-btn:active{border-color:var(--s);color:var(--s);}
 .team-del-btn{background:none;border:none;padding:4px 6px;font-size:16px;cursor:pointer;opacity:.4;transition:opacity .15s;}
 .team-del-btn:active{opacity:1;}
+.team-rename-btn{background:none;border:1px solid var(--dark5);border-radius:7px;padding:4px 8px;font-size:14px;cursor:pointer;color:var(--dim);opacity:.7;margin-left:4px;transition:opacity .15s,color .15s,border-color .15s;}
+.team-rename-btn:active{opacity:1;color:var(--s);border-color:var(--s);}
 .btn-new-team{width:100%;border:none;border-radius:12px;padding:13px;background:linear-gradient(135deg,var(--p),var(--p2));color:var(--s);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;margin-top:6px;transition:opacity .15s;}
 .btn-new-team:active{opacity:.85;}
 .teams-dismiss{width:100%;background:none;border:1px solid var(--dark5);border-radius:10px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;color:var(--dim);cursor:pointer;margin-top:8px;text-transform:uppercase;}
@@ -2883,9 +2885,36 @@ function renderTeamsList(){
       +(isActive
         ?'<span class="team-active-badge">Active</span>'
         :'<button type="button" class="team-switch-btn" onclick="switchToTeam(\''+esc(t.id)+'\')">Switch</button>')
+      +'<button type="button" class="team-rename-btn" onclick="renameTeam(\''+esc(t.id)+'\')" title="Rename team">✎</button>'
       +(canDelete&&!isActive?'<button type="button" class="team-del-btn" onclick="deleteTeam(\''+esc(t.id)+'\',\''+esc(t.name)+'\')" title="Delete team">🗑</button>':'')
       +'</div>';
   }).join('');
+}
+
+/* Rename a team in place — updates the teams list and all UI labels if it's
+   the active team. Triggered from the ✎ button in the Switch Team modal. */
+function renameTeam(id){
+  var teams=loadTeams();
+  var t=teams.find(function(x){return x.id===id;});
+  if(!t) return;
+  var nn=prompt('Rename team:', t.name);
+  if(nn===null) return; // cancelled
+  nn=(nn||'').trim();
+  if(!nn){alert('Team name cannot be empty.');return;}
+  if(nn===t.name) return; // unchanged
+  t.name=nn;
+  saveTeams(teams);
+  // If renaming the active team, update everything visible
+  if(id===ACTIVE_TEAM_ID){
+    G.team=nn;
+    var inp=document.getElementById('su-team'); if(inp) inp.value=nn;
+    var lbl=document.getElementById('tsw-name'); if(lbl) lbl.textContent=nn;
+    var hdr=document.getElementById('hdr-team'); if(hdr) hdr.textContent=nn.toUpperCase();
+    var scUs=document.getElementById('sc-us-name'); if(scUs) scUs.textContent=nn.toUpperCase().slice(0,9);
+    var penUsLbl=document.getElementById('pen-us-label'); if(penUsLbl) penUsLbl.textContent=nn.toUpperCase().slice(0,8)+' FLAGS';
+  }
+  renderTeamsList();
+  showToast('✓ Renamed to '+nn);
 }
 
 function switchToTeam(id){
@@ -2979,9 +3008,61 @@ window.onload=function(){
   try{var cfg=localStorage.getItem('ff_fb_config');if(cfg)document.getElementById('sync-fb-config').value=cfg;}catch(e){}
   // Restore team name in setup input
   try{var tname=getActiveTeamName();var inp=document.getElementById('su-team');if(inp&&tname&&tname!=='My Team')inp.value=tname;}catch(e){}
+  // Auto-save team / coach name as the user edits — no need to start a game first
+  try{
+    var teamInp=document.getElementById('su-team');
+    if(teamInp){
+      teamInp.addEventListener('blur', saveTeamNameInline);
+      teamInp.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); teamInp.blur(); } });
+    }
+    var coachInp=document.getElementById('su-coach');
+    if(coachInp){
+      coachInp.addEventListener('blur', saveCoachNameInline);
+      coachInp.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); coachInp.blur(); } });
+    }
+  }catch(e){}
   // Check if there's a saved in-progress game to restore
   checkRestoreGameState();
 };
+
+/* ── Auto-save team / coach name when user edits the setup inputs.
+   Persists to teams list + updates switcher chip + scoreboard labels —
+   without requiring the user to click "Start Game" first. */
+function saveTeamNameInline(){
+  var inp=document.getElementById('su-team');
+  if(!inp) return;
+  var newName=(inp.value||'').trim();
+  if(!newName) return; // ignore empty
+  // Update in-memory game state
+  G.team=newName;
+  // Persist to teams list under the active team
+  try{
+    var teams=loadTeams();
+    var tidx=teams.findIndex(function(t){return t.id===ACTIVE_TEAM_ID;});
+    if(tidx<0){
+      // No active team yet — create one so name actually saves
+      teams.push({id:ACTIVE_TEAM_ID,name:newName});
+      saveTeams(teams);
+    } else if(teams[tidx].name!==newName){
+      teams[tidx].name=newName;
+      saveTeams(teams);
+    } else {
+      return; // unchanged
+    }
+  }catch(e){return;}
+  // Update visible UI labels
+  var lbl=document.getElementById('tsw-name'); if(lbl) lbl.textContent=newName;
+  var hdr=document.getElementById('hdr-team'); if(hdr) hdr.textContent=newName.toUpperCase();
+  var scUs=document.getElementById('sc-us-name'); if(scUs) scUs.textContent=newName.toUpperCase().slice(0,9);
+  var penUsLbl=document.getElementById('pen-us-label'); if(penUsLbl) penUsLbl.textContent=newName.toUpperCase().slice(0,8)+' FLAGS';
+  // Subtle confirmation
+  try{ showToast('✓ Team name saved'); }catch(e){}
+}
+function saveCoachNameInline(){
+  var inp=document.getElementById('su-coach');
+  if(!inp) return;
+  G.coach=(inp.value||'').trim();
+}
 
 /* ── START GAME ── */
 function startGame(){
@@ -9782,11 +9863,20 @@ function _pscRenderPrintCanvas(d,photoImg){
     rr(sx,sy,sgW,sgH,15);
     ctx.strokeStyle=isTop?'rgba(255,215,0,.5)':'rgba(255,255,255,.1)';
     ctx.lineWidth=isTop?1.5:1;ctx.stroke();
-    ctx.textAlign='center';ctx.fillStyle=isTop?sec:(sd.v>0?sd.c:'rgba(255,255,255,.22)');
-    if(isTop){ctx.shadowColor=sec;ctx.shadowBlur=14;}
+    // Top-stat halo: a non-blurring radial gradient behind the number so the
+    // digit itself stays crisp on print. Replaces the old shadowBlur halo.
+    if(isTop){
+      var hg=ctx.createRadialGradient(sx+sgW/2,sy+50,2,sx+sgW/2,sy+50,sgW*0.55);
+      hg.addColorStop(0,'rgba(255,215,0,.42)');
+      hg.addColorStop(.5,'rgba(255,215,0,.12)');
+      hg.addColorStop(1,'rgba(255,215,0,0)');
+      ctx.fillStyle=hg;
+      ctx.fillRect(sx,sy+14,sgW,sgH-28);
+    }
+    ctx.textAlign='center';
+    ctx.fillStyle=isTop?sec:(sd.v>0?sd.c:'rgba(255,255,255,.22)');
     ctx.font='800 48px "Bebas Neue",Arial Black,sans-serif';
     ctx.fillText(sd.v,sx+sgW/2,sy+56);
-    ctx.shadowBlur=0;
     ctx.fillStyle='rgba(255,255,255,.5)';
     ctx.font='800 10.5px "Barlow Condensed",Arial,sans-serif';
     ctx.fillText(sd.l,sx+sgW/2,sy+78);
