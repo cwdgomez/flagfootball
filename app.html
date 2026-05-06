@@ -8764,8 +8764,20 @@ function renderPlayerSeasonCard(name){
   var dominantStat = statWeights[0].key;
 
   // ── Title — driven by dominant stat so the title always matches ──
+  // QBs get their own title ladder driven by qbTDs since they don't accumulate
+  // catches/INTs/etc. the way receivers and defenders do.
+  var isQB = (name===G.qb);
   function getTitle(){
-    // Special MVP titles first
+    // QB-specific titles take priority — they're who they are
+    if(isQB){
+      if(totals.qbTDs>=15) return 'GUNSLINGER';
+      if(totals.qbTDs>=10) return 'FIELD GENERAL';
+      if(totals.qbTDs>=5)  return 'PRECISION PASSER';
+      if(totals.qbTDs>=1)  return 'STARTING QB';
+      // QB with no recorded TDs — fall through to MVP / dominant logic
+    }
+
+    // Special MVP titles
     if(totals.mvp>=3) return 'THE MVP';
     if(totals.mvp>=2) return 'BACK-TO-BACK MVP';
 
@@ -8801,6 +8813,10 @@ function renderPlayerSeasonCard(name){
   // ── Badges ────────────────────────────────────────────────
   var badges=[];
   if(totals.mvp>0) badges.push({icon:'⭐',label:'MVP x'+totals.mvp,cls:'gold-badge'});
+  // QB-specific badges — only if isQB so receivers don't get them
+  if(isQB && totals.qbTDs>=20) badges.push({icon:'🎯',label:'Field General',cls:'gold-badge'});
+  else if(isQB && totals.qbTDs>=10) badges.push({icon:'🎯',label:'Field General',cls:'blue-badge'});
+  if(isQB && totals.qbTDs>=5) badges.push({icon:'🏈',label:'QB1',cls:'gold-badge'});
   if(hatTrickGames>0) badges.push({icon:'🔥',label:'Hat Trick'+(hatTrickGames>1?' x'+hatTrickGames:''),cls:'red-badge'});
   if(totals.gp>=games.length&&games.length>0) badges.push({icon:'💪',label:'Perfect Attendance',cls:'green-badge'});
   if(allTDs>=10) badges.push({icon:'🏆',label:'10 TD Club',cls:'gold-badge'});
@@ -8931,13 +8947,15 @@ function renderPlayerSeasonCard(name){
     +'</div></div>';
 
   // ── Stat tiles ────────────────────────────────────────────
+  // QBs see "TD PASSES" / "PASS CONVS" labels instead of generic ones
+  // since for them all TDs are throws and all conversions are QB convs.
   var statDefs=[
-    {label:'TOUCHDOWNS',val:allTDs,color:s,key:'tds'},
+    {label:isQB?'TD PASSES':'TOUCHDOWNS',val:allTDs,color:s,key:'tds'},
     {label:'CATCHES',val:totals.catches,color:'#60a5fa',key:'catches'},
     {label:'FLAGS',val:totals.flags,color:'#4ade80',key:'flags'},
     {label:'INTERCEPTIONS',val:totals.ints,color:'#a78bfa',key:'ints'},
     {label:'BLOCKS',val:totals.blocks,color:'#fb923c',key:'blocks'},
-    {label:'CONVERSIONS',val:totals.conv,color:'#f472b6',key:'conv'},
+    {label:isQB?'PASS CONVS':'CONVERSIONS',val:totals.conv,color:'#f472b6',key:'conv'},
   ];
   var maxStatVal=Math.max(1, allTDs, totals.catches, totals.flags, totals.ints, totals.blocks, totals.conv);
 
@@ -9884,15 +9902,16 @@ function _pscRenderPrintCanvas(d,photoImg){
   var eyY=sbY+sbH+22;
   ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.45)';
   ctx.font='800 12px "Barlow Condensed",Arial,sans-serif';
-  ctx.fillText('— SEASON STATS —',W/2,eyY);
+  ctx.fillText(d.isQB?'— QB SEASON STATS —':'— SEASON STATS —',W/2,eyY);
 
+  // QB labels reflect that for a QB all TDs are passes and all convs are QB convs
   var statDefs=[
-    {l:'TOUCHDOWNS',v:d.tds,c:sec,k:'tds'},
+    {l:d.isQB?'TD PASSES':'TOUCHDOWNS',v:d.tds,c:sec,k:'tds'},
     {l:'CATCHES',v:d.catches,c:'#60a5fa',k:'catches'},
     {l:'FLAGS',v:d.flags,c:'#4ade80',k:'flags'},
     {l:'INTERCEPTIONS',v:d.ints,c:'#a78bfa',k:'ints'},
     {l:'BLOCKS',v:d.blocks,c:'#fb923c',k:'blocks'},
-    {l:'CONVERSIONS',v:d.conv,c:'#f472b6',k:'conv'}
+    {l:d.isQB?'PASS CONVS':'CONVERSIONS',v:d.conv,c:'#f472b6',k:'conv'}
   ];
   var sgY=eyY+12, sgGap=8, sgW=(W-80-sgGap*2)/3, sgH=92;
   var maxS=Math.max(1,d.tds,d.catches,d.flags,d.ints,d.blocks,d.conv);
