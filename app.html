@@ -1954,6 +1954,7 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
       <button type="button" class="sact-btn" style="background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.35);color:#818cf8" onclick="proGate('cloudBackup',cloudBackup)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg> Backup<span class="pro-badge">PRO</span></button>
       <button type="button" class="sact-btn" style="background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.25);color:#818cf8" onclick="proGate('cloudRestore',cloudRestore)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg> Restore<span class="pro-badge">PRO</span></button>
       <button type="button" class="sact-btn" style="background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.35);color:#f59e0b" onclick="proGate('seasonReport',generateSeasonReport)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg> Summary<span class="pro-badge">PRO</span></button>
+      <button type="button" class="sact-btn" style="background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.4);color:#c084fc" onclick="proGate('print',generateCoachSpeechSheet)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> Speech<span class="pro-badge">PRO</span></button>
       <button type="button" class="sact-btn sact-clear" onclick="clearSeason()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Clear All</button>
     </div>
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="importSeason(event)">
@@ -9691,6 +9692,253 @@ function printPlayerSeasonCardPDF(){
     console.error('printPlayerSeasonCardPDF load error',err);
     showToast('Could not load PDF library — check your connection');
     if(btn){btn.removeAttribute('disabled');if(btn._prev){btn.innerHTML=btn._prev;btn._prev=null;}}
+  });
+}
+
+/* ── Coach's End-of-Season Speech Sheet ──────────────────────────
+   Generates a US Letter PDF the coach can read off at the team
+   banquet. One entry per kid sorted by jersey number, each with a
+   2–3 sentence callout based on their dominant stat + best game,
+   plus a small italic stat line for reference. Uses jsPDF text
+   rendering (no canvas) so the output stays crisp on any printer.
+*/
+function generateCoachSpeechSheet(){
+  var games=loadSeason();
+  if(!games.length){showToast('No games saved yet — play a game first!');return;}
+
+  // ── Aggregate per-player stats (mirrors trophy card aggregation) ──
+  var agg={}; var names=new Set();
+  games.forEach(function(g){
+    Object.keys(g.playerStats||{}).forEach(function(name){
+      names.add(name);
+      var t=agg[name]=agg[name]||{tds:0,qbTDs:0,catches:0,flags:0,ints:0,blocks:0,conv:0,fumbles:0,gp:0,wins:0,losses:0,ties:0,mvp:0,score:0,bestGame:null,bestScore:-1};
+      var ps=g.playerStats[name]||{};
+      t.gp++;
+      t.tds+=(ps.tds||0); t.qbTDs+=(ps.qbTDs||0);
+      t.catches+=(ps.catches||0); t.flags+=(ps.flags||0);
+      t.ints+=(ps.ints||0); t.blocks+=(ps.blocks||0);
+      t.conv+=(ps.conv||0)+(ps.conv1||0)+(ps.conv2||0)+(ps.qbConvs||0);
+      t.fumbles+=(ps.fumbles||0);
+      t.score+=(ps.score||0);
+      var us=g.us||0, them=g.them||0;
+      if(us>them) t.wins++; else if(us<them) t.losses++; else t.ties++;
+      if(g.mvp===name) t.mvp++;
+      var thisStat=(ps.tds||0)*6+(ps.qbTDs||0)*6+(ps.catches||0)+(ps.flags||0)+(ps.ints||0)*2+(ps.blocks||0)+(ps.score||0);
+      if(thisStat>t.bestScore){
+        t.bestScore=thisStat;
+        t.bestGame={opp:g.opp||'opponent', date:g.date||'', us:us, them:them, won:us>them};
+      }
+    });
+  });
+
+  // Roster order — by jersey number ascending (kids without numbers go last)
+  var roster=Array.from(names).sort(function(a,b){
+    var ja=parseInt(jerseyNum(a)||'9999',10), jb=parseInt(jerseyNum(b)||'9999',10);
+    if(ja!==jb) return ja-jb;
+    return a.localeCompare(b);
+  });
+
+  // Team-level stats for header
+  var teamRec={wins:0,losses:0,ties:0};
+  games.forEach(function(g){
+    if(g.us>g.them) teamRec.wins++;
+    else if(g.us<g.them) teamRec.losses++;
+    else teamRec.ties++;
+  });
+  var seasonMVP='', mvpCt=0;
+  Object.keys(agg).forEach(function(n){if(agg[n].mvp>mvpCt){mvpCt=agg[n].mvp; seasonMVP=n;}});
+  var teamName=getActiveTeamName()||G.team||'Team';
+  var seasonLabel=(function(){
+    var yr=(new Date()).getFullYear(), m=(new Date()).getMonth();
+    return (m<=5?(yr-1)+'–'+String(yr).slice(-2):yr+'–'+String(yr+1).slice(-2));
+  })();
+
+  // ── Callout builder — picks a phrase based on dominant stat ──
+  function buildCallout(name,t){
+    var fn=firstName(name);
+    var allTDs=t.tds+t.qbTDs;
+    var isQB=(name===G.qb);
+    var lines=[];
+    // Lead sentence — identity-driven
+    if(isQB && t.qbTDs>=10){
+      lines.push(fn+' ran the offense from start to finish — '+t.qbTDs+' TD pass'+(t.qbTDs!==1?'es':'')+(t.conv?' and '+t.conv+' conversion'+(t.conv!==1?'s':''):'')+' across the season. Without him there’s no scoreboard.');
+    } else if(isQB){
+      lines.push(fn+' was our quarterback all year — kept the offense moving and made the right reads. '+t.qbTDs+' TD pass'+(t.qbTDs!==1?'es':'')+' through the season.');
+    } else if(allTDs>=8){
+      lines.push(fn+' was a scoring machine — '+allTDs+' total TDs across '+t.gp+' games. When the team needed points, the ball found him.');
+    } else if(allTDs>=4){
+      lines.push(fn+' found the endzone '+allTDs+' times this season — a real scoring threat every time he was on the field.');
+    } else if(t.catches>=12){
+      lines.push(fn+' was the QB’s best friend — '+t.catches+' catches and dependable hands every drive. If it was in the air near him, it was coming down.');
+    } else if(t.flags>=12){
+      lines.push(fn+' was the engine of the defense — '+t.flags+' flag pulls, more than most on the team. He brought energy every snap.');
+    } else if(t.ints>=2){
+      lines.push(fn+' played the ball like a defender should — '+t.ints+' interception'+(t.ints>1?'s':'')+' that ended drives when we needed it most.');
+    } else if(t.blocks>=3){
+      lines.push(fn+' was a wall — '+t.blocks+' blocks. He plays bigger than the stat sheet shows.');
+    } else if(t.gp>=games.length && games.length>=3){
+      lines.push('Every team needs a kid who shows up — and '+fn+' did just that. '+t.gp+' games, every one of them, ready to play.');
+    } else if(allTDs>0 || t.catches>0 || t.flags>0){
+      lines.push(fn+' grew week by week. '+t.gp+' games of effort, and you could see it on the field.');
+    } else {
+      lines.push(fn+' brought it every practice and every game. '+t.gp+' games of being a great teammate.');
+    }
+    // Best moment
+    if(t.bestGame && t.bestGame.opp){
+      var bg=t.bestGame;
+      var fmtDate='';
+      try{ if(bg.date) fmtDate=new Date(bg.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}); }catch(e){}
+      var resPart=bg.us===bg.them ? bg.us+'–'+bg.them+' tie' : (bg.won ? bg.us+'–'+bg.them+' win' : bg.us+'–'+bg.them+' loss');
+      lines.push('Best moment: vs '+bg.opp+(fmtDate?', '+fmtDate:'')+' — '+resPart+'.');
+    }
+    // MVP shoutout
+    if(t.mvp>0){
+      lines.push(t.mvp===1?'Earned MVP once.':'MVP '+t.mvp+' times this season.');
+    }
+    return lines.join(' ');
+  }
+
+  // ── Compact stats line for reference under each callout ──
+  function compactStats(name,t){
+    var parts=[];
+    var rec=t.wins+'–'+t.losses+(t.ties?'–'+t.ties:'');
+    parts.push(t.gp+' GP, '+rec);
+    if(name===G.qb && t.qbTDs>0) parts.push(t.qbTDs+' TD pass'+(t.qbTDs!==1?'es':''));
+    if(t.tds>0) parts.push(t.tds+' rec TD'+(t.tds!==1?'s':''));
+    if(t.catches>0) parts.push(t.catches+' catch'+(t.catches!==1?'es':''));
+    if(t.flags>0) parts.push(t.flags+' flag'+(t.flags!==1?'s':''));
+    if(t.ints>0) parts.push(t.ints+' INT'+(t.ints!==1?'s':''));
+    if(t.blocks>0) parts.push(t.blocks+' block'+(t.blocks!==1?'s':''));
+    if(t.conv>0) parts.push(t.conv+' conv');
+    if(t.mvp>0) parts.push(t.mvp+' MVP');
+    return parts.join(' · ');
+  }
+
+  // ── Render PDF (lazy-load jsPDF if not present) ──
+  showToast('🎤 Building speech sheet for '+teamName+'...');
+  _pscLoadJsPDF().then(function(jsPDF){
+    var doc=new jsPDF({orientation:'portrait', unit:'in', format:'letter', compress:true});
+    var pageW=8.5, pageH=11;
+    var marginL=0.75, marginR=0.75, marginT=0.75, marginB=0.6;
+    var contentW=pageW-marginL-marginR;
+    var y=marginT;
+
+    // Team primary/secondary color stripe
+    var pri=TC.primary||'#cc0000', sec=TC.secondary||'#FFD700';
+    function hexToRgb(hex){
+      try{var n=parseInt((hex||'#000').replace('#',''),16);return [(n>>16)&255,(n>>8)&255,n&255];}
+      catch(e){return [200,0,0];}
+    }
+    var priRGB=hexToRgb(pri), secRGB=hexToRgb(sec);
+
+    // Top accent bar
+    doc.setFillColor(priRGB[0],priRGB[1],priRGB[2]);
+    doc.rect(0,0,pageW,0.18,'F');
+    doc.setFillColor(secRGB[0],secRGB[1],secRGB[2]);
+    doc.rect(0,0.18,pageW,0.04,'F');
+
+    // Header
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(22);
+    doc.setTextColor(15,15,15);
+    doc.text(teamName.toUpperCase(),marginL,y+0.05);
+    y+=0.38;
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(11);
+    doc.setTextColor(110,110,110);
+    doc.text('END OF SEASON · COACH’S SHOUTOUTS · '+seasonLabel,marginL,y);
+    y+=0.32;
+
+    // Team summary line
+    var rec=teamRec.wins+'–'+teamRec.losses+(teamRec.ties?'–'+teamRec.ties:'');
+    var summary='Final record: '+rec+' · '+games.length+' game'+(games.length!==1?'s':'');
+    if(seasonMVP) summary+=' · Season MVP leader: '+dispName(seasonMVP)+' ('+mvpCt+'×)';
+    doc.setFont('helvetica','italic');
+    doc.setFontSize(10);
+    doc.setTextColor(140,140,140);
+    doc.text(summary,marginL,y);
+    y+=0.24;
+
+    // Hairline divider
+    doc.setDrawColor(secRGB[0],secRGB[1],secRGB[2]);
+    doc.setLineWidth(0.012);
+    doc.line(marginL,y,marginL+contentW,y);
+    y+=0.32;
+
+    // Per-player blocks
+    roster.forEach(function(name){
+      var t=agg[name];
+      if(!t || t.gp===0) return; // skip absent-all-season
+      var jersey=jerseyNum(name);
+      var nameLine='#'+(jersey||'-')+'  ·  '+dispName(name).toUpperCase()+(name===G.qb?'  ·  QB':'');
+      var blurb=buildCallout(name,t);
+      var stats=compactStats(name,t);
+
+      // CRITICAL: set body font BEFORE measuring — splitTextToSize uses the
+      // currently-active font's width metrics. If we measure at 9pt italic
+      // (prior state) but render at 11pt regular, lines overflow the margin.
+      var bodyIndent=0.22, bodyMaxW=contentW-bodyIndent;
+      doc.setFont('helvetica','normal'); doc.setFontSize(11);
+      var blurbLines=doc.splitTextToSize(blurb,bodyMaxW);
+      doc.setFont('helvetica','italic'); doc.setFontSize(9);
+      var statLines=doc.splitTextToSize(stats,bodyMaxW);
+      var blockH=0.26 + blurbLines.length*0.18 + 0.04 + statLines.length*0.14 + 0.20;
+
+      // Pagebreak if needed
+      if(y+blockH>pageH-marginB){
+        doc.addPage();
+        // Top accent on continuation pages
+        doc.setFillColor(priRGB[0],priRGB[1],priRGB[2]);
+        doc.rect(0,0,pageW,0.10,'F');
+        y=marginT;
+      }
+
+      // Player name (bold)
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(13);
+      doc.setTextColor(20,20,20);
+      doc.text(nameLine,marginL,y);
+      y+=0.24;
+
+      // Callout body
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(11);
+      doc.setTextColor(45,45,45);
+      blurbLines.forEach(function(ln){
+        doc.text(ln,marginL+bodyIndent,y);
+        y+=0.18;
+      });
+      y+=0.04;
+
+      // Stat reference (italic)
+      doc.setFont('helvetica','italic');
+      doc.setFontSize(9);
+      doc.setTextColor(130,130,130);
+      statLines.forEach(function(ln){
+        doc.text(ln,marginL+bodyIndent,y);
+        y+=0.14;
+      });
+      y+=0.20; // spacer between players
+    });
+
+    // Footer on every page
+    var totalPages=doc.internal.getNumberOfPages();
+    for(var p=1;p<=totalPages;p++){
+      doc.setPage(p);
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(9);
+      doc.setTextColor(160,160,160);
+      var footY=pageH-0.4;
+      doc.text(teamName+' · Page '+p+' of '+totalPages,marginL,footY);
+      doc.text('CGMAX FFTP · cgmaxfftp.com',pageW-marginR,footY,{align:'right'});
+    }
+
+    var fname=teamName.replace(/[^a-zA-Z0-9_-]+/g,'_')+'_Coach_Speech_Sheet.pdf';
+    doc.save(fname);
+    showToast('🎤 Speech sheet saved! Print it or read off your phone at the banquet.');
+  }).catch(function(err){
+    console.error('Speech sheet PDF error',err);
+    showToast('Could not load PDF library — check your connection');
   });
 }
 
