@@ -1371,6 +1371,9 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
 .psc-trend-btn:active{background:rgba(255,255,255,.08);color:#fff;}
 .psc-send-parents-btn{width:100%;background:linear-gradient(135deg,rgba(34,197,94,.18),rgba(34,197,94,.08));border:1px solid rgba(34,197,94,.4);border-radius:14px;padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:2px;color:#4ade80;cursor:pointer;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent;transition:background .2s,transform .1s;position:relative;overflow:hidden;}
 .psc-send-parents-btn:active{transform:scale(.98);background:linear-gradient(135deg,rgba(34,197,94,.3),rgba(34,197,94,.15));}
+.psc-print-btn{position:relative;width:100%;margin-top:10px;background:linear-gradient(135deg,#FFE085 0%,#FFD700 35%,#fff8dc 50%,#FFD700 65%,#b8860b 100%);background-size:200% 100%;animation:pscFoil 5s linear infinite;border:1px solid rgba(0,0,0,.55);border-radius:14px;padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:2.5px;color:#0a0a0a;cursor:pointer;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent;overflow:hidden;box-shadow:0 8px 22px rgba(255,215,0,.32), inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(0,0,0,.18);}
+.psc-print-btn:active{transform:scale(.98);opacity:.95;}
+.psc-print-btn[disabled]{opacity:.6;cursor:wait;animation:none;}
 
 /* ── Animations ───────────────────────────────────────────── */
 @keyframes pscFoil{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
@@ -8894,6 +8897,10 @@ function renderPlayerSeasonCard(name){
       +'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>'
       +' Send Season Recap to Parents'
     +'</button>'
+    +'<button type="button" class="psc-print-btn" id="psc-print-btn" onclick="printPlayerSeasonCardPDF()">'
+      +'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>'
+      +' Print 8×10 Trophy PDF'
+    +'</button>'
   +'</div>';
 
   body.innerHTML=html;
@@ -9475,6 +9482,437 @@ function sendSeasonRecap(){
 
   // Generate the share card with the recap text attached
   sharePlayerSeasonCard(msgText);
+}
+
+/* ── 8×10 Print-to-PDF Trophy Card ─────────────────────────────
+   Renders a brand-new 8:10 aspect card (2400×3000 @ 300 DPI) using
+   the same visual language as the share card, then wraps it in an
+   exact 8.00 × 10.00 inch portrait PDF page sized for Picrit-style
+   black 8×10 frames (no mat, full-bleed). Lazy-loads jsPDF on first
+   use so the page-load cost stays zero.
+*/
+var _pscJsPdfPromise=null;
+function _pscLoadJsPDF(){
+  if(_pscJsPdfPromise) return _pscJsPdfPromise;
+  if(window.jspdf&&window.jspdf.jsPDF){_pscJsPdfPromise=Promise.resolve(window.jspdf.jsPDF);return _pscJsPdfPromise;}
+  _pscJsPdfPromise=new Promise(function(resolve,reject){
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.async=true;
+    s.onload=function(){
+      if(window.jspdf&&window.jspdf.jsPDF) resolve(window.jspdf.jsPDF);
+      else reject(new Error('jsPDF failed to expose constructor'));
+    };
+    s.onerror=function(){reject(new Error('Failed to load jsPDF'));};
+    document.head.appendChild(s);
+  });
+  return _pscJsPdfPromise;
+}
+
+function printPlayerSeasonCardPDF(){
+  var d=window._pscData;
+  if(!d){showToast('Open a player card first');return;}
+  var btn=document.getElementById('psc-print-btn');
+  if(btn){btn.setAttribute('disabled','disabled');var prev=btn.innerHTML;btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Building 8×10 PDF…';btn._prev=prev;}
+  showToast('🖨 Building 8×10 trophy PDF for '+d.firstName+'...');
+
+  // Pre-load jsPDF and player photo in parallel
+  var photoPromise=new Promise(function(resolve){
+    if(!d.photo){resolve(null);return;}
+    var img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=function(){resolve(img);};
+    img.onerror=function(){resolve(null);};
+    img.src=d.photo;
+    setTimeout(function(){if(!img.complete) resolve(null);},1500);
+  });
+
+  Promise.all([_pscLoadJsPDF(),photoPromise]).then(function(arr){
+    var jsPDF=arr[0], photoImg=arr[1];
+    try{
+      var canvas=_pscRenderPrintCanvas(d,photoImg);
+      var doc=new jsPDF({orientation:'portrait',unit:'in',format:[8,10],compress:true});
+      var dataUrl=canvas.toDataURL('image/jpeg',0.95);
+      doc.addImage(dataUrl,'JPEG',0,0,8,10,undefined,'FAST');
+      var fname=(d.firstName||'Player').replace(/[^a-zA-Z0-9_-]+/g,'_')+'_Trophy_Card_8x10.pdf';
+      doc.save(fname);
+      showToast('🏆 Trophy PDF saved! Print at full size · 8×10 portrait');
+    }catch(e){
+      console.error('printPlayerSeasonCardPDF error',e);
+      showToast('PDF export failed — please try again');
+    }finally{
+      if(btn){btn.removeAttribute('disabled');if(btn._prev){btn.innerHTML=btn._prev;btn._prev=null;}}
+    }
+  }).catch(function(err){
+    console.error('printPlayerSeasonCardPDF load error',err);
+    showToast('Could not load PDF library — check your connection');
+    if(btn){btn.removeAttribute('disabled');if(btn._prev){btn.innerHTML=btn._prev;btn._prev=null;}}
+  });
+}
+
+/* Renders the trophy card into an offscreen canvas at 2400×3000 (300 DPI on 8×10).
+   Uses logical coordinates W=800, H=1000 with DPR=3 so all numbers stay readable. */
+function _pscRenderPrintCanvas(d,photoImg){
+  var W=800, H=1000, DPR=3;
+  var canvas=document.createElement('canvas');
+  canvas.width=W*DPR; canvas.height=H*DPR;
+  var ctx=canvas.getContext('2d');
+  ctx.scale(DPR,DPR);
+  // High-quality image smoothing for the photo
+  ctx.imageSmoothingEnabled=true;
+  if('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality='high';
+
+  var pri=d.primary||'#AA0000', sec=d.secondary||'#FFD700';
+  var darkP,midP;
+  try{darkP=shadeColor(pri,-70);}catch(e){darkP='#170303';}
+  try{midP=shadeColor(pri,-40);}catch(e){midP='#440000';}
+
+  function rr(x,y,w,h,r){
+    ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+    ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+    ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+    ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+  }
+  function hexA(hex,a){
+    try{var n=parseInt((hex||'#000').replace('#',''),16);
+      var rC=(n>>16)&255,gC=(n>>8)&255,bC=n&255;
+      return 'rgba('+rC+','+gC+','+bC+','+a+')';
+    }catch(e){return 'rgba(255,255,255,'+a+')';}
+  }
+
+  // ── Background ───────────────────────────────────────────
+  var bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#0a0b10');bg.addColorStop(0.55,'#06070a');bg.addColorStop(1,'#020203');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  // Team-color glow from top
+  var spot=ctx.createRadialGradient(W/2,-80,80,W/2,-80,640);
+  spot.addColorStop(0,hexA(pri,.7));spot.addColorStop(.45,hexA(pri,.18));spot.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=spot;ctx.fillRect(0,0,W,560);
+  // Gold corner glow
+  var spot2=ctx.createRadialGradient(W,H,40,W,H,560);
+  spot2.addColorStop(0,'rgba(255,215,0,.10)');spot2.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=spot2;ctx.fillRect(0,H-580,W,580);
+  // Diagonal hash on hero
+  ctx.save();
+  ctx.beginPath();ctx.rect(0,0,W,520);ctx.clip();
+  ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+  for(var k=-H;k<W+H;k+=14){ctx.beginPath();ctx.moveTo(k,0);ctx.lineTo(k+H,H);ctx.stroke();}
+  ctx.restore();
+  // Subtle dot grid
+  ctx.fillStyle='rgba(255,255,255,.025)';
+  for(var gx=0;gx<W;gx+=34){for(var gy=0;gy<H;gy+=34){ctx.fillRect(gx,gy,1,1);}}
+
+  // ── Top foil bar ─────────────────────────────────────────
+  var topGrad=ctx.createLinearGradient(0,0,W,0);
+  topGrad.addColorStop(0,sec);topGrad.addColorStop(.3,'#fff7c2');topGrad.addColorStop(.5,sec);topGrad.addColorStop(.7,pri);topGrad.addColorStop(1,sec);
+  ctx.fillStyle=topGrad;ctx.fillRect(0,0,W,7);
+
+  // ── Header strip: CGMAX brand · SEASON YEAR ──────────────
+  var seasonYear=(function(){
+    var yr=(new Date()).getFullYear();
+    // Football season runs fall→winter; if it's Jan–Jun, label as prior year season
+    var m=(new Date()).getMonth();
+    if(m<=5) return (yr-1)+'–'+String(yr).slice(-2);
+    return yr+'–'+String(yr+1).slice(-2);
+  })();
+  // Brand chip top-left
+  rr(36,22,150,34,17);ctx.fillStyle='rgba(0,0,0,.5)';ctx.fill();
+  rr(36,22,150,34,17);ctx.strokeStyle='rgba(255,255,255,.14)';ctx.lineWidth=1;ctx.stroke();
+  ctx.textAlign='left';ctx.fillStyle=sec;
+  ctx.font='900 14px "Barlow Condensed",Arial,sans-serif';
+  ctx.fillText('CGMAX',52,44);
+  ctx.fillStyle='rgba(255,255,255,.55)';ctx.font='600 11px "Barlow Condensed",Arial,sans-serif';
+  ctx.fillText('FFTP · TROPHY CARD',98,44);
+  // Season year chip top-right
+  ctx.font='800 13px "Barlow Condensed",Arial,sans-serif';
+  var syTxt='SEASON '+seasonYear;
+  var syW=ctx.measureText(syTxt).width+30;
+  rr(W-36-syW,22,syW,34,17);ctx.fillStyle='rgba(0,0,0,.5)';ctx.fill();
+  rr(W-36-syW,22,syW,34,17);ctx.strokeStyle='rgba(255,215,0,.35)';ctx.lineWidth=1;ctx.stroke();
+  ctx.textAlign='center';ctx.fillStyle=sec;
+  ctx.fillText(syTxt,W-36-syW/2,44);
+
+  // ── Jersey watermark behind avatar ───────────────────────
+  if(d.jerseyNum){
+    ctx.save();
+    ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.045)';
+    ctx.font='900 380px "Bebas Neue",Arial Black,sans-serif';
+    ctx.fillText('#'+d.jerseyNum,W/2,260);
+    ctx.restore();
+  }
+
+  // ── Avatar with win-rate ring ────────────────────────────
+  var avatarCY=200, avatarR=92;
+  // Track ring
+  ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=7;
+  ctx.beginPath();ctx.arc(W/2,avatarCY,avatarR+10,0,Math.PI*2);ctx.stroke();
+  if((d.winPct||0)>0){
+    var startA=-Math.PI/2;
+    var endA=startA+(Math.PI*2*(d.winPct/100));
+    ctx.strokeStyle=sec;ctx.lineWidth=7;ctx.lineCap='round';
+    ctx.shadowColor=sec;ctx.shadowBlur=16;
+    ctx.beginPath();ctx.arc(W/2,avatarCY,avatarR+10,startA,endA);ctx.stroke();
+    ctx.shadowBlur=0;ctx.lineCap='butt';
+  }
+  // Avatar fill / photo
+  ctx.save();
+  ctx.beginPath();ctx.arc(W/2,avatarCY,avatarR,0,Math.PI*2);ctx.closePath();ctx.clip();
+  var avBase=ctx.createRadialGradient(W/2-30,avatarCY-30,5,W/2,avatarCY,avatarR);
+  avBase.addColorStop(0,hexA('#ffffff',.18));avBase.addColorStop(.6,midP);avBase.addColorStop(1,darkP);
+  ctx.fillStyle=avBase;ctx.fillRect(W/2-avatarR,avatarCY-avatarR,avatarR*2,avatarR*2);
+  if(photoImg){
+    try{ctx.drawImage(photoImg,W/2-avatarR,avatarCY-avatarR,avatarR*2,avatarR*2);}catch(e){}
+  } else {
+    ctx.textAlign='center';ctx.fillStyle=sec;
+    ctx.font='900 92px "Bebas Neue",Arial Black,sans-serif';
+    ctx.fillText(d.jerseyNum||(d.firstName?d.firstName.charAt(0):'?'),W/2,avatarCY+32);
+  }
+  ctx.restore();
+  ctx.strokeStyle='rgba(0,0,0,.7)';ctx.lineWidth=4;
+  ctx.beginPath();ctx.arc(W/2,avatarCY,avatarR,0,Math.PI*2);ctx.stroke();
+
+  // Jersey corner badge
+  if(d.jerseyNum){
+    var jbX=W/2+avatarR-10, jbY=avatarCY+avatarR-22;
+    var jbg=ctx.createLinearGradient(jbX-24,jbY-15,jbX+24,jbY+19);
+    jbg.addColorStop(0,'#FFE085');jbg.addColorStop(.5,sec);jbg.addColorStop(1,'#b8860b');
+    rr(jbX-24,jbY-15,50,34,9);ctx.fillStyle=jbg;ctx.fill();
+    ctx.strokeStyle='#0a0a0a';ctx.lineWidth=2.5;ctx.stroke();
+    ctx.textAlign='center';ctx.fillStyle='#0a0a0a';
+    ctx.font='900 19px "Bebas Neue",Arial Black,sans-serif';
+    ctx.fillText('#'+d.jerseyNum,jbX+1,jbY+9);
+  }
+
+  // ── Foil title pill ──────────────────────────────────────
+  var tY=avatarCY+avatarR+30;
+  var titleTxt=(d.title||'').toUpperCase();
+  ctx.font='900 17px "Barlow Condensed",Arial,sans-serif';
+  var tW=ctx.measureText(titleTxt).width+90;
+  var tX=(W-tW)/2;
+  var foil=ctx.createLinearGradient(tX,tY,tX+tW,tY);
+  foil.addColorStop(0,'#FFE085');foil.addColorStop(.3,sec);foil.addColorStop(.5,'#fff8dc');foil.addColorStop(.7,sec);foil.addColorStop(1,'#b8860b');
+  rr(tX,tY,tW,38,19);ctx.fillStyle=foil;ctx.fill();
+  rr(tX,tY,tW,38,19);ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=1;ctx.stroke();
+  ctx.textAlign='center';ctx.fillStyle='#0a0a0a';
+  ctx.fillText('★  '+titleTxt+'  ★',W/2,tY+25);
+
+  // ── Player name ──────────────────────────────────────────
+  var nameY=tY+88;
+  var nameTxt=(d.dispName||'').toUpperCase();
+  ctx.font='800 80px "Bebas Neue",Arial Black,sans-serif';
+  ctx.fillStyle='rgba(0,0,0,.55)';
+  ctx.textAlign='center';
+  ctx.fillText(nameTxt,W/2,nameY+3);
+  var nGrad=ctx.createLinearGradient(0,nameY-56,0,nameY+5);
+  nGrad.addColorStop(0,'#ffffff');nGrad.addColorStop(.7,'#ffffff');nGrad.addColorStop(1,'rgba(255,255,255,.55)');
+  ctx.font='800 80px "Bebas Neue",Arial Black,sans-serif';
+  ctx.fillStyle=nGrad;ctx.fillText(nameTxt,W/2,nameY);
+  var nameW=Math.min(ctx.measureText(nameTxt).width,W-100);
+  var ulY=nameY+10;
+  var ulGrad=ctx.createLinearGradient(W/2-nameW/2,ulY,W/2+nameW/2,ulY);
+  ulGrad.addColorStop(0,'rgba(255,215,0,0)');ulGrad.addColorStop(.5,sec);ulGrad.addColorStop(1,'rgba(255,215,0,0)');
+  ctx.strokeStyle=ulGrad;ctx.lineWidth=1.6;
+  ctx.beginPath();ctx.moveTo(W/2-nameW/2,ulY);ctx.lineTo(W/2+nameW/2,ulY);ctx.stroke();
+
+  // Subhead
+  var subY=nameY+32;
+  var subParts=[];
+  if(d.jerseyNum) subParts.push('#'+d.jerseyNum);
+  if(d.isQB) subParts.push('QB');
+  subParts.push((d.teamName||'My Team').toUpperCase());
+  var subTxt=subParts.join('  ·  ');
+  ctx.fillStyle='rgba(255,255,255,.55)';
+  ctx.font='700 17px "Barlow Condensed",Arial,sans-serif';
+  ctx.fillText(subTxt,W/2,subY);
+
+  // ── Scoreboard chip strip ────────────────────────────────
+  var sbY=subY+18;
+  var sbCells=[
+    {n:d.wins,l:'WINS',c:'#4ade80'},
+    {n:d.losses,l:'LOSSES',c:'#f87171'}
+  ];
+  if(d.ties) sbCells.push({n:d.ties,l:'TIES',c:'rgba(255,255,255,.7)'});
+  sbCells.push({n:d.gp,l:'GAMES',c:'#ffffff'});
+  sbCells.push({n:(d.winPct||0)+'%',l:'WIN RATE',c:sec});
+  var sbW=W-160, sbX=80, sbH=70;
+  rr(sbX,sbY,sbW,sbH,18);
+  var sbBg=ctx.createLinearGradient(sbX,sbY,sbX,sbY+sbH);
+  sbBg.addColorStop(0,'rgba(0,0,0,.55)');sbBg.addColorStop(1,'rgba(0,0,0,.32)');
+  ctx.fillStyle=sbBg;ctx.fill();
+  rr(sbX,sbY,sbW,sbH,18);ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;ctx.stroke();
+  var cellW=sbW/sbCells.length;
+  sbCells.forEach(function(c,i){
+    var cx=sbX+cellW*i+cellW/2;
+    ctx.textAlign='center';ctx.fillStyle=c.c;
+    ctx.font='800 30px "Bebas Neue",Arial Black,sans-serif';ctx.fillText(c.n,cx,sbY+38);
+    ctx.fillStyle='rgba(255,255,255,.4)';
+    ctx.font='800 11px "Barlow Condensed",Arial,sans-serif';
+    ctx.fillText(c.l,cx,sbY+56);
+    if(i<sbCells.length-1){
+      ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(sbX+cellW*(i+1),sbY+12);ctx.lineTo(sbX+cellW*(i+1),sbY+sbH-12);ctx.stroke();
+    }
+  });
+
+  // ── Stat tiles 3×2 ───────────────────────────────────────
+  var eyY=sbY+sbH+22;
+  ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.45)';
+  ctx.font='800 12px "Barlow Condensed",Arial,sans-serif';
+  ctx.fillText('— SEASON STATS —',W/2,eyY);
+
+  var statDefs=[
+    {l:'TOUCHDOWNS',v:d.tds,c:sec,k:'tds'},
+    {l:'CATCHES',v:d.catches,c:'#60a5fa',k:'catches'},
+    {l:'FLAGS',v:d.flags,c:'#4ade80',k:'flags'},
+    {l:'INTERCEPTIONS',v:d.ints,c:'#a78bfa',k:'ints'},
+    {l:'BLOCKS',v:d.blocks,c:'#fb923c',k:'blocks'},
+    {l:'CONVERSIONS',v:d.conv,c:'#f472b6',k:'conv'}
+  ];
+  var sgY=eyY+12, sgGap=8, sgW=(W-80-sgGap*2)/3, sgH=92;
+  var maxS=Math.max(1,d.tds,d.catches,d.flags,d.ints,d.blocks,d.conv);
+  statDefs.forEach(function(sd,i){
+    var sx=40+(i%3)*(sgW+sgGap);
+    var sy=sgY+Math.floor(i/3)*(sgH+sgGap);
+    var isTop=(sd.k===d.dominantStat) && sd.v>0;
+    rr(sx,sy,sgW,sgH,15);
+    var tg=ctx.createLinearGradient(sx,sy,sx,sy+sgH);
+    if(isTop){tg.addColorStop(0,'rgba(255,215,0,.18)');tg.addColorStop(1,'rgba(255,215,0,.04)');}
+    else{tg.addColorStop(0,'rgba(255,255,255,.06)');tg.addColorStop(1,'rgba(255,255,255,.02)');}
+    ctx.fillStyle=tg;ctx.fill();
+    rr(sx,sy,sgW,sgH,15);
+    ctx.strokeStyle=isTop?'rgba(255,215,0,.5)':'rgba(255,255,255,.1)';
+    ctx.lineWidth=isTop?1.5:1;ctx.stroke();
+    ctx.textAlign='center';ctx.fillStyle=isTop?sec:(sd.v>0?sd.c:'rgba(255,255,255,.22)');
+    if(isTop){ctx.shadowColor=sec;ctx.shadowBlur=14;}
+    ctx.font='800 48px "Bebas Neue",Arial Black,sans-serif';
+    ctx.fillText(sd.v,sx+sgW/2,sy+56);
+    ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(255,255,255,.5)';
+    ctx.font='800 10.5px "Barlow Condensed",Arial,sans-serif';
+    ctx.fillText(sd.l,sx+sgW/2,sy+78);
+    var barW=Math.round(((sd.v||0)/maxS)*(sgW-24));
+    ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(sx+12,sy+sgH-10,sgW-24,3);
+    if(barW>0){ctx.fillStyle=isTop?sec:sd.c;ctx.fillRect(sx+12,sy+sgH-10,barW,3);}
+    if(isTop){
+      ctx.save();
+      ctx.translate(sx+sgW-8,sy+8);
+      ctx.rotate(35*Math.PI/180);
+      rr(-30,-9,80,18,3);
+      var rg=ctx.createLinearGradient(-30,0,50,0);
+      rg.addColorStop(0,sec);rg.addColorStop(1,'#b8860b');
+      ctx.fillStyle=rg;ctx.fill();
+      ctx.fillStyle='#0a0a0a';ctx.font='900 9px "Barlow Condensed",Arial,sans-serif';
+      ctx.textAlign='center';ctx.fillText('TOP STAT',10,4);
+      ctx.restore();
+    }
+  });
+
+  // ── Achievement badges (1 row, up to 6) ─────────────────
+  var bdY=sgY+sgH*2+sgGap+22;
+  if(d.badges&&d.badges.length){
+    ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.45)';
+    ctx.font='800 12px "Barlow Condensed",Arial,sans-serif';
+    ctx.fillText('— ACHIEVEMENTS · '+d.badges.length+' —',W/2,bdY);
+    bdY+=10;
+    var bShown=Math.min(d.badges.length,6);
+    // Auto-fit width based on count so labels like "Perfect Attendance" fit
+    var bWid=bShown<=4?160:(bShown===5?142:118);
+    var bGap=8, bRowH=72;
+    var rowW2=bShown*bWid+(bShown-1)*bGap;
+    var startX=(W-rowW2)/2;
+    var palMap={'gold-badge':{bg1:'rgba(255,215,0,.18)',bg2:'rgba(255,215,0,.04)',br:'rgba(255,215,0,.5)',tx:sec},
+                'green-badge':{bg1:'rgba(34,197,94,.18)',bg2:'rgba(34,197,94,.04)',br:'rgba(34,197,94,.5)',tx:'#4ade80'},
+                'blue-badge':{bg1:'rgba(99,102,241,.2)',bg2:'rgba(99,102,241,.04)',br:'rgba(99,102,241,.5)',tx:'#a5b4fc'},
+                'red-badge':{bg1:'rgba(239,68,68,.18)',bg2:'rgba(239,68,68,.04)',br:'rgba(239,68,68,.45)',tx:'#f87171'}};
+    for(var bi=0;bi<bShown;bi++){
+      var bx=startX+bi*(bWid+bGap);
+      var by=bdY;
+      var b=d.badges[bi];
+      var pal=palMap[b.cls]||palMap['gold-badge'];
+      rr(bx,by,bWid,bRowH,13);
+      var bgGrad=ctx.createLinearGradient(bx,by,bx,by+bRowH);
+      bgGrad.addColorStop(0,pal.bg1);bgGrad.addColorStop(1,pal.bg2);
+      ctx.fillStyle=bgGrad;ctx.fill();
+      rr(bx,by,bWid,bRowH,13);ctx.strokeStyle=pal.br;ctx.lineWidth=1;ctx.stroke();
+      ctx.textAlign='center';
+      ctx.fillStyle='#fff';
+      ctx.font='30px "Apple Color Emoji","Segoe UI Emoji",sans-serif';
+      ctx.fillText(b.icon,bx+bWid/2,by+34);
+      ctx.fillStyle=pal.tx;
+      ctx.font='800 10.5px "Barlow Condensed",Arial,sans-serif';
+      var lab=b.label.toUpperCase();
+      if(ctx.measureText(lab).width>bWid-10){
+        while(lab.length>0 && ctx.measureText(lab+'…').width>bWid-10){lab=lab.slice(0,-1);}
+        lab=lab+'…';
+      }
+      ctx.fillText(lab,bx+bWid/2,by+58);
+    }
+    bdY+=bRowH+10;
+  }
+
+  // ── Best Performance compact line ───────────────────────
+  if(d.bestGame){
+    var bg2=d.bestGame, bpH=58;
+    rr(40,bdY,W-80,bpH,15);
+    var bpGrad=ctx.createLinearGradient(40,bdY,W-40,bdY);
+    bpGrad.addColorStop(0,'rgba(255,255,255,.07)');bpGrad.addColorStop(1,'rgba(255,255,255,.03)');
+    ctx.fillStyle=bpGrad;ctx.fill();
+    rr(40,bdY,W-80,bpH,15);ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;ctx.stroke();
+    var bpTop=ctx.createLinearGradient(40,bdY,W-40,bdY);
+    bpTop.addColorStop(0,'rgba(255,215,0,0)');bpTop.addColorStop(.5,sec);bpTop.addColorStop(1,'rgba(255,215,0,0)');
+    ctx.fillStyle=bpTop;ctx.fillRect(56,bdY,W-112,2);
+
+    ctx.textAlign='left';ctx.fillStyle='rgba(255,215,0,.7)';
+    ctx.font='900 10px "Barlow Condensed",Arial,sans-serif';
+    ctx.fillText('⚡  BEST PERFORMANCE',56,bdY+18);
+
+    ctx.fillStyle='#ffffff';
+    ctx.font='800 20px "Bebas Neue",Arial Black,sans-serif';
+    ctx.fillText('vs. '+(bg2.opp||'Opponent').toUpperCase(),56,bdY+42);
+
+    if(bg2.us!==undefined){
+      var isTie=bg2.us===bg2.them;
+      var pillTxt=isTie?'TIE':(bg2.won?'WIN':'LOSS');
+      var pillCol=isTie?'rgba(255,255,255,.65)':(bg2.won?'#4ade80':'#f87171');
+      var pillBg=isTie?'rgba(255,255,255,.1)':(bg2.won?'rgba(34,197,94,.16)':'rgba(239,68,68,.16)');
+      ctx.font='900 11px "Barlow Condensed",Arial,sans-serif';
+      var pTxtW=ctx.measureText(pillTxt).width;
+      var pW=pTxtW+20, pX=W-40-pW-12, pY=bdY+12;
+      rr(pX,pY,pW,20,10);ctx.fillStyle=pillBg;ctx.fill();
+      rr(pX,pY,pW,20,10);ctx.strokeStyle=pillCol;ctx.lineWidth=1;ctx.stroke();
+      ctx.textAlign='center';ctx.fillStyle=pillCol;
+      ctx.fillText(pillTxt,pX+pW/2,pY+14);
+
+      ctx.textAlign='right';ctx.fillStyle='#ffffff';
+      ctx.font='800 26px "Bebas Neue",Arial Black,sans-serif';
+      ctx.fillText(bg2.us+' – '+bg2.them,W-52,bdY+46);
+    }
+    bdY+=bpH+8;
+  }
+
+  // ── Footer: signature seal + team + url ─────────────────
+  var footY=H-40;
+  // hairline
+  var hl=ctx.createLinearGradient(40,footY-10,W-40,footY-10);
+  hl.addColorStop(0,'rgba(255,255,255,0)');hl.addColorStop(.5,'rgba(255,255,255,.2)');hl.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=hl;ctx.fillRect(40,footY-10,W-80,1);
+  // seal
+  ctx.beginPath();ctx.arc(64,footY+8,9,0,Math.PI*2);
+  var sealG=ctx.createRadialGradient(61,footY+5,1,64,footY+8,10);
+  sealG.addColorStop(0,sec);sealG.addColorStop(1,pri);
+  ctx.fillStyle=sealG;ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=1;ctx.stroke();
+  ctx.textAlign='left';ctx.fillStyle='rgba(255,255,255,.6)';
+  ctx.font='800 14px "Barlow Condensed",Arial,sans-serif';
+  ctx.fillText((d.teamName||'').toUpperCase(),84,footY+13);
+  ctx.textAlign='right';ctx.fillStyle='rgba(255,255,255,.4)';
+  ctx.font='600 12px "Barlow Condensed",Arial,sans-serif';
+  ctx.fillText('CGMAX FFTP · cgmaxfftp.com',W-40,footY+13);
+
+  // Bottom foil bar
+  ctx.fillStyle=topGrad;ctx.fillRect(0,H-3,W,3);
+
+  return canvas;
 }
 
 /* ── Season Summary Share Card ── */
