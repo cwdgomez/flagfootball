@@ -465,7 +465,7 @@ test.describe('5 — Season Screen', () => {
     // Open Season (bypass pro gate if possible — inject pro license)
     await page.evaluate(() => {
       localStorage.setItem('ff_license_key', 'CGMAX-TEST-TEST-TEST');
-      localStorage.setItem('ff_is_pro', '1');
+      localStorage.setItem('ff_pro_v1', 'unlocked'); // the app checks ff_pro_v1==='unlocked' (was the non-existent ff_is_pro)
     });
 
     const seasonTab = page.locator('.nav-tab:has-text("Season"), [onclick*="openSeason"]').first();

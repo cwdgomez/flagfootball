@@ -6,7 +6,15 @@
 // Keep this single line on its own; CI parses it with a regex.
 const CACHE_VERSION = 'fftp-v17::2026-05-06';
 const FONT_CACHE    = 'fftp-fonts-v1';  // Separate long-lived cache for Google Fonts
+const LIB_CACHE     = 'fftp-libs-v1';   // Pinned third-party libs (Supabase SDK) so offline launches still get auth/sync
 const OFFLINE_URL   = './app.html';
+
+// Pinned CDN libraries the app cannot function without offline. The Supabase SDK was never
+// cached, so an offline PWA launch had no auth client and every change that session was never
+// queued for cloud sync. Keep the version in step with app.html / statcoach.html / auth-callback.html.
+const PRECACHE_LIBS = [
+  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.0/dist/umd/supabase.min.js',
+];
 
 const PRECACHE_ASSETS = [
   './app.html',
@@ -31,6 +39,11 @@ self.addEventListener('install', evt => {
   evt.waitUntil(
     caches.open(CACHE_VERSION)
       .then(cache => cache.addAll(PRECACHE_ASSETS))
+      // Libs are best-effort: a CDN hiccup must not prevent the SW from installing
+      .then(() => caches.open(LIB_CACHE).then(cache =>
+        Promise.all(PRECACHE_LIBS.map(u => fetch(u, { mode: 'cors', credentials: 'omit' })
+          .then(r => { if (r && r.status === 200) return cache.put(u, r); })
+          .catch(() => null)))))
       .then(() => self.skipWaiting())   // activate immediately
   );
   // Note: if precaching fails the error will surface in the DevTools SW panel
@@ -42,7 +55,7 @@ self.addEventListener('activate', evt => {
     caches.keys()
       .then(keys => Promise.all(
         keys
-          .filter(k => k !== CACHE_VERSION && k !== FONT_CACHE)
+          .filter(k => k !== CACHE_VERSION && k !== FONT_CACHE && k !== LIB_CACHE)
           .map(k => caches.delete(k))
       ))
       .then(() => self.clients.claim())
@@ -83,25 +96,41 @@ self.addEventListener('fetch', evt => {
     return;
   }
 
-  // Other cross-origin requests (CDN libs, Firebase SDK): try network, fall back to cache
-  if(url.origin !== self.location.origin){
+  // Pinned libs: cache-first (immutable URL), refresh in background
+  if(PRECACHE_LIBS.indexOf(req.url) !== -1){
     evt.respondWith(
-      caches.match(req).then(cached => cached || fetch(req).catch(() => null))
+      caches.open(LIB_CACHE).then(cache =>
+        cache.match(req).then(cached => {
+          const net = fetch(req, { mode: 'cors', credentials: 'omit' })
+            .then(resp => { if(resp && resp.status === 200 && resp.type === 'cors') cache.put(req, resp.clone()); return resp; })
+            .catch(() => null);
+          return cached || net;
+        })
+      )
     );
     return;
   }
 
-  // Navigation requests: network-first, fall back to offline app shell
+  // Other cross-origin requests (API, other CDN libs): network only — never serve stale API
+  // data or auth pages from cache. (This branch never stored anything anyway.)
+  if(url.origin !== self.location.origin){
+    return;
+  }
+
+  // Navigation requests: network-first, fall back to the cached copy of THAT page, then the app shell
   if(req.mode === 'navigate'){
     evt.respondWith(
       fetch(req)
         .then(resp => {
-          // Update cache with fresh nav response
-          const copy = resp.clone();
-          caches.open(CACHE_VERSION).then(c => c.put(req, copy));
+          // Only cache good responses — a 5xx must not replace a working precached page
+          if(resp && resp.ok){
+            const copy = resp.clone();
+            caches.open(CACHE_VERSION).then(c => c.put(req, copy));
+          }
           return resp;
         })
-        .catch(() => caches.match(OFFLINE_URL))
+        .catch(() => caches.match(req, { ignoreSearch: true })
+          .then(cached => cached || caches.match(OFFLINE_URL)))
     );
     return;
   }

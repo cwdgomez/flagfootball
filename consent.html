@@ -480,6 +480,7 @@ function removePhoto(){
 
 /* ── PRE-FILL TEAM NAME FROM URL ── */
 var _coachUid='';
+var _coachSig='';
 (function(){
   try{
     var params=new URLSearchParams(window.location.search);
@@ -490,6 +491,8 @@ var _coachUid='';
     // Capture coach uid for ownership tracking
     var uid=params.get('uid')||'';
     if(uid&&/^[0-9a-f-]{36}$/i.test(uid))_coachUid=uid;
+    var sig=params.get('sig')||'';
+    if(sig&&/^[0-9a-f]{32}$/i.test(sig))_coachSig=sig;
   }catch(e){}
 })();
 
@@ -558,7 +561,8 @@ function submitConsent(){
       signature:sigData,
       date:formDate,
       photo:photoBase64||null,
-      coachUid:_coachUid||null
+      coachUid:_coachUid||null,
+      sig:_coachSig||null
     })
   })
   .then(function(r){return r.json();})

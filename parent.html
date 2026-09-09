@@ -503,20 +503,37 @@ function toggleSun(){
   }
 
   /* ════════════ POLLING ════════════ */
+  var backoffUntil=0;
   function poll(){
+    if(Date.now()<backoffUntil)return; // rate-limited — skip this tick
+    var httpStatus=0;
     fetch(LIVE_GAME_URL+'?code='+encodeURIComponent(CODE))
-      .then(function(r){return r.json();})
+      .then(function(r){httpStatus=r.status;return r.json().catch(function(){return {};});})
       .then(function(resp){
+        if(httpStatus===429){
+          // Too many phones on this network — slow down for a bit, keep the last scores on screen
+          backoffUntil=Date.now()+30000;
+          if(!lastData)showWaiting();
+          return;
+        }
+        if(httpStatus>=500||(httpStatus>=400&&httpStatus!==404)){
+          // Server hiccup: treat like a connection issue, never as "game ended"
+          failCount++;
+          if(failCount>=3)showError('⚠ Connection issue — retrying…');
+          return;
+        }
         if(!resp.found){
           if(!lastData){
             showWaiting();
           } else {
-            // Had live data before but game is now gone — session ended or expired
+            // Explicit 404 after we had live data — the coach ended the game (or it expired).
+            // Keep the last scoreboard on screen and stop polling.
             showError('📴 Game session ended or expired. Stats above are from the last update.');
             if(pollTimer){clearInterval(pollTimer);pollTimer=null;}
           }
           return;
         }
+        failCount=0;clearError();
         renderState(resp.game_data);
       })
       .catch(function(){
