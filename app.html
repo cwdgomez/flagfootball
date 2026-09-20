@@ -11201,6 +11201,9 @@ var SYNC_ENGINE={
         // doesn't block everything behind it. Everything else is retried with backoff.
         if(httpStatus===400||httpStatus===403){
           console.warn('[Sync] dropped non-retryable item',key,httpStatus,result.error);
+          // Say so out loud — a silently dropped 'teams'/'season' upload is exactly how
+          // "my other device doesn't see my team" happens.
+          try{showToast((httpStatus===403?'⭐ Cloud sync skipped ':'⚠️ Cloud sync rejected ')+item.dataType+(result.error?' — '+String(result.error).slice(0,60):''));}catch(e){}
           self.queue.shift();delete self._retryCount[key];self.persistQueue();
           if(self.queue.length>0)self.scheduleSync(500);else showSyncIndicator('synced');
         }else{
