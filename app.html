@@ -5200,10 +5200,10 @@ function renderRosterScreen(){
     fileInput.setAttribute('onchange','handlePhotoUpload('+idx+',this)');
     photoCol.appendChild(fileInput);
 
-    var isPro=isPro();
+    var proUser=isPro(); // (a local named isPro shadowed the global function → "isPro is not a function")
     var photoLblEl=document.createElement('div');
     photoLblEl.className='rpr-photo-lbl';
-    if(isPro){
+    if(proUser){
       photoLblEl.textContent='photo';
     }else{
       var proSpan=document.createElement('span');
