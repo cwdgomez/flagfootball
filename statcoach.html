@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.0/dist/umd/supabase.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -395,6 +395,9 @@ function toggleSun(){
   // Auto-join if code is in URL
   var urlCode = new URLSearchParams(window.location.search).get('code');
   var urlRole = new URLSearchParams(window.location.search).get('role');
+  // Stat-coach access key — issued only in the head coach's Stat Coach link (not the parent
+  // scoreboard link). Without it the channel name won't match and no events are accepted.
+  var urlKey = (new URLSearchParams(window.location.search).get('key') || '').toUpperCase().replace(/[^A-Z2-9]/g, '').slice(0, 12);
   if (urlCode && urlCode.length === 6) {
     document.getElementById('join-code-input').value = urlCode.toUpperCase();
     joinGame();
@@ -433,6 +436,7 @@ function toggleSun(){
   function joinGame() {
     var code = document.getElementById('join-code-input').value.trim().toUpperCase();
     if (code.length !== 6) { showErr('Enter the 6-character game code'); return; }
+    if (!urlKey) { showErr('This link is missing its Stat Coach key. Ask the head coach to re-share the Stat Coach link from the app.'); return; }
     gameCode = code;
     showErr('');
     showScreen('connecting');
@@ -443,7 +447,7 @@ function toggleSun(){
   function connectChannel(code) {
     if (channel) { try { sb.removeChannel(channel); } catch(e) {} }
 
-    channel = sb.channel('cocoach:' + code, { config: { broadcast: { ack: false } } });
+    channel = sb.channel('cocoach:' + code + ':' + urlKey, { config: { broadcast: { ack: false } } });
 
     var retryTimer = null;
     var waitTimeoutTimer = null;
