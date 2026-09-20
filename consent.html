@@ -542,8 +542,19 @@ function submitConsent(){
     return;
   }
 
-  // Get signature as data URL
-  var sigData=canvas.toDataURL('image/png');
+  // Get signature as data URL — re-inked in dark on transparent so it reads on the
+  // light email/PDF (the on-screen pad draws white strokes for the dark theme).
+  var sigData=(function(){
+    try{
+      var off=document.createElement('canvas');off.width=canvas.width;off.height=canvas.height;
+      var oc=off.getContext('2d');
+      oc.drawImage(canvas,0,0);
+      // Keep only the drawn strokes' alpha, recolor them near-black
+      oc.globalCompositeOperation='source-in';
+      oc.fillStyle='#1B1B1F';oc.fillRect(0,0,off.width,off.height);
+      return off.toDataURL('image/png');
+    }catch(e){return canvas.toDataURL('image/png');}
+  })();
   var formDate=document.getElementById('form-date').textContent;
 
   btn.disabled=true;
