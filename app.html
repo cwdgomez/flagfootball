@@ -7869,7 +7869,13 @@ function deactivateStatCoach(){
 
 // Open consent form — passes team name, season, and coach uid for pre-fill + ownership
 async function openConsentForm(){
-  var team=encodeURIComponent(G.team||'');
+  // Before a game starts G.team is empty, which produced consent links with team= blank.
+  // Recap/season-card emails match parents by EXACT team name, so always pre-fill it:
+  // in-game name → setup-screen input → active team's saved name.
+  var suTeam=(document.getElementById('su-team')||{}).value||'';
+  var teamName=(G.team||suTeam||(typeof getActiveTeamName==='function'?getActiveTeamName():'')||'').trim();
+  if(teamName==='My Team')teamName=suTeam.trim()||teamName;
+  var team=encodeURIComponent(teamName);
   // Use inferSeasonName() so consent form season matches the recap API season exactly
   var season=encodeURIComponent(inferSeasonName());
   var uid='',sig='';

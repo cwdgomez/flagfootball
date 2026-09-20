@@ -485,7 +485,13 @@ var _coachSig='';
   try{
     var params=new URLSearchParams(window.location.search);
     var team=params.get('team');
-    if(team)document.getElementById('f-team').value=decodeURIComponent(team);
+    if(team){
+      var ft=document.getElementById('f-team');
+      ft.value=decodeURIComponent(team);
+      // Lock the team name when the coach's link supplies it — recap emails match
+      // parents to the team by exact name, so a parent retyping it would break the link.
+      ft.readOnly=true;ft.style.opacity='.75';ft.title='Set by your coach\u2019s link';
+    }
     var season=params.get('season');
     if(season)document.getElementById('f-season').value=decodeURIComponent(season);
     // Capture coach uid for ownership tracking
@@ -536,8 +542,19 @@ function submitConsent(){
     return;
   }
 
-  // Get signature as data URL
-  var sigData=canvas.toDataURL('image/png');
+  // Get signature as data URL — re-inked in dark on transparent so it reads on the
+  // light email/PDF (the on-screen pad draws white strokes for the dark theme).
+  var sigData=(function(){
+    try{
+      var off=document.createElement('canvas');off.width=canvas.width;off.height=canvas.height;
+      var oc=off.getContext('2d');
+      oc.drawImage(canvas,0,0);
+      // Keep only the drawn strokes' alpha, recolor them near-black
+      oc.globalCompositeOperation='source-in';
+      oc.fillStyle='#1B1B1F';oc.fillRect(0,0,off.width,off.height);
+      return off.toDataURL('image/png');
+    }catch(e){return canvas.toDataURL('image/png');}
+  })();
   var formDate=document.getElementById('form-date').textContent;
 
   btn.disabled=true;
