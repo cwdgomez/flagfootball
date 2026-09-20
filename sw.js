@@ -4,7 +4,7 @@
 
 // Format: 'fftp-vN::YYYY-MM-DD' — auto-bumped by scripts/bump-sw-version.js on every push.
 // Keep this single line on its own; CI parses it with a regex.
-const CACHE_VERSION = 'fftp-v17::2026-05-06';
+const CACHE_VERSION = 'fftp-v17::2026-09-20';
 const FONT_CACHE    = 'fftp-fonts-v1';  // Separate long-lived cache for Google Fonts
 const LIB_CACHE     = 'fftp-libs-v1';   // Pinned third-party libs (Supabase SDK) so offline launches still get auth/sync
 const OFFLINE_URL   = './app.html';
