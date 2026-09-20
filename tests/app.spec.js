@@ -26,6 +26,7 @@ async function loadFreshApp(page) {
   await page.evaluate(() => {
     localStorage.setItem('ff_tos_consent', JSON.stringify({ version: '1.0', timestamp: new Date().toISOString(), email: null }));
     localStorage.setItem('ff_access_v1', 'lite');
+    localStorage.setItem('ff_onboarded', '1'); // dismiss first-run onboarding overlay (it intercepted clicks on CI)
   });
   await page.reload({ waitUntil: 'domcontentloaded' });
 }
@@ -68,6 +69,7 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('ff_tos_consent', JSON.stringify({ version: '1.0', timestamp: new Date().toISOString(), email: null }));
     localStorage.setItem('ff_access_v1', 'lite');
+    localStorage.setItem('ff_onboarded', '1'); // dismiss first-run onboarding overlay (it intercepted clicks on CI)
   });
 });
 
@@ -430,9 +432,11 @@ test.describe('5 — Season Screen', () => {
 
       // Either the season screen is now active, OR a Pro modal appeared
       const seasonActive = await page.locator('#screen-season.active').isVisible();
-      const proModal     = await page.locator('.modal-overlay.show, .pro-modal.show, [id*="pro-modal"]').isVisible().catch(() => false);
+      const proModal     = await page.locator('#pro-upgrade-modal.show, .pro-upgrade-modal.show, .modal-overlay.show').isVisible().catch(() => false);
+      // For Lite users proGate() opens the license/activation gate rather than the upsell modal
+      const proGateShown = await page.locator('#code-gate:not(.hidden)').isVisible().catch(() => false);
 
-      expect(seasonActive || proModal).toBe(true);
+      expect(seasonActive || proModal || proGateShown).toBe(true);
     }
   });
 
@@ -455,6 +459,10 @@ test.describe('5 — Season Screen', () => {
       // Use the team-specific season key pattern
       const teamId = 'default';
       localStorage.setItem('ff_season_' + teamId, JSON.stringify(mockGames));
+      // The podium ranks only players on the active roster — seed matching names
+      localStorage.setItem('ff_roster_' + teamId, JSON.stringify([
+        { num: 1, name: 'Alice' }, { num: 2, name: 'Bob' }, { num: 3, name: 'Charlie' }, { num: 4, name: 'Dave' },
+      ]));
       // Also set the active team ID
       localStorage.setItem('ff_active_team', teamId);
     });
@@ -519,7 +527,7 @@ test.describe('6 — Button & UI Interaction', () => {
     // If we can find an "End Game" trigger in the UI, click it;
     // otherwise inject the summary HTML via JS so the button is testable.
     const endBtn = page.locator('button:has-text("End Game"), button:has-text("Save to Season"), .end-game-btn').first();
-    const alreadyPresent = await endBtn.isAttached().catch(() => false);
+    const alreadyPresent = (await endBtn.count().catch(() => 0)) > 0;
     if (!alreadyPresent) {
       // Trigger endAndSave / showSummary from JS to populate the summary HTML
       await page.evaluate(() => {
@@ -533,7 +541,7 @@ test.describe('6 — Button & UI Interaction', () => {
     }
 
     // If still not found, the button may require a full game flow — skip gracefully
-    const found = await endBtn.isAttached().catch(() => false);
+    const found = (await endBtn.count().catch(() => 0)) > 0;
     test.skip(!found, 'End Game button requires completed game state — skipping');
     if (found) await expect(endBtn).toBeAttached();
   });
