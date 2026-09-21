@@ -217,6 +217,19 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .team-switcher-bar{display:flex;align-items:center;justify-content:space-between;background:var(--dark2);border:1px solid var(--dark5);border-radius:12px;padding:10px 13px;margin-bottom:14px;}
 .tsw-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;color:var(--dimmer);text-transform:uppercase;margin-bottom:2px;}
 .tsw-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;color:var(--txt);}
+.colors-toggle{display:flex;align-items:center;gap:10px;width:100%;background:var(--dark2);border:1px solid var(--dark5);border-radius:12px;padding:11px 13px;margin:14px 0 6px;cursor:pointer;color:var(--txt);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-align:left;}
+.colors-toggle:active{border-color:var(--s);}
+.colors-toggle-dots{display:flex;gap:4px;}
+.colors-dot{width:16px;height:16px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:var(--p,#CC0000);}
+#colors-dot-secondary{background:var(--s,#FFD700);}
+.colors-toggle-lbl{flex:1;}
+.colors-toggle-chev{color:var(--dim);transition:transform .2s;}
+.colors-toggle[aria-expanded="true"] .colors-toggle-chev{transform:rotate(180deg);}
+.team-colors-panel{padding:4px 2px 0;}
+.team-colors-panel.hidden{display:none;}
+.tsw-actions{display:flex;gap:6px;align-items:center;}
+.tsw-refresh{background:var(--dark3);border:1px solid var(--dark5);border-radius:8px;width:34px;height:31px;font-size:16px;color:var(--dim);cursor:pointer;line-height:1;}
+.tsw-refresh:active{border-color:var(--s);color:var(--s);}
 .tsw-btn{background:var(--dark3);border:1px solid var(--dark5);border-radius:8px;padding:6px 12px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--dim);cursor:pointer;transition:border-color .15s,color .15s;text-transform:uppercase;white-space:nowrap;}
 .tsw-btn:active{border-color:var(--s);color:var(--s);}
 
@@ -562,6 +575,9 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 /* Button row */
 .egm-btn-row{display:flex;gap:10px;margin-top:18px;}
 .egm-save{flex:2;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.45);border-radius:10px;padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:var(--green);cursor:pointer;min-height:48px;}
+.egm-recap-note{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--dim);margin:0 2px 8px;line-height:1.35;}
+.egm-recap-btn{width:100%;background:rgba(255,215,0,.10);border:1px solid rgba(255,215,0,.45);border-radius:10px;padding:13px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:var(--s);cursor:pointer;min-height:48px;}
+.egm-recap-btn:disabled{opacity:.5;cursor:default;}
 .egm-cancel{flex:1;background:var(--dark3);border:1px solid var(--dark5);border-radius:10px;padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:var(--dim);cursor:pointer;min-height:48px;}
 
 /* ── STAT CARDS MODAL ── */
@@ -1413,7 +1429,6 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
 </style>
 </head>
 <body>
-<div class="ptr-indicator" id="ptr-indicator"><div class="ptr-spinner"></div>REFRESHING…</div>
 <div id="grid-bg"></div>
 
 <!-- PHOTO CONSENT CONFIRMATION MODAL -->
@@ -1616,7 +1631,10 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
         <div class="tsw-label">Active Team</div>
         <div class="tsw-name" id="tsw-name">My Team</div>
       </div>
-      <button type="button" class="tsw-btn" onclick="proGate('teams',openTeamsModal)">⟳ Switch Team <span class="pro-badge">PRO</span></button>
+      <div class="tsw-actions">
+        <button type="button" class="tsw-refresh" onclick="manualRefresh()" title="Refresh app (pulls latest cloud data)" aria-label="Refresh app">&#8635;</button>
+        <button type="button" class="tsw-btn" onclick="proGate('teams',openTeamsModal)">Switch Team <span class="pro-badge">PRO</span></button>
+      </div>
     </div>
 
     <div class="setup-section-lbl">🏈 Team Info</div>
@@ -1627,7 +1645,12 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
       <input type="text" id="su-coach" placeholder="Coach Smith"/>
     </div>
 
-    <div class="setup-section-lbl">🎨 Team Colors</div>
+    <button type="button" class="colors-toggle" id="colors-toggle" onclick="toggleColorsPanel()" aria-expanded="false" aria-controls="team-colors-panel">
+      <span class="colors-toggle-dots"><span class="colors-dot" id="colors-dot-primary"></span><span class="colors-dot" id="colors-dot-secondary"></span></span>
+      <span class="colors-toggle-lbl">&#127912; Team Colors</span>
+      <span class="colors-toggle-chev" id="colors-toggle-chev">&#9662;</span>
+    </button>
+    <div id="team-colors-panel" class="team-colors-panel hidden">
     <div class="fg">
       <div class="color-role-lbl">Primary Color</div>
       <div class="color-swatches" id="primary-swatches"></div>
@@ -1644,6 +1667,7 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
         <input type="color" id="custom-secondary" value="#FFD700" oninput="setCustom('secondary',this.value)">
       </div>
     </div>
+    </div><!-- /team-colors-panel -->
 
     <div class="setup-section-lbl">📋 Game Setup</div>
     <div class="fg"><label>Opponent Team</label>
@@ -1996,6 +2020,9 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
       <button type="button" class="egm-save" onclick="saveEditedGame()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Changes</button>
       <button type="button" class="egm-cancel" onclick="closeEditGame()">Cancel</button>
     </div>
+    <div class="egm-section">Parent Recap Emails</div>
+    <div class="egm-recap-note" id="egm-recap-note">Saves your changes first, then emails every consented parent an updated recap for this game.</div>
+    <button type="button" class="egm-recap-btn" id="egm-recap-btn" onclick="resendRecapForEditedGame()">&#128232; Save &amp; Send Recap Emails</button>
   </div>
 </div>
 
@@ -2040,6 +2067,7 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
       <button type="button" class="ract-btn ract-import-roster" onclick="openRosterImportModal()">&#128229; Import Roster</button>
       <button type="button" class="ract-btn ract-reset" onclick="resetToDefault()">&#8617; Reset to Default</button>
       <button type="button" class="ract-btn" style="background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.4);color:rgba(168,85,247,.9);" onclick="openConsentForm()">&#128203; Send Parent Consent Form</button>
+      <button type="button" class="ract-btn" style="background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.4);color:rgba(56,189,248,.9);" onclick="importParentPhotos()" title="Pull in photos parents attached to the consent form">&#128247; Import Parent Photos</button>
     </div>
   </div>
 </div>
@@ -2661,6 +2689,7 @@ function applyTheme(){
   var scoreTxt = sLight ? darken(s,80) : s;  // make sure score text is readable
 
   var root=document.documentElement;
+  try{var dp=document.getElementById('colors-dot-primary'),ds=document.getElementById('colors-dot-secondary');if(dp)dp.style.background=p;if(ds)ds.style.background=s;}catch(e){}
   root.style.setProperty('--p',p);root.style.setProperty('--p2',p2);
   root.style.setProperty('--s',s);root.style.setProperty('--s2',darken(s,50));
   root.style.setProperty('--pdim',rgba(pSafe,.15));root.style.setProperty('--sdim',rgba(s,.15));
@@ -2792,6 +2821,13 @@ function pickColor(role,hex,el){
   document.getElementById('custom-'+role).value=hex;
   applyTheme();
   if(typeof saveTeamColors==='function')saveTeamColors();
+}
+function toggleColorsPanel(force){
+  var panel=document.getElementById('team-colors-panel'),btn=document.getElementById('colors-toggle');
+  if(!panel||!btn)return;
+  var open=typeof force==='boolean'?force:panel.classList.contains('hidden');
+  panel.classList.toggle('hidden',!open);
+  btn.setAttribute('aria-expanded',open?'true':'false');
 }
 function setCustom(role,hex){TC[role]=hex;document.querySelectorAll('#'+role+'-swatches .swatch').forEach(function(s){s.classList.remove('sel');});applyTheme();if(typeof saveTeamColors==='function')saveTeamColors();}
 
@@ -5095,6 +5131,21 @@ function saveEditedGame(){
   closeEditGame();
   renderSeasonScreen();
   showToast('✅ Game updated!');
+  return game;
+}
+
+/* Save the edits, then re-email consented parents an "Updated" recap for this game.
+   Covers two real cases: a stat was logged to the wrong player, or the original
+   send failed (e.g. the server rejected it) and the coach wants to try again. */
+function resendRecapForEditedGame(){
+  if(!isPro()){proGate('recap',function(){});return;}
+  if(!CURRENT_USER||!AUTH_SESSION){showToast('⚠️ Sign in to send recap emails');return;}
+  var btn=document.getElementById('egm-recap-btn');
+  if(!confirm('Send an updated game recap email to every parent who has completed the consent form for '+getActiveTeamName()+'?'))return;
+  var game=saveEditedGame();
+  if(!game)return;
+  if(btn){btn.disabled=true;btn.textContent='Sending…';}
+  sendPostGameRecap(game,game.playerStats,null,{resend:true,onDone:function(){if(btn){btn.disabled=false;btn.innerHTML='&#128232; Save &amp; Send Recap Emails';}}});
 }
 
 function exportSeason(){
@@ -5200,7 +5251,7 @@ function renderRosterScreen(){
     var row=document.createElement('div');
     row.className='roster-player-row';
     var pkey=(player.name||((player.first||'')+' '+(player.last||''))).trim();
-    var photoSrc=photos[pkey]||'';
+    var photoSrc=findPhoto(photos,pkey)||'';
 
     // ── Photo column (DOM-built — no innerHTML) ───────────────
     var photoCol=document.createElement('div');
@@ -6164,82 +6215,19 @@ if('serviceWorker' in navigator){
   });
 }
 
-/* ════════════════════════════════════════════════════
-   PWA PULL-TO-REFRESH (Home Screen / standalone mode)
-   Works on iOS Safari standalone + Android TWA/Chrome
-   Guard: does NOT fire during momentum scroll or when
-   an input/textarea is focused — prevents data wipe
-   on iPhone when scrolling back to the top of the page.
-════════════════════════════════════════════════════ */
-(function(){
-  if(!('ontouchstart' in window))return;
-
-  var ptr=document.getElementById('ptr-indicator');
-  if(!ptr)return;
-  var startY=0,pulling=false,threshold=100;
-
-  // Track whether the page is (or was recently) scrolling.
-  // We mark it true on every scroll event and clear it
-  // after 600 ms of inactivity.  PTR is blocked while this
-  // flag is set so momentum-scroll that coasts to scrollY=0
-  // can never accidentally trigger a page reload.
-  var _scrollActive=false,_scrollTimer=null;
-  window.addEventListener('scroll',function(){
-    _scrollActive=true;
-    clearTimeout(_scrollTimer);
-    _scrollTimer=setTimeout(function(){_scrollActive=false;},600);
-  },{passive:true});
-
-  document.addEventListener('touchstart',function(e){
-    // ── PTR GUARD: only allow PTR on the setup screen ──
-    // Season, active game, roster, trend, and any open modal all block it.
-    // This is the safest approach — PTR on those screens causes reloads that
-    // kill live sessions, lose stats, and disrupt parents/stat coach.
-    var setupScreen=document.getElementById('screen-setup');
-    if(!setupScreen||!setupScreen.classList.contains('active'))return;
-    // Also block if any fixed overlay/modal is open on top of setup
-    var editModal=document.getElementById('edit-game-modal');
-    if(editModal&&editModal.classList.contains('open'))return;
-    var scModal=document.getElementById('statcards-modal');
-    if(scModal&&scModal.classList.contains('open'))return;
-    // Only activate PTR when already at the very top
-    if(window.scrollY>5)return;
-    // Skip if the page is still settling from a scroll gesture
-    if(_scrollActive)return;
-    // Skip if the user is typing in a form field
-    var ae=document.activeElement;
-    if(ae&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.tagName==='SELECT'))return;
-    startY=e.touches[0].clientY;
-    pulling=true;
-  },{passive:true});
-
-  document.addEventListener('touchmove',function(e){
-    if(!pulling)return;
-    var dy=e.touches[0].clientY-startY;
-    if(dy<0){pulling=false;return;}
-    if(dy>10&&dy<threshold){
-      ptr.style.height=Math.min(dy*0.5,48)+'px';
-      ptr.classList.remove('active');
-    }else if(dy>=threshold){
-      ptr.classList.add('active');
-      ptr.style.height='';
-    }
-  },{passive:true});
-
-  document.addEventListener('touchend',function(){
-    if(!pulling)return;
-    pulling=false;
-    if(ptr.classList.contains('active')){
-      // Trigger refresh only after intentional full pull
-      ptr.classList.add('releasing');
-      setTimeout(function(){
-        window.location.reload();
-      },400);
-    }else{
-      ptr.style.height='0';
-    }
-  },{passive:true});
-})();
+/* Pull-to-refresh was removed (2026-09-21): even with guards it kept reloading the
+   setup screen mid-edit and wiping unsaved form fields. The ↻ button in the team
+   switcher bar (manualRefresh) is the explicit replacement. */
+function manualRefresh(){
+  if(typeof gameInProgress==='function'&&gameInProgress()){
+    if(!confirm('A game is in progress. Refreshing keeps your saved stats but reloads the screen. Continue?'))return;
+  }
+  showToast('\u21bb Refreshing\u2026');
+  // Persist anything still queued so the reload can't lose it, then reload.
+  try{if(typeof SYNC_ENGINE!=='undefined')SYNC_ENGINE.persistQueue();}catch(e){}
+  try{if(typeof onScoutInput==='function')onScoutInput();}catch(e){}
+  setTimeout(function(){window.location.reload();},250);
+}
 
 /* ════════════════════════════════════════════════════
    VIBRATION + AUDIO FEEDBACK
@@ -6931,8 +6919,61 @@ function handlePhotoUpload(idx,input){
   };
   reader.readAsDataURL(file);
 }
+/* Photo keys are the exact player name at upload time. When a roster is re-typed
+   ("Nico L" vs "Nico L.", "cade a." vs "Cade A.") the exact key misses, so fall back
+   to a normalized match (case/punctuation/whitespace-insensitive). */
+function photoKeyNorm(n){return String(n||'').toLowerCase().replace(/[^a-z0-9]+/g,'');}
+function findPhoto(photos,name){
+  if(!photos||!name)return null;
+  if(photos[name])return photos[name];
+  var t=String(name).trim();
+  if(photos[t])return photos[t];
+  var want=photoKeyNorm(t);if(!want)return null;
+  var keys=Object.keys(photos);
+  for(var i=0;i<keys.length;i++){if(photoKeyNorm(keys[i])===want)return photos[keys[i]];}
+  return null;
+}
 function getPlayerPhoto(name){
-  var photos=loadPhotos();return photos[name]||null;
+  return findPhoto(loadPhotos(),name);
+}
+
+/* ── Import parent-uploaded photos (from the consent form) into this team's roster ── */
+function importParentPhotos(){
+  proGate('photos',function(){
+    var token=getAuthToken?getAuthToken():null;
+    if(!token){showToast('⚠️ Sign in to import parent photos');return;}
+    var teamName=getActiveTeamName();
+    var season=(typeof inferSeasonName==='function')?inferSeasonName():'';
+    showToast('☁️ Looking for parent photos for '+teamName+'…');
+    fetch(SYNC_API_BASE+'/team-photos?team_name='+encodeURIComponent(teamName)+'&season='+encodeURIComponent(season),{
+      headers:{'Authorization':'Bearer '+token}
+    })
+    .then(function(r){return r.json().then(function(j){j._status=r.status;return j;});})
+    .then(function(data){
+      if(!data||!data.success){showToast('⚠️ Could not load parent photos'+(data&&data.error?': '+data.error:''));return;}
+      var incoming=data.photos||{};
+      var names=Object.keys(incoming);
+      if(!names.length){showToast('📋 No parent photos yet for '+teamName+' ('+season+'). Parents add one on the consent form.');return;}
+      var photos=loadPhotos();
+      var roster=LIVE_ROSTER||loadRosterData()||[];
+      var added=0,unmatched=[];
+      names.forEach(function(pn){
+        var want=photoKeyNorm(pn);
+        var match=null;
+        for(var i=0;i<roster.length;i++){var rn=(roster[i].name||'').trim();if(rn&&photoKeyNorm(rn)===want){match=rn;break;}}
+        if(!match){unmatched.push(pn);return;}
+        if(!/^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(incoming[pn]))return;
+        // Coach-taken photos win; only fill gaps
+        if(findPhoto(photos,match))return;
+        photos[match]=incoming[pn];added++;
+      });
+      if(added){savePhotos(photos);if(typeof renderRosterScreen==='function')renderRosterScreen();}
+      var msg='📷 '+added+' parent photo'+(added===1?'':'s')+' added';
+      if(unmatched.length)msg+=' • no roster match for: '+unmatched.slice(0,3).join(', ')+(unmatched.length>3?' +'+(unmatched.length-3):'');
+      showToast(msg);
+    })
+    .catch(function(e){console.warn('[photos] import failed',e);showToast('⚠️ Could not reach the server to import photos');});
+  });
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -11513,10 +11554,12 @@ function inferSeasonName(){
 }
 
 // Main function — called automatically after game save + recap card render
-function sendPostGameRecap(gameData,playerStats,scoreCardBase64){
-  // Guards: Pro + signed in + recaps enabled
-  if(!isPro()||!CURRENT_USER||!AUTH_SESSION)return;
-  if(!isRecapEnabled())return;
+function sendPostGameRecap(gameData,playerStats,scoreCardBase64,opts){
+  opts=opts||{};
+  var done=function(){try{if(typeof opts.onDone==='function')opts.onDone();}catch(e){}};
+  // Guards: Pro + signed in + recaps enabled (an explicit re-send ignores the on/off toggle)
+  if(!isPro()||!CURRENT_USER||!AUTH_SESSION){done();return;}
+  if(!opts.resend&&!isRecapEnabled()){done();return;}
 
   var teamId=ACTIVE_TEAM_ID||'default';
   var teamName=getActiveTeamName();
@@ -11539,7 +11582,8 @@ function sendPostGameRecap(gameData,playerStats,scoreCardBase64){
     score_them:gameData.them||0,
     game_index:gameIndex,
     player_stats:playerStats,
-    score_card_base64:scoreCardBase64||null
+    score_card_base64:scoreCardBase64||null,
+    resend:!!opts.resend
   };
 
   console.log('[game-recap] Sending recap for '+teamName+' vs '+payload.opponent+'...');
@@ -11567,18 +11611,19 @@ function sendPostGameRecap(gameData,playerStats,scoreCardBase64){
         showToast('📧 Recap already sent for this game — parents were emailed earlier.');
       } else {
         var count=data.emails_sent||0;
-        showToast('\u{1F4E8} Game recaps sent to '+count+' parent'+(count!==1?'s':'')+'!');
+        showToast('\u{1F4E8} '+(data.resend?'Updated recaps':'Game recaps')+' sent to '+count+' parent'+(count!==1?'s':'')+'!');
         console.log('[game-recap] Success: '+count+' emails sent');
       }
     } else {
       console.warn('[game-recap] API returned error:',data.error);
-      showToast('⚠️ Recap email error: '+(data.error||'something went wrong. Check your connection and try again.'));
+      showToast('⚠️ Recap email error: '+(data.error||'something went wrong. Check your connection and try again.')+' — you can retry from Season → ✎ Edit → Send Recap Emails.');
     }
+    done();
   })
   .catch(function(err){
     console.error('[game-recap] Network error:',err);
-    showToast('⚠️ Could not send recap emails — network error. Try again when back online.');
-    // Silent fail — don't disrupt the coach's post-game flow
+    showToast('⚠️ Could not send recap emails — network error. Retry later from Season → ✎ Edit → Send Recap Emails.');
+    done();
   });
 }
 </script>
