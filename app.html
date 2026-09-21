@@ -11387,7 +11387,16 @@ function applyCloudData(teamId,dataType,data){
         localStorage.setItem('ff_colors_'+teamId,JSON.stringify(data));
         break;
       case 'photos':
-        localStorage.setItem('ff_photos_v1',JSON.stringify(data));
+        // Photos are one global map on the device but are stored per team_id in the cloud
+        // (each team's saves upload the whole map under its own team_id). Replacing the map
+        // with whichever team's row arrived last silently dropped other players' photos, so
+        // merge instead: keep what we have, let incoming keys win for the same player.
+        try{
+          var curP=JSON.parse(localStorage.getItem('ff_photos_v1')||'{}')||{};
+          var inP=(data&&typeof data==='object')?data:{};
+          Object.keys(inP).forEach(function(k){if(typeof inP[k]==='string'&&inP[k].indexOf('data:image/')===0)curP[k]=inP[k];});
+          localStorage.setItem('ff_photos_v1',JSON.stringify(curP));
+        }catch(e){localStorage.setItem('ff_photos_v1',JSON.stringify(data));}
         break;
       case 'plays':
         localStorage.setItem('ff_plays',JSON.stringify(data));
