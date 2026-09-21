@@ -706,13 +706,25 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .roster-content{width:100%;max-width:560px;}
 .roster-sec{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin:14px 0 8px 2px;}
 /* ── ROSTER ROW — flexbox, always works with or without photo ── */
+.consent-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--dark2);border:1px solid var(--dark5);border-radius:12px;padding:10px 12px;margin:0 0 10px;}
+.consent-bar.hidden{display:none;}
+.consent-bar-main{display:flex;align-items:baseline;gap:8px;min-width:0;}
+.consent-bar-count{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--s);}
+.consent-bar-lbl{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--dim);letter-spacing:.5px;}
+.consent-bar-actions{display:flex;gap:6px;flex-shrink:0;}
+.consent-bar-btn{background:var(--dark3);border:1px solid var(--dark5);border-radius:8px;padding:6px 10px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--dim);cursor:pointer;text-transform:uppercase;min-height:31px;}
+.consent-bar-btn:active{border-color:var(--s);color:var(--s);}
+.rpr-consent-dot{position:absolute;top:-2px;right:-2px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;border:2px solid var(--dark2);line-height:1;}
+.rpr-consent-dot.yes{background:var(--green);color:#06210f;}
+.rpr-consent-dot.no{background:#F59E0B;color:#2a1a00;}
+.consent-bar-count{white-space:nowrap;}
 .roster-player-row{
   background:var(--sur);border:1px solid var(--dark5);border-radius:14px;
   padding:10px 10px 10px 12px;margin-bottom:8px;
   display:flex;flex-direction:row;align-items:center;gap:10px;
 }
 /* Photo column */
-.rpr-photo-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.rpr-photo-col{position:relative;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;}
 .rpr-photo{width:44px;height:44px;border-radius:50%;object-fit:cover;cursor:pointer;
   border:2px solid rgba(255,255,255,.1);transition:border-color .2s;flex-shrink:0;}
 .rpr-photo:hover{border-color:var(--s);}
@@ -1632,7 +1644,8 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
         <div class="tsw-name" id="tsw-name">My Team</div>
       </div>
       <div class="tsw-actions">
-        <button type="button" class="tsw-refresh" onclick="manualRefresh()" title="Refresh app (pulls latest cloud data)" aria-label="Refresh app">&#8635;</button>
+        <button type="button" class="tsw-refresh" onclick="syncNow()" title="Sync now — upload everything on this device, then pull the latest" aria-label="Sync now">&#9729;</button>
+        <button type="button" class="tsw-refresh" onclick="manualRefresh()" title="Refresh app" aria-label="Refresh app">&#8635;</button>
         <button type="button" class="tsw-btn" onclick="proGate('teams',openTeamsModal)">Switch Team <span class="pro-badge">PRO</span></button>
       </div>
     </div>
@@ -1989,6 +2002,7 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
       <button type="button" class="sact-btn" style="background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.25);color:#818cf8" onclick="proGate('cloudRestore',cloudRestore)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg> Restore<span class="pro-badge">PRO</span></button>
       <button type="button" class="sact-btn" style="background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.35);color:#f59e0b" onclick="proGate('seasonReport',generateSeasonReport)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg> Summary<span class="pro-badge">PRO</span></button>
       <button type="button" class="sact-btn" style="background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.4);color:#c084fc" onclick="proGate('print',generateCoachSpeechSheet)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> Speech<span class="pro-badge">PRO</span></button>
+      <button type="button" class="sact-btn" style="background:rgba(242,179,0,.12);border-color:rgba(242,179,0,.4);color:#F2B300" onclick="sendSeasonReportCards()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> Report Cards<span class="pro-badge">PRO</span></button>
       <button type="button" class="sact-btn sact-clear" onclick="clearSeason()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Clear All</button>
     </div>
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="importSeason(event)">
@@ -2055,6 +2069,16 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
   </div>
   <div class="roster-content">
     <div class="roster-sec">Players <span id="roster-count" class="roster-player-count">0</span></div>
+    <div class="consent-bar hidden" id="consent-bar" role="status">
+      <div class="consent-bar-main">
+        <span class="consent-bar-count" id="consent-bar-count">&ndash;</span>
+        <span class="consent-bar-lbl" id="consent-bar-lbl">parents consented</span>
+      </div>
+      <div class="consent-bar-actions">
+        <button type="button" class="consent-bar-btn" onclick="refreshConsentStatus(true)" title="Refresh">&#8635;</button>
+        <button type="button" class="consent-bar-btn" id="consent-remind-btn" onclick="copyConsentReminder()" title="Copy a reminder for parents who haven't signed">Copy reminder</button>
+      </div>
+    </div>
     <div id="roster-player-list"></div>
     <button type="button" class="roster-add-btn" onclick="addRosterPlayer()">+ Add Player</button>
     <div class="roster-entry-tip">Tap any field to edit • Changes save automatically</div>
@@ -5241,6 +5265,7 @@ function closeRoster(){
 function updateRosterCountBadge(){var el=document.getElementById('roster-count');if(el)el.textContent=LIVE_ROSTER.length;}
 function renderRosterScreen(){
   var s=TC.secondary,p=TC.primary;
+  try{refreshConsentStatus(false);renderConsentBar();}catch(e){}
   var btn=document.getElementById('roster-save-btn');
   if(btn){btn.style.background=p;btn.style.color=s;}
   updateRosterCountBadge();
@@ -5292,6 +5317,18 @@ function renderRosterScreen(){
     }
     photoCol.appendChild(photoLblEl);
 
+    // ── Consent badge (from /api/team-consent; names only, no parent PII) ──
+    // Rendered as a small corner badge on the photo so the row keeps its width on phones.
+    var cState=consentStateFor(pkey);
+    if(cState!=='unknown'){
+      var cDot=document.createElement('div');
+      cDot.className='rpr-consent-dot '+(cState==='yes'?'yes':'no');
+      cDot.textContent=cState==='yes'?'\u2713':'!';
+      cDot.title=cState==='yes'?'Consent form on file':'No consent form yet';
+      cDot.setAttribute('aria-label',cDot.title);
+      photoCol.appendChild(cDot);
+    }
+
     // ── Number column ─────────────────────────────────────────
     var numCol=document.createElement('div');
     numCol.className='rpr-num';
@@ -5340,6 +5377,7 @@ function renderRosterScreen(){
     delBtn.textContent=' ✕';
 
     row.appendChild(photoCol);
+
     row.appendChild(numCol);
     row.appendChild(namesCol);
     row.appendChild(qbBtn);
@@ -6935,6 +6973,147 @@ function findPhoto(photos,name){
 }
 function getPlayerPhoto(name){
   return findPhoto(loadPhotos(),name);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CONSENT STATUS — which parents have signed for the active team
+   Pulled from /api/team-consent (names + has_photo only; guardian emails
+   never leave the server). Cached per team+season for 10 minutes.
+   ══════════════════════════════════════════════════════════════ */
+var CONSENT_STATUS={key:null,names:null,fetchedAt:0,loading:false};
+function consentCacheKey(){return getActiveTeamName()+'|'+(typeof inferSeasonName==='function'?inferSeasonName():'');}
+function consentStateFor(name){
+  if(!CONSENT_STATUS.names||CONSENT_STATUS.key!==consentCacheKey())return 'unknown';
+  var want=photoKeyNorm(nameKeyFL(name));
+  for(var i=0;i<CONSENT_STATUS.names.length;i++){if(photoKeyNorm(nameKeyFL(CONSENT_STATUS.names[i]))===want)return 'yes';}
+  return 'no';
+}
+/* "Grayson Gomez" and "Grayson G." → "grayson g" (mirrors backend _names.js) */
+function nameKeyFL(n){
+  var t=String(n||'').toLowerCase().replace(/[^a-z0-9\s]/g,'').trim().split(/\s+/).filter(Boolean);
+  if(!t.length)return '';if(t.length===1)return t[0];return t[0]+' '+t[t.length-1].charAt(0);
+}
+function refreshConsentStatus(force){
+  var bar=document.getElementById('consent-bar');
+  var token=getAuthToken?getAuthToken():null;
+  if(!token||!CURRENT_USER){if(bar)bar.classList.add('hidden');return;}
+  var key=consentCacheKey();
+  if(!force&&CONSENT_STATUS.key===key&&CONSENT_STATUS.names&&Date.now()-CONSENT_STATUS.fetchedAt<10*60*1000){renderConsentBar();return;}
+  if(CONSENT_STATUS.loading)return;
+  CONSENT_STATUS.loading=true;
+  var teamName=getActiveTeamName(),season=(typeof inferSeasonName==='function')?inferSeasonName():'';
+  fetch(SYNC_API_BASE+'/team-consent?team_name='+encodeURIComponent(teamName)+'&season='+encodeURIComponent(season),{headers:{'Authorization':'Bearer '+token}})
+  .then(function(r){return r.ok?r.json():null;})
+  .then(function(d){
+    CONSENT_STATUS.loading=false;
+    if(!d||!d.success){return;}
+    CONSENT_STATUS.key=key;CONSENT_STATUS.fetchedAt=Date.now();
+    CONSENT_STATUS.names=(d.players||[]).map(function(p){return p.name;});
+    renderConsentBar();
+    if(typeof renderRosterScreen==='function')renderRosterScreen();
+  })
+  .catch(function(){CONSENT_STATUS.loading=false;});
+}
+function consentMissingNames(){
+  var roster=LIVE_ROSTER||loadRosterData()||[];
+  return roster.map(function(p){return (p.name||'').trim();}).filter(function(n){return n&&consentStateFor(n)==='no';});
+}
+function renderConsentBar(){
+  var bar=document.getElementById('consent-bar');if(!bar)return;
+  if(!CONSENT_STATUS.names||CONSENT_STATUS.key!==consentCacheKey()){bar.classList.add('hidden');return;}
+  var roster=LIVE_ROSTER||[];var total=roster.filter(function(p){return (p.name||'').trim();}).length;
+  var missing=consentMissingNames();var done=total-missing.length;
+  document.getElementById('consent-bar-count').textContent=done+' / '+total;
+  document.getElementById('consent-bar-lbl').textContent=missing.length===0&&total>0?'parents consented — everyone is in!':'parents consented';
+  var rb=document.getElementById('consent-remind-btn');if(rb)rb.style.display=missing.length?'':'none';
+  bar.classList.remove('hidden');
+}
+function copyConsentReminder(){
+  var missing=consentMissingNames();
+  if(!missing.length){showToast('✅ Every parent has signed!');return;}
+  var teamName=getActiveTeamName();
+  var msg='Hi '+teamName+' families! Quick reminder — I still need the photo & media consent form for: '+missing.join(', ')+'. It takes about 2 minutes and gets your player into the post-game recap emails. Tap the consent link I shared earlier (or ask me to resend it). Thanks!';
+  var done=function(){showToast('📋 Reminder copied for '+missing.length+' player'+(missing.length===1?'':'s'));};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(msg).then(done).catch(function(){prompt('Copy this reminder:',msg);});}
+  else{prompt('Copy this reminder:',msg);}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SEASON REPORT CARDS — end-of-season AI card per player, emailed to
+   every consented parent (Pro). Totals are aggregated from the saved games.
+   ══════════════════════════════════════════════════════════════ */
+function aggregateSeasonForCards(){
+  var games=loadSeason()||[];
+  var totals={},played={};
+  var KEYS=['tds','catches','flags','ints','conv','qbTDs','qbConvs','qbInts','fumbles','blocks'];
+  games.forEach(function(g){
+    var ps=g.playerStats||{};
+    Object.keys(ps).forEach(function(name){
+      var st=ps[name]||{};totals[name]=totals[name]||{};played[name]=(played[name]||0)+1;
+      KEYS.forEach(function(k){totals[name][k]=(totals[name][k]||0)+(Number(st[k])||0);});
+    });
+  });
+  var w=0,l=0,t=0;games.forEach(function(g){if(g.us>g.them)w++;else if(g.us<g.them)l++;else t++;});
+  // Only current roster members get cards (players removed mid-season are skipped)
+  var roster=(LIVE_ROSTER||loadRosterData()||[]).map(function(p){return (p.name||'').trim();}).filter(Boolean);
+  var players=roster.map(function(n){return {name:n,gamesPlayed:played[n]||0,stats:totals[n]||{}};});
+  return {games:games.length,record:{wins:w,losses:l,ties:t},players:players};
+}
+function sendSeasonReportCards(){
+  proGate('seasonCards',function(){
+    var token=getAuthToken?getAuthToken():null;
+    if(!token||!CURRENT_USER){showToast('⚠️ Sign in to send report cards');return;}
+    var agg=aggregateSeasonForCards();
+    if(!agg.games){showToast('⚠️ No saved games yet — finish the season first');return;}
+    if(!agg.players.length){showToast('⚠️ Roster is empty');return;}
+    var teamName=getActiveTeamName(),season=(typeof inferSeasonName==='function')?inferSeasonName():'Season';
+    var missing=(CONSENT_STATUS.names&&CONSENT_STATUS.key===consentCacheKey())?consentMissingNames():null;
+    var msg='Send '+season+' report cards for '+teamName+'?\n\n'+agg.games+' games · record '+agg.record.wins+'-'+agg.record.losses+(agg.record.ties?'-'+agg.record.ties:'')+'\n'+agg.players.length+' players on roster'
+      +(missing?'\n'+(agg.players.length-missing.length)+' parent'+((agg.players.length-missing.length)===1?'':'s')+' will be emailed (only consented parents receive one)':'\nOnly parents with a consent form on file will be emailed.')
+      +'\n\nThis is meant to be sent ONCE at the end of the season.';
+    if(!confirm(msg))return;
+    showToast('📝 Writing report cards… this takes about 20 seconds');
+    fetch(SYNC_API_BASE+'/generate-season-cards',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({team_id:ACTIVE_TEAM_ID||'default',team_name:teamName,season_name:season,record:agg.record,total_games:agg.games,players:agg.players})})
+    .then(function(r){return r.json().catch(function(){return {};}).then(function(j){j._status=r.status;return j;});})
+    .then(function(d){
+      if(!d.success){showToast('⚠️ Report cards failed: '+(d.error||('HTTP '+d._status)));return;}
+      var sum=d.summary||{};
+      showToast('🎓 '+(sum.total||0)+' report cards written · '+(sum.parentEmailed||0)+' parent'+((sum.parentEmailed||0)===1?'':'s')+' emailed'+(sum.emailErrors?' · '+sum.emailErrors.length+' failed':''));
+      try{localStorage.setItem('ff_season_cards_sent_'+(ACTIVE_TEAM_ID||'default'),new Date().toISOString());}catch(e){}
+    })
+    .catch(function(){showToast('⚠️ Could not reach the server — try again when online');});
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SYNC NOW — push everything this device has for the active team, then pull.
+   Replaces "re-save each thing to force an upload".
+   ══════════════════════════════════════════════════════════════ */
+function syncNow(){
+  if(!CURRENT_USER||!syncOwnerId()){showToast('⚠️ Sign in to sync');return;}
+  if(typeof gameInProgress==='function'&&gameInProgress()){showToast('⚠️ Finish or pause the live game before syncing');return;}
+  var tid=ACTIVE_TEAM_ID||'default',n=0;
+  try{
+    var roster=loadRosterData();if(roster&&roster.length){SYNC_ENGINE.queueChange(tid,'roster',roster);n++;}
+    SYNC_ENGINE.queueChange(tid,'colors',{primary:TC.primary,secondary:TC.secondary});n++;
+    var notes=JSON.parse(localStorage.getItem(currentNotesKey())||'{}');if(Object.keys(notes).length){SYNC_ENGINE.queueChange(tid,'notes',notes);n++;}
+    if(isPro()){
+      var season=loadSeason();if(season&&season.length){SYNC_ENGINE.queueChange(tid,'season',season);n++;}
+      var photos=loadPhotos();if(Object.keys(photos).length){SYNC_ENGINE.queueChange(tid,'photos',photos);n++;}
+      SYNC_ENGINE.queueChange('_global','teams',loadTeams());n++;
+      var plays=JSON.parse(localStorage.getItem('ff_plays')||'null');if(Array.isArray(plays)&&plays.length){SYNC_ENGINE.queueChange('_global','plays',plays);n++;}
+    }
+  }catch(e){console.warn('[Sync] syncNow queue error',e);}
+  SYNC_ENGINE._retryCount={};
+  SYNC_ENGINE.scheduleSync(100);
+  showToast('☁️ Syncing '+n+' item'+(n===1?'':'s')+' to the cloud…');
+  // After the queue drains, pull anything newer from other devices
+  var waited=0;(function poll(){
+    if(SYNC_ENGINE.queue.length===0&&!SYNC_ENGINE.syncInProgress){SYNC_ENGINE.downloadAll();showToast('✅ Sync complete');return;}
+    if((waited+=500)>60000){showToast('⚠️ Some items are still uploading — they will finish in the background');return;}
+    setTimeout(poll,500);
+  })();
 }
 
 /* ── Import parent-uploaded photos (from the consent form) into this team's roster ── */
