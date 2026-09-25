@@ -228,6 +228,10 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .team-colors-panel{padding:4px 2px 0;}
 .team-colors-panel.hidden{display:none;}
 .tsw-actions{display:flex;gap:6px;align-items:center;}
+.cloud-status{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.5px;color:var(--dim);margin:-8px 2px 12px;min-height:14px;display:flex;flex-wrap:wrap;gap:4px 12px;}
+.cloud-status .cs-bad{color:#F59E0B;}
+.cloud-status .cs-ok{color:var(--green);}
+.cloud-status:empty{display:none;}
 .tsw-refresh{background:var(--dark3);border:1px solid var(--dark5);border-radius:8px;width:34px;height:31px;font-size:16px;color:var(--dim);cursor:pointer;line-height:1;}
 .tsw-refresh:active{border-color:var(--s);color:var(--s);}
 .tsw-btn{background:var(--dark3);border:1px solid var(--dark5);border-radius:8px;padding:6px 12px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--dim);cursor:pointer;transition:border-color .15s,color .15s;text-transform:uppercase;white-space:nowrap;}
@@ -1649,6 +1653,7 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
         <button type="button" class="tsw-btn" onclick="proGate('teams',openTeamsModal)">Switch Team <span class="pro-badge">PRO</span></button>
       </div>
     </div>
+    <div class="cloud-status" id="cloud-status" aria-live="polite"></div>
 
     <div class="setup-section-lbl">🏈 Team Info</div>
     <div class="fg"><label>Team Name</label>
@@ -3196,7 +3201,18 @@ function saveCoachNameInline(){
 }
 
 /* ── START GAME ── */
+/* Keep the screen on during a live game (Android Chrome, iOS 16.4+ Safari/PWA).
+   Re-acquired on foreground because the OS releases it when the tab is hidden. */
+var _wakeLock=null,_wantWake=false;
+function acquireWakeLock(){
+  _wantWake=true;
+  if(!('wakeLock' in navigator)||_wakeLock)return;
+  navigator.wakeLock.request('screen').then(function(l){_wakeLock=l;l.addEventListener('release',function(){_wakeLock=null;});}).catch(function(){});
+}
+function releaseWakeLock(){_wantWake=false;if(_wakeLock){try{_wakeLock.release();}catch(e){}_wakeLock=null;}}
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&_wantWake)acquireWakeLock();});
 function startGame(){
+  acquireWakeLock();
   try{
     var teamName=document.getElementById('su-team').value.trim();
     if(!teamName){alert('Please enter your team name!');return;}
@@ -3643,6 +3659,7 @@ function buildGameRecord(us,them){
 // re-persisted the finished game → duplicate season entries.
 function markGameFinalized(){
   G.finalized=true;
+  releaseWakeLock();
   clearSavedGameState();
   stopLiveSync();
   clearPersistedLiveState();
@@ -6784,21 +6801,29 @@ function closeTimerModal(){
 function setTimerPreset(min){
   document.getElementById('timer-custom-min').value=min;
 }
+/* The clock is anchored to a wall-clock deadline (timerEndsAt) and re-derived on every
+   tick, so backgrounding the tab on iOS (which throttles/pauses setInterval) no longer
+   makes the quarter clock drift or stall — when the app comes back it's already right. */
+var timerEndsAt=0;
+function timerRemaining(){return timerRunning&&timerEndsAt?Math.max(0,Math.round((timerEndsAt-Date.now())/1000)):timerSeconds;}
 function startTimer(){
   var min=parseInt(document.getElementById('timer-custom-min').value)||10;
   timerDefaultMin=min;
   timerSeconds=min*60;
   closeTimerModal();
   timerRunning=true;
+  timerEndsAt=Date.now()+timerSeconds*1000;
   updateTimerDisplay();
-  timerInterval=setInterval(tickTimer,1000);
+  clearInterval(timerInterval);
+  timerInterval=setInterval(tickTimer,250);
   var wrap=document.getElementById('qtimer-wrap');
   if(wrap)wrap.classList.add('running');
   var play=document.getElementById('qtimer-play');
   if(play)play.textContent='⏸';
 }
 function pauseTimer(){
-  timerRunning=false;
+  if(timerRunning)timerSeconds=timerRemaining();
+  timerRunning=false;timerEndsAt=0;
   clearInterval(timerInterval);
   var wrap=document.getElementById('qtimer-wrap');
   if(wrap){wrap.classList.remove('running');wrap.classList.remove('warning');}
@@ -6807,7 +6832,9 @@ function pauseTimer(){
 }
 function resumeTimer(){
   timerRunning=true;
-  timerInterval=setInterval(tickTimer,1000);
+  timerEndsAt=Date.now()+timerSeconds*1000;
+  clearInterval(timerInterval);
+  timerInterval=setInterval(tickTimer,250);
   var wrap=document.getElementById('qtimer-wrap');
   if(wrap)wrap.classList.add('running');
   var play=document.getElementById('qtimer-play');
@@ -6815,15 +6842,21 @@ function resumeTimer(){
 }
 function resetTimer(){
   pauseTimer();
-  timerSeconds=0;
+  timerSeconds=0;timerEndsAt=0;_lastTickSec=-1;
   updateTimerDisplay();
   var disp=document.getElementById('qtimer-display');
   if(disp){disp.textContent='—:——';disp.className='qtimer-display';}
   var play=document.getElementById('qtimer-play');
   if(play)play.textContent='▶';
 }
+var _lastTickSec=-1;
 function tickTimer(){
+  var rem=timerRemaining();
+  if(rem===_lastTickSec&&rem>0)return; // 250ms tick, but only act when the second changes
+  var prev=_lastTickSec;_lastTickSec=rem;
+  timerSeconds=rem;
   if(timerSeconds<=0){
+    timerEndsAt=0;_lastTickSec=-1;
     // Time's up — auto-advance quarter
     clearInterval(timerInterval);timerRunning=false;
     vibe([100,30,100,30,100]);
@@ -6835,10 +6868,9 @@ function tickTimer(){
     if(G.cq<G.quarters){setTimeout(advanceQ,1500);}
     return;
   }
-  timerSeconds--;
   updateTimerDisplay();
-  // Warning at 60s and 30s
-  if(timerSeconds===60||timerSeconds===30){
+  // Warning at 60s and 30s (fires once even if the tab slept through the exact second)
+  if((prev>60&&timerSeconds<=60)||(prev>30&&timerSeconds<=30)){
     vibe([20,10,20]);
     var wrap=document.getElementById('qtimer-wrap');
     if(wrap)wrap.classList.add('warning');
@@ -6859,16 +6891,70 @@ function updateTimerDisplay(){
    PLAYER PHOTOS  (base64, localStorage)
 ════════════════════════════════════════════════════════════ */
 var LS_PHOTOS='ff_photos_v1';
-function loadPhotos(){try{return JSON.parse(localStorage.getItem(LS_PHOTOS))||{};}catch(e){return{};}}
-function savePhotos(p){
-  try{localStorage.setItem(LS_PHOTOS,JSON.stringify(p));}
-  catch(e){
-    console.warn('[FFTP] savePhotos failed:',e);
-    if(e&&(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED')){
-      showToast('⚠️ Storage full — photo not saved. Remove old photos to free space.');
-    }
-  }
+/* Photos are the one large blob in the app. They now live in IndexedDB (hundreds of MB
+   available) with an in-memory cache so every existing synchronous loadPhotos() caller
+   keeps working. localStorage keeps only a fallback copy when IDB is unavailable.
+   One-time migration moves the old localStorage map into IDB on first run. */
+var PHOTOS_CACHE=null,_photosDb=null,_photosReady=false;
+function openPhotosDb(){
+  return new Promise(function(res){
+    if(_photosDb)return res(_photosDb);
+    if(!('indexedDB' in window))return res(null);
+    try{
+      var req=indexedDB.open('fftp-photos',1);
+      req.onupgradeneeded=function(){req.result.createObjectStore('kv');};
+      req.onsuccess=function(){_photosDb=req.result;res(_photosDb);};
+      req.onerror=function(){res(null);};
+    }catch(e){res(null);}
+  });
 }
+function idbGetPhotos(){
+  return openPhotosDb().then(function(db){
+    if(!db)return null;
+    return new Promise(function(res){
+      try{var tx=db.transaction('kv','readonly');var r=tx.objectStore('kv').get('photos');r.onsuccess=function(){res(r.result||null);};r.onerror=function(){res(null);};}catch(e){res(null);}
+    });
+  });
+}
+function idbPutPhotos(map){
+  return openPhotosDb().then(function(db){
+    if(!db)return false;
+    return new Promise(function(res){
+      try{var tx=db.transaction('kv','readwrite');tx.objectStore('kv').put(map,'photos');tx.oncomplete=function(){res(true);};tx.onerror=function(){res(false);};}catch(e){res(false);}
+    });
+  });
+}
+function loadPhotos(){
+  if(PHOTOS_CACHE)return PHOTOS_CACHE;
+  try{PHOTOS_CACHE=JSON.parse(localStorage.getItem(LS_PHOTOS))||{};}catch(e){PHOTOS_CACHE={};}
+  return PHOTOS_CACHE;
+}
+function savePhotos(p){
+  PHOTOS_CACHE=p||{};
+  idbPutPhotos(PHOTOS_CACHE).then(function(ok){
+    if(ok){try{localStorage.removeItem(LS_PHOTOS);}catch(e){}return;}
+    // No IndexedDB — fall back to localStorage and warn on quota
+    try{localStorage.setItem(LS_PHOTOS,JSON.stringify(PHOTOS_CACHE));}
+    catch(e){
+      console.warn('[FFTP] savePhotos failed:',e);
+      if(e&&(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED')){
+        showToast('⚠️ Storage full — photo not saved. Remove old photos to free space.');
+      }
+    }
+  });
+}
+/* Hydrate the cache from IDB at startup (merging any legacy localStorage copy), then refresh UI. */
+(function hydratePhotos(){
+  idbGetPhotos().then(function(fromIdb){
+    var legacy={};try{legacy=JSON.parse(localStorage.getItem(LS_PHOTOS))||{};}catch(e){}
+    var merged=Object.assign({},fromIdb||{},PHOTOS_CACHE||{},legacy);
+    var changed=JSON.stringify(merged)!==JSON.stringify(fromIdb||{});
+    PHOTOS_CACHE=merged;_photosReady=true;
+    if(changed||Object.keys(legacy).length)savePhotos(merged);
+    try{if(typeof renderRosterScreen==='function'&&document.getElementById('roster-player-list'))renderRosterScreen();}catch(e){}
+    try{if(typeof renderAll==='function'&&typeof G!=='undefined'&&G&&G.team)renderAll();}catch(e){}
+  });
+})();
 /* ── PHOTO CONSENT FLOW ── */
 var _pendingPhotoIdx=null; // roster index waiting for consent confirmation
 
@@ -6974,6 +7060,78 @@ function findPhoto(photos,name){
 function getPlayerPhoto(name){
   return findPhoto(loadPhotos(),name);
 }
+/* Downscale any image data-URL to a MAX px JPEG thumbnail (async; cb(null) on failure). */
+function shrinkPhoto(src,MAX,cb){
+  try{
+    var img=new Image();
+    img.onload=function(){
+      try{
+        var ratio=Math.min(1,MAX/img.width,MAX/img.height);
+        var c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*ratio));c.height=Math.max(1,Math.round(img.height*ratio));
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        cb(c.toDataURL('image/jpeg',0.75));
+      }catch(e){cb(null);}
+    };
+    img.onerror=function(){cb(null);};
+    img.src=src;
+  }catch(e){cb(null);}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CLOUD STATUS LINE — one glance answers "is my stuff synced and is Pro alive?"
+   ══════════════════════════════════════════════════════════════ */
+var LS_LAST_SYNC='ff_last_sync_ok',LS_LAST_RECAP='ff_last_recap',LS_PRO_END='ff_pro_period_end';
+function fmtAgo(ts){
+  if(!ts)return 'never';var d=Date.now()-ts;
+  if(d<60e3)return 'just now';if(d<3600e3)return Math.round(d/60e3)+'m ago';if(d<86400e3)return Math.round(d/3600e3)+'h ago';return Math.round(d/86400e3)+'d ago';
+}
+function renderCloudStatus(){
+  var el=document.getElementById('cloud-status');if(!el)return;
+  if(!CURRENT_USER){el.textContent='';return;}
+  var parts=[];
+  var last=parseInt(localStorage.getItem(LS_LAST_SYNC)||'0',10);
+  var pending=(typeof SYNC_ENGINE!=='undefined'&&SYNC_ENGINE.queue)?SYNC_ENGINE.queue.length:0;
+  parts.push('<span class="'+(pending?'cs-bad':'')+'">☁ '+(pending?pending+' waiting to upload':'synced '+fmtAgo(last))+'</span>');
+  if(!navigator.onLine)parts.push('<span class="cs-bad">offline</span>');
+  if(isPro()){
+    var end=localStorage.getItem(LS_PRO_END);var endD=end?new Date(end):null;
+    if(endD&&!isNaN(endD)){var days=Math.round((endD-Date.now())/86400e3);parts.push('<span class="'+(days<0?'cs-bad':'')+'">★ Pro '+(days<0?'renewal overdue':days<=7?'renews in '+days+'d':'through '+endD.toLocaleDateString('en-US',{month:'short',day:'numeric'}))+'</span>');}
+    else parts.push('<span>★ Pro</span>');
+  }
+  var lr=null;try{lr=JSON.parse(localStorage.getItem(LS_LAST_RECAP)||'null');}catch(e){}
+  if(lr&&lr.ts)parts.push('<span class="'+(lr.ok?'':'cs-bad')+'">✉ last recap '+(lr.ok?lr.n+' sent ':'failed ')+fmtAgo(lr.ts)+'</span>');
+  el.innerHTML=parts.join('');
+}
+try{setInterval(renderCloudStatus,30000);window.addEventListener('online',renderCloudStatus);window.addEventListener('offline',renderCloudStatus);}catch(e){}
+
+/* ══════════════════════════════════════════════════════════════
+   CLIENT ERROR REPORTING — uncaught errors go to /api/client-error (throttled,
+   deduped, no PII) so the daily smoke test can tell the coach-owner about them.
+   ══════════════════════════════════════════════════════════════ */
+var _errSeen={},_errSent=0,_errWindow=Date.now();
+function reportClientError(message,source,line,stack,context){
+  try{
+    if(!navigator.onLine)return;
+    var now=Date.now();if(now-_errWindow>60000){_errWindow=now;_errSent=0;}
+    if(_errSent>=5)return;                       // max 5/min per device
+    var key=String(message).slice(0,120)+'|'+(line||'');
+    if(_errSeen[key])return;_errSeen[key]=1;      // once per unique error per session
+    // Never report our own network/extension noise
+    if(/ResizeObserver|Script error\.?$|Load failed|NetworkError|Failed to fetch/i.test(String(message)))return;
+    _errSent++;
+    var ver='';try{ver=(document.querySelector('meta[name="app-version"]')||{}).content||'';}catch(e){}
+    var hdr={'Content-Type':'application/json'};
+    var tok=(typeof getAuthToken==='function')?getAuthToken():null;if(tok)hdr['Authorization']='Bearer '+tok;
+    fetch(SYNC_API_BASE+'/client-error',{method:'POST',headers:hdr,keepalive:true,body:JSON.stringify({
+      message:String(message).slice(0,300),source:String(source||'').slice(0,200),line:line||0,
+      stack:String(stack||'').split('\n').slice(0,4).join(' | ').slice(0,600),
+      url:location.pathname,version:ver,
+      context:String(context||((document.querySelector('.screen.active')||{}).id||'')).slice(0,120)
+    })}).catch(function(){});
+  }catch(e){}
+}
+window.addEventListener('error',function(ev){reportClientError(ev.message||String(ev.error||'error'),ev.filename,ev.lineno,ev.error&&ev.error.stack);});
+window.addEventListener('unhandledrejection',function(ev){var r=ev.reason||{};reportClientError('Unhandled promise: '+(r.message||String(r)).slice(0,200),'',0,r.stack);});
 
 /* ══════════════════════════════════════════════════════════════
    CONSENT STATUS — which parents have signed for the active team
@@ -7135,7 +7293,7 @@ function importParentPhotos(){
       if(!names.length){showToast('📋 No parent photos yet for '+teamName+' ('+season+'). Parents add one on the consent form.');return;}
       var photos=loadPhotos();
       var roster=LIVE_ROSTER||loadRosterData()||[];
-      var added=0,unmatched=[];
+      var added=0,unmatched=[],pending=[];
       names.forEach(function(pn){
         var want=photoKeyNorm(pn);
         var match=null;
@@ -7144,12 +7302,21 @@ function importParentPhotos(){
         if(!/^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(incoming[pn]))return;
         // Coach-taken photos win; only fill gaps
         if(findPhoto(photos,match))return;
-        photos[match]=incoming[pn];added++;
+        pending.push({name:match,src:incoming[pn]});
       });
-      if(added){savePhotos(photos);if(typeof renderRosterScreen==='function')renderRosterScreen();}
-      var msg='📷 '+added+' parent photo'+(added===1?'':'s')+' added';
-      if(unmatched.length)msg+=' • no roster match for: '+unmatched.slice(0,3).join(', ')+(unmatched.length>3?' +'+(unmatched.length-3):'');
-      showToast(msg);
+      // Parent uploads can be full-size camera photos (hundreds of KB each). Downscale to
+      // the same 120px thumbnail the in-app uploader uses so 20 players can't blow the
+      // storage quota.
+      (function next(){
+        if(!pending.length){
+          if(added){savePhotos(photos);if(typeof renderRosterScreen==='function')renderRosterScreen();}
+          var msg='📷 '+added+' parent photo'+(added===1?'':'s')+' added';
+          if(unmatched.length)msg+=' • no roster match for: '+unmatched.slice(0,3).join(', ')+(unmatched.length>3?' +'+(unmatched.length-3):'');
+          showToast(msg);return;
+        }
+        var it=pending.shift();
+        shrinkPhoto(it.src,120,function(small){if(small){photos[it.name]=small;added++;}next();});
+      })();
     })
     .catch(function(e){console.warn('[photos] import failed',e);showToast('⚠️ Could not reach the server to import photos');});
   });
@@ -8263,6 +8430,7 @@ function postAuthRoute(){
   .then(function(r){return r.json();})
   .then(function(data){
     if(data.has_active_license){
+      try{if(data.current_period_end)localStorage.setItem(LS_PRO_END,String(data.current_period_end));}catch(e){}
       // Auto-linked Pro — celebrate and dismiss
       try{
         localStorage.setItem(LS_PRO,'unlocked');
@@ -8451,6 +8619,7 @@ function scheduleProRecheck(){
     })
     .then(function(data){
       if(data.has_active_license){
+        try{if(data.current_period_end)localStorage.setItem(LS_PRO_END,String(data.current_period_end));}catch(e){}
         localStorage.setItem(LS_PRO_LAST_CHECK,String(Date.now()));
         localStorage.removeItem(LS_PRO_FAIL_SINCE);
         // Keep local key fresh in case it changed (e.g. re-issued key)
@@ -11055,6 +11224,7 @@ function initSupabaseAuth(){
 
 /* ── AUTH UI ── */
 function updateAuthUI(){
+  try{setTimeout(renderCloudStatus,0);}catch(e){}
   var hdrBtn=document.getElementById('auth-hdr-btn');
   var setupPrompt=document.getElementById('auth-setup-prompt');
   var signedInStrip=document.getElementById('auth-signedin-strip');
@@ -11392,6 +11562,7 @@ var SYNC_ENGINE={
       if(result.success){
         var versionKey='ff_sync_ver:'+item.teamId+':'+item.dataType;
         localStorage.setItem(versionKey,String(result.server_version));
+        try{localStorage.setItem(LS_LAST_SYNC,String(Date.now()));}catch(e){}
         self.queue.shift();
         delete self._retryCount[key];
 
@@ -11571,11 +11742,11 @@ function applyCloudData(teamId,dataType,data){
         // with whichever team's row arrived last silently dropped other players' photos, so
         // merge instead: keep what we have, let incoming keys win for the same player.
         try{
-          var curP=JSON.parse(localStorage.getItem('ff_photos_v1')||'{}')||{};
+          var curP=Object.assign({},loadPhotos());
           var inP=(data&&typeof data==='object')?data:{};
           Object.keys(inP).forEach(function(k){if(typeof inP[k]==='string'&&inP[k].indexOf('data:image/')===0)curP[k]=inP[k];});
-          localStorage.setItem('ff_photos_v1',JSON.stringify(curP));
-        }catch(e){localStorage.setItem('ff_photos_v1',JSON.stringify(data));}
+          savePhotos(curP);
+        }catch(e){console.warn('[Sync] photos apply failed',e);}
         break;
       case 'plays':
         localStorage.setItem('ff_plays',JSON.stringify(data));
@@ -11594,6 +11765,7 @@ function applyCloudData(teamId,dataType,data){
 
 /* ── Sync status indicator ── */
 function showSyncIndicator(state){
+  try{renderCloudStatus();}catch(e){}
   var el=document.getElementById('sync-indicator');
   if(!el)return;
   var icon=document.getElementById('sync-icon');
@@ -11684,6 +11856,8 @@ function syncPlaysIfNeeded(){
   }catch(e){}
 }
 
+// Quarter clock: re-derive from the deadline the moment the app is foregrounded
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&timerRunning){try{_lastTickSec=-1;tickTimer();}catch(e){}}});
 // Resume uploads as soon as connectivity returns (retry timers may be minutes out)
 window.addEventListener('online',function(){try{SYNC_ENGINE._retryCount={};SYNC_ENGINE.scheduleSync(1000);}catch(e){}});
 // Flush pending sync when the app is backgrounded (best-effort)
@@ -11799,11 +11973,13 @@ function sendPostGameRecap(gameData,playerStats,scoreCardBase64,opts){
         showToast('📧 Recap already sent for this game — parents were emailed earlier.');
       } else {
         var count=data.emails_sent||0;
+        try{localStorage.setItem(LS_LAST_RECAP,JSON.stringify({ts:Date.now(),ok:true,n:count}));renderCloudStatus();}catch(e){}
         showToast('\u{1F4E8} '+(data.resend?'Updated recaps':'Game recaps')+' sent to '+count+' parent'+(count!==1?'s':'')+'!');
         console.log('[game-recap] Success: '+count+' emails sent');
       }
     } else {
       console.warn('[game-recap] API returned error:',data.error);
+      try{localStorage.setItem(LS_LAST_RECAP,JSON.stringify({ts:Date.now(),ok:false}));renderCloudStatus();}catch(e){}
       showToast('⚠️ Recap email error: '+(data.error||'something went wrong. Check your connection and try again.')+' — you can retry from Season → ✎ Edit → Send Recap Emails.');
     }
     done();
