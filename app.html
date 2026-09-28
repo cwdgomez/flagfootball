@@ -11133,7 +11133,7 @@ function initSupabaseAuth(){
         closeAuthModal();
         showToast('✅ Signed in as '+(CURRENT_USER.email||'').split('@')[0]);
         // Upsert coach profile (captures marketing opt-in)
-        ensureCoachProfile();
+        ensureCoachProfile();try{loadCoachContactEmail();}catch(e){}
         AUTH_MKT_OPT_IN=false;
         var mktCb=document.getElementById('auth-mkt-opt');
         if(mktCb)mktCb.checked=false;
@@ -11159,7 +11159,7 @@ function initSupabaseAuth(){
         AUTH_SESSION=result.data.session;
         CURRENT_USER=result.data.session.user;
         ensureSyncOwner(CURRENT_USER.id);
-        ensureCoachProfile();
+        ensureCoachProfile();try{loadCoachContactEmail();}catch(e){}
         updateAuthUI();
         // If gate is showing (returning user who somehow lost localStorage), route past auth panel
         if(GATE_ACTIVE){
@@ -11193,7 +11193,7 @@ function initSupabaseAuth(){
           CURRENT_USER=sess.user;
           ensureSyncOwner(CURRENT_USER.id);
           updateAuthUI();
-          ensureCoachProfile();
+          ensureCoachProfile();try{loadCoachContactEmail();}catch(e){}
           showToast('✅ Signed in as '+(CURRENT_USER.email||'').split('@')[0]);
           if(!localStorage.getItem(LS_TOS_CONSENT))saveConsentLocally();
           setTimeout(function(){
@@ -11328,10 +11328,13 @@ function openAccountMenu(){
   var email=CURRENT_USER.email||'Unknown';
   var queueLen=SYNC_ENGINE.queue.length;
   var syncStatus=queueLen>0?queueLen+' changes pending':'All synced';
+  var contact=getCoachContactEmail();
   var choice=prompt(
     '👤 Account: '+email+'\n'
+    +'✉️ Parents contact you at: '+(contact||email)+'\n'
     +'☁️ Sync: '+syncStatus+'\n\n'
     +'Type an option:\n'
+    +'  contact — Change the email parents see in recaps & forms\n'
     +'  signout — Sign out\n'
     +'  unsubscribe — Stop marketing emails\n'
     +'  cancel — Go back'
@@ -11340,6 +11343,33 @@ function openAccountMenu(){
   var cmd=(choice||'').trim().toLowerCase();
   if(cmd==='signout')authSignOut();
   else if(cmd==='unsubscribe')updateMarketingOptIn(false);
+  else if(cmd==='contact')promptCoachContactEmail();
+}
+
+/* ── COACH CONTACT EMAIL — the address parents see in recap / report-card / consent
+   emails (and the Reply-To). Defaults to the sign-in email; coaches who sign in with a
+   personal account can point parents at a team or business address instead. ── */
+var LS_COACH_CONTACT='ff_coach_contact_email';
+function getCoachContactEmail(){try{return localStorage.getItem(LS_COACH_CONTACT)||'';}catch(e){return '';}}
+function promptCoachContactEmail(){
+  if(!CURRENT_USER||!sbClient){showToast('⚠️ Sign in first');return;}
+  var cur=getCoachContactEmail()||CURRENT_USER.email||'';
+  var v=prompt('Email address parents should use to reach you.\nThis appears in game recaps, report cards and consent confirmations, and replies go here.\n\nLeave blank to use your sign-in email ('+(CURRENT_USER.email||'')+').',cur);
+  if(v===null)return;
+  v=(v||'').trim();
+  if(v&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){alert('That does not look like an email address.');return;}
+  sbClient.from('coach_profiles').update({contact_email:v||null,updated_at:new Date().toISOString()}).eq('id',CURRENT_USER.id)
+  .then(function(r){
+    if(r&&r.error){showToast('⚠️ Could not save: '+r.error.message);return;}
+    try{if(v)localStorage.setItem(LS_COACH_CONTACT,v);else localStorage.removeItem(LS_COACH_CONTACT);}catch(e){}
+    showToast(v?'✉️ Parents will now contact you at '+v:'✉️ Using your sign-in email for parent contact');
+  });
+}
+/* Keep the local copy in step with the profile row after sign-in */
+function loadCoachContactEmail(){
+  if(!CURRENT_USER||!sbClient)return;
+  sbClient.from('coach_profiles').select('contact_email').eq('id',CURRENT_USER.id).maybeSingle()
+  .then(function(r){var c=r&&r.data&&r.data.contact_email;try{if(c)localStorage.setItem(LS_COACH_CONTACT,c);else localStorage.removeItem(LS_COACH_CONTACT);}catch(e){}}).catch(function(){});
 }
 
 /* ── GET AUTH TOKEN (for API calls) ── */
