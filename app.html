@@ -387,6 +387,30 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .scout-meta{font-size:13px;color:var(--dimmer);margin-top:6px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.2px;}
 .scout-hist-btn{background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;opacity:.7;transition:opacity .2s;}
 .scout-hist-btn:hover{opacity:1;}
+/* Past results vs this opponent (Game Setup panel + scouting modal) */
+.scout-hist{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 10px;font-family:'Barlow Condensed',sans-serif;}
+.scout-rec{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-right:4px;}
+.scout-g{font-size:13px;font-weight:700;letter-spacing:.5px;padding:3px 8px;border-radius:6px;border:1px solid var(--dark5);background:var(--dark3);color:var(--fg);}
+.scout-g em{font-style:normal;font-weight:400;color:var(--dimmer);margin-left:3px;}
+.scout-g.w{border-color:rgba(34,197,94,.45);color:var(--green);}
+.scout-g.l{border-color:rgba(239,68,68,.45);color:#ef4444;}
+.scout-open-btn{width:100%;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.3);border-radius:10px;padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);cursor:pointer;min-height:44px;}
+#scout-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.88);align-items:flex-start;justify-content:center;overflow-y:auto;padding:16px 10px 80px;-webkit-overflow-scrolling:touch;}
+#scout-modal.open{display:flex;}
+#scout-modal .scout-ta{min-height:150px;font-size:15px;}
+.sc-name-tap{cursor:pointer;text-decoration:underline dotted rgba(255,255,255,.35);text-underline-offset:3px;}
+.sum-scout{background:var(--sur);border:1px solid rgba(255,215,0,.15);border-radius:12px;padding:12px 14px;margin-bottom:10px;}
+.sum-scout-notes{font-family:'Barlow Condensed',sans-serif;font-size:15px;line-height:1.5;color:var(--fg);white-space:normal;margin-bottom:10px;}
+.sum-scout-empty{font-family:'Barlow Condensed',sans-serif;font-size:14px;line-height:1.45;color:var(--dim);margin-bottom:10px;}
+/* Season → Opponents list */
+.opp-row{display:flex;flex-direction:column;align-items:stretch;gap:4px;width:100%;text-align:left;background:var(--sur);border:1px solid var(--dark5);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;color:var(--fg);}
+.opp-row:active{border-color:rgba(255,215,0,.4);}
+.opp-main{display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+.opp-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.5px;}
+.opp-rec{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--dim);letter-spacing:.5px;white-space:nowrap;}
+.opp-notes{font-family:'Barlow Condensed',sans-serif;font-size:14px;line-height:1.4;color:var(--fg);opacity:.85;}
+.opp-notes.empty{color:var(--gold);opacity:.8;}
+.sl-empty{text-align:center;padding:16px;color:var(--dimmer);font-family:'Barlow Condensed',sans-serif;font-size:13px;line-height:1.45;}
 .has-note .pname::after{content:" 📝";font-size:12px;}
 
 /* ROTATIONS */
@@ -1694,6 +1718,7 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
         <div class="scout-hdr">
           <div class="scout-hdr-left">🕵️ Scouting Notes <span class="scout-saved-badge" id="scout-badge" style="display:none">Notes saved</span></div>
         </div>
+        <div id="scout-hist-wrap"></div>
         <textarea class="scout-ta" id="scout-ta" rows="3" placeholder="e.g. Blitz every 3rd down, QB scrambles left, #7 is their go-to WR..." oninput="onScoutInput()"></textarea>
         <div class="scout-meta" id="scout-meta"></div>
       </div>
@@ -1866,7 +1891,7 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
     </div>
     <div class="sc-div">vs</div>
     <div class="sc-team them">
-      <div class="sc-name" id="sc-opp-name">OPP</div>
+      <div class="sc-name sc-name-tap" id="sc-opp-name" role="button" tabindex="0" title="Scouting notes on this opponent" onclick="openScoutModal(G.opp,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openScoutModal(G.opp,event);}">OPP</div>
       <div class="sc-num" id="sc-them">0</div>
       <div class="sc-btns">
         <button type="button" class="sb td-btn" onclick="addScore('them',6)">+TD</button>
@@ -1995,6 +2020,8 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
     <div id="sl-player-cards"></div>
     <div class="season-sec">Game History</div>
     <div id="sl-games"></div>
+    <div class="season-sec">Opponents &amp; Scouting</div>
+    <div id="sl-opponents"></div>
     <div class="season-sec">Data</div>
     <div class="season-actions">
       <button type="button" class="sact-btn" style="background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.35);color:var(--purple)" onclick="openQR()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="5" y="5" width="3" height="3" fill="currentColor" stroke="none"/><rect x="16" y="5" width="3" height="3" fill="currentColor" stroke="none"/><rect x="5" y="16" width="3" height="3" fill="currentColor" stroke="none"/><path d="M14 14h3v3h-3zM17 17h3v3h-3zM14 20h3"/></svg> QR Code</button>
@@ -2033,6 +2060,9 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
       <div class="egm-score-label" id="egm-opp-label">Opponent</div>
       <input type="number" class="egm-score-input" id="egm-score-them" min="0" max="999" inputmode="numeric" aria-label="Opponent score">
     </div>
+    <div class="egm-section">Scouting</div>
+    <div class="egm-recap-note">What did this team do that you want to remember for the rematch?</div>
+    <button type="button" class="scout-open-btn" onclick="openScoutModal(document.getElementById('egm-opp-name').value,event)">🕵️ Scouting Notes</button>
     <div class="egm-section">Players &amp; Stats</div>
     <div id="egm-players"></div>
     <div class="egm-btn-row">
@@ -2042,6 +2072,22 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
     <div class="egm-section">Parent Recap Emails</div>
     <div class="egm-recap-note" id="egm-recap-note">Saves your changes first, then emails every consented parent an updated recap for this game.</div>
     <button type="button" class="egm-recap-btn" id="egm-recap-btn" onclick="resendRecapForEditedGame()">&#128232; Save &amp; Send Recap Emails</button>
+  </div>
+</div>
+
+<!-- OPPONENT SCOUTING MODAL -->
+<div id="scout-modal" role="dialog" aria-modal="true" aria-labelledby="scm-title">
+  <div class="egm-card">
+    <div class="egm-title" id="scm-title">Scouting Report</div>
+    <div class="egm-subtitle" id="scm-sub"></div>
+    <div id="scm-hist"></div>
+    <div class="egm-section">Notes</div>
+    <textarea class="scout-ta" id="scm-ta" rows="7" placeholder="e.g. Blitz every 3rd down, QB scrambles left, #7 is their go-to WR, they line up 3 wide on 4th..."></textarea>
+    <div class="scout-meta">Private to you. Shown on Game Setup and the scoreboard whenever you play this team again.</div>
+    <div class="egm-btn-row">
+      <button type="button" class="egm-save" onclick="saveScoutModal()">Save Notes</button>
+      <button type="button" class="egm-cancel" onclick="closeScoutModal()">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -3243,6 +3289,8 @@ function startGame(){
     document.querySelectorAll('.nav-tab').forEach(function(t,i){t.classList.toggle('active',i===0);});
     document.querySelectorAll('.panel').forEach(function(p,i){p.classList.toggle('active',i===0);});
     renderAll();
+    // Remind the coach that there's a scouting report on this opponent (tap their name to read it)
+    try{var sd=loadScoutData(G.opp);if(sd&&sd.notes)setTimeout(function(){showToast('🕵️ You have scouting notes on '+G.opp+' — tap their name on the scoreboard');},900);}catch(e){}
   }catch(err){alert('Error starting game: '+err.message);console.error(err);}
 }
 
@@ -3807,6 +3855,9 @@ function renderSummary(){
       +'<span style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;color:var(--blue)">■ DEFENSE</span>'
     +'</div>'
     +'<div class="pt-section">'+ptRows+'</div>'
+    +'<div class="sum-lbl">🕵️ Scouting — '+esc(G.opp)+'</div>'
+    +(function(){var sd=loadScoutData(G.opp);return '<div class="sum-scout">'+(sd?'<div class="sum-scout-notes">'+esc(sd.notes).replace(/\n/g,'<br>')+'</div>':'<div class="sum-scout-empty">Nothing written yet. Jot down what they did while it\'s fresh — it shows up on Game Setup next time you face them.</div>')
+      +'<button type="button" class="scout-open-btn" onclick="openScoutModal(G.opp,event)">'+(sd?'✏️ Edit Scouting Notes':'🕵️ Add Scouting Notes')+'</button></div>';})()
     +'<button type="button" class="share-recap-btn" onclick="proGate(\'share\',openShareCard)">📤 Share Game Recap <span class=\'pro-badge\'>PRO</span></button>'
     +'<button type="button" class="share-recap-btn" style="background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(168,85,247,.06));border-color:rgba(168,85,247,.4);color:#c084fc;margin-top:6px;" onclick="proGate(\'statcards\',openProStatCard)">🎴 Generate Player Stat Cards <span class=\'pro-badge\'>PRO</span></button>'
     +'<button type="button" class="end-game-btn" onclick="endAndSave()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> End Game &amp; Save to Season</button>'
@@ -3921,18 +3972,76 @@ function doReset(){
   buildQBList();buildAbsentList();
 }
 
-/* ── OPPONENT SCOUTING NOTES ── */
+/* ── OPPONENT SCOUTING NOTES ──
+   One map per account (ff_scout_v2): { <normalized opp>: {name, notes, updatedAt} }.
+   Synced to the cloud as data_type 'scouting' under team '_global', so a note typed on the
+   phone at Saturday's game is on the iPad before the rematch. Older builds kept one
+   ff_scout_<opp> key per opponent and never synced them; they are folded in on first load.
+   Notes can be written in four places: the Game Setup panel (as soon as an opponent is
+   typed), by tapping the opponent's name on the live scoreboard, from the Summary tab,
+   and from Season → Opponents / Edit Game. */
+var LS_SCOUT='ff_scout_v2';
 function normalizeOpp(name){return(name||'').trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');}
-function getScoutKey(opp){var n=normalizeOpp(opp);return n?'ff_scout_'+n:null;}
-function loadScoutData(opp){try{var k=getScoutKey(opp);return k?JSON.parse(localStorage.getItem(k)||'null'):null;}catch(e){return null;}}
+function loadScoutMap(){
+  try{var m=JSON.parse(localStorage.getItem(LS_SCOUT)||'null');if(m&&typeof m==='object'&&!Array.isArray(m))return m;}catch(e){}
+  return migrateScoutKeys();
+}
+function migrateScoutKeys(){
+  var m={};
+  try{
+    var keys=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('ff_scout_')===0&&k!==LS_SCOUT)keys.push(k);}
+    keys.forEach(function(k){
+      try{var d=JSON.parse(localStorage.getItem(k)||'null');
+        if(d&&d.notes&&String(d.notes).trim()){var n=k.slice(9);var ts=d.lastUpdated?new Date(d.lastUpdated+'T12:00:00').getTime():0;
+          m[n]={name:n.replace(/_/g,' '),notes:String(d.notes),updatedAt:ts||Date.now()};}
+      }catch(e){}
+    });
+    localStorage.setItem(LS_SCOUT,JSON.stringify(m));
+  }catch(e){}
+  return m;
+}
+function saveScoutMap(m){
+  try{localStorage.setItem(LS_SCOUT,JSON.stringify(m));}
+  catch(e){console.warn('[FFTP] saveScoutMap failed:',e);}
+  try{if(typeof SYNC_ENGINE!=='undefined'&&syncOwnerId())SYNC_ENGINE.queueChange('_global','scouting',m);}catch(e){}
+}
+/* Newest note per opponent wins — used when two devices both wrote scouting notes offline */
+function mergeScoutMaps(a,b){
+  var out={};
+  [a,b].forEach(function(m){
+    if(!m||typeof m!=='object')return;
+    Object.keys(m).forEach(function(k){var v=m[k];if(!v||!v.notes)return;if(!out[k]||(v.updatedAt||0)>(out[k].updatedAt||0))out[k]=v;});
+  });
+  return out;
+}
+function loadScoutData(opp){
+  var n=normalizeOpp(opp);if(!n)return null;
+  var d=loadScoutMap()[n];if(!d||!d.notes)return null;
+  return {name:d.name||opp,notes:d.notes,updatedAt:d.updatedAt||0,lastUpdated:d.updatedAt?new Date(d.updatedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'}):''};
+}
 function saveScoutNotes(opp,notes){
-  var key=getScoutKey(opp);
-  if(!key)return;
-  var data=loadScoutData(opp)||{};
-  data.notes=notes;
-  data.lastUpdated=new Date().toISOString().split('T')[0];
-  try{localStorage.setItem(key,JSON.stringify(data));}
-  catch(e){console.warn('[FFTP] saveScoutNotes failed:',e);}
+  var n=normalizeOpp(opp);if(!n)return;
+  var m=loadScoutMap();
+  notes=String(notes||'').slice(0,4000);
+  if(!notes.trim()){if(m[n]){delete m[n];saveScoutMap(m);}return;}
+  m[n]={name:String(opp||'').trim().slice(0,40),notes:notes,updatedAt:Date.now()};
+  saveScoutMap(m);
+}
+/* Past results against this opponent (active team's season), newest first */
+function scoutHistory(opp){
+  var n=normalizeOpp(opp);if(!n)return [];
+  return loadSeason().filter(function(g){return g&&normalizeOpp(g.opp)===n;}).map(function(g){
+    var us=parseInt(g.us,10)||0,them=parseInt(g.them,10)||0;
+    return {date:g.date||'',us:us,them:them,res:us>them?'W':us<them?'L':'T'};
+  });
+}
+function scoutShortDate(d){var m=/^(\d{4})-(\d{2})-(\d{2})/.exec(d||'');return m?(parseInt(m[2],10)+'/'+parseInt(m[3],10)):'';}
+function scoutHistoryHtml(opp){
+  var h=scoutHistory(opp);if(!h.length)return '';
+  var w=0,l=0,t=0;h.forEach(function(x){if(x.res==='W')w++;else if(x.res==='L')l++;else t++;});
+  return '<div class="scout-hist"><span class="scout-rec">'+w+'-'+l+(t?'-'+t:'')+' vs them</span>'
+    +h.slice(0,4).map(function(x){return '<span class="scout-g '+x.res.toLowerCase()+'">'+x.res+' '+x.us+'-'+x.them+(x.date?' <em>'+esc(scoutShortDate(x.date))+'</em>':'')+'</span>';}).join('')
+    +'</div>';
 }
 function renderScoutPanel(){
   var oppEl=document.getElementById('su-opp');
@@ -3941,21 +4050,65 @@ function renderScoutPanel(){
   var ta=document.getElementById('scout-ta');
   var badge=document.getElementById('scout-badge');
   var meta=document.getElementById('scout-meta');
+  var hist=document.getElementById('scout-hist-wrap');
   if(!panel)return;
   if(opp.trim().length<2){panel.classList.remove('visible');return;}
   panel.classList.add('visible');
   var data=loadScoutData(opp);
   // Only populate if not currently focused (don't overwrite what coach is typing)
   if(ta!==document.activeElement){ta.value=data&&data.notes?data.notes:'';}
+  if(hist)hist.innerHTML=scoutHistoryHtml(opp);
+  var count=scoutHistory(opp).length;
   if(data&&data.lastUpdated){
     badge.style.display='inline-block';
-    var games=loadSeason();
-    var count=games.filter(function(g){return normalizeOpp(g.opp)===normalizeOpp(opp);}).length;
     meta.textContent='Last updated: '+data.lastUpdated+(count?' · Faced '+count+' time'+(count!==1?'s':''):'');
   } else {
     badge.style.display='none';
-    meta.textContent='';
+    meta.textContent=count?'Faced '+count+' time'+(count!==1?'s':'')+' — no notes yet':'';
   }
+}
+/* ── Scouting modal (live game, Summary tab, Season → Opponents, Edit Game) ── */
+var _scoutModalOpp=null;
+function openScoutModal(opp,ev){
+  if(ev&&ev.stopPropagation)ev.stopPropagation();
+  opp=String(opp||'').trim();
+  if(!opp||opp==='Opponent'){showToast('Set an opponent name first');return;}
+  _scoutModalOpp=opp;
+  var d=loadScoutData(opp);
+  document.getElementById('scm-title').textContent='Scouting: '+opp;
+  document.getElementById('scm-sub').textContent=d&&d.lastUpdated?'Notes last updated '+d.lastUpdated:'No notes yet — what should you remember about this team next time?';
+  document.getElementById('scm-hist').innerHTML=scoutHistoryHtml(opp);
+  document.getElementById('scm-ta').value=d?d.notes:'';
+  var m=document.getElementById('scout-modal');m.classList.add('open');m.scrollTop=0;
+  setTimeout(function(){try{document.getElementById('scm-ta').focus();}catch(e){}},60);
+}
+function closeScoutModal(){document.getElementById('scout-modal').classList.remove('open');_scoutModalOpp=null;}
+function saveScoutModal(){
+  var opp=_scoutModalOpp;if(!opp)return;
+  var v=document.getElementById('scm-ta').value||'';
+  saveScoutNotes(opp,v);
+  closeScoutModal();
+  showToast(v.trim()?'🕵️ Scouting notes saved for '+opp:'Scouting notes cleared for '+opp);
+  try{renderScoutPanel();}catch(e){}
+  try{renderOpponents();}catch(e){}
+  try{if(typeof G!=='undefined'&&G&&G.tab==='summary'&&gameInProgress())renderSummary();}catch(e){}
+}
+/* Season → Opponents: every team we've played or written notes on, with record + notes preview */
+function renderOpponents(){
+  var el=document.getElementById('sl-opponents');if(!el)return;
+  var map=loadScoutMap(),rows={};
+  loadSeason().forEach(function(g){var n=normalizeOpp(g&&g.opp);if(!n)return;if(!rows[n])rows[n]={name:g.opp,w:0,l:0,t:0,last:''};var us=parseInt(g.us,10)||0,them=parseInt(g.them,10)||0;if(us>them)rows[n].w++;else if(us<them)rows[n].l++;else rows[n].t++;if((g.date||'')>rows[n].last)rows[n].last=g.date||'';});
+  Object.keys(map).forEach(function(n){if(!rows[n])rows[n]={name:map[n].name||n.replace(/_/g,' '),w:0,l:0,t:0,last:''};});
+  var keys=Object.keys(rows).sort(function(a,b){return rows[a].name.localeCompare(rows[b].name);});
+  if(!keys.length){el.innerHTML='<div class="sl-empty">Opponents appear here once you\'ve played a game. Tap one to write scouting notes for next time.</div>';return;}
+  el.innerHTML=keys.map(function(n){
+    var r=rows[n],d=map[n],notes=d&&d.notes?d.notes.trim():'';
+    var preview=notes?notes.replace(/\s+/g,' ').slice(0,90)+(notes.length>90?'…':''):'';
+    return '<button type="button" class="opp-row" data-opp="'+esc(r.name)+'" onclick="openScoutModal(this.getAttribute(\'data-opp\'),event)">'
+      +'<div class="opp-main"><div class="opp-name">'+esc(r.name)+'</div><div class="opp-rec">'+r.w+'-'+r.l+(r.t?'-'+r.t:'')+(r.last?' · last '+esc(scoutShortDate(r.last)):'')+'</div></div>'
+      +'<div class="opp-notes'+(notes?'':' empty')+'">'+(notes?esc(preview):'Add scouting notes')+'</div>'
+      +'</button>';
+  }).join('');
 }
 var _scoutDebounce=null;
 function onOppInput(){
@@ -4622,6 +4775,7 @@ function renderTrophyPodium(ranked){
 
 function renderSeasonScreen(){
   var games=loadSeason();
+  try{renderOpponents();}catch(e){console.warn('[FFTP] renderOpponents failed',e);}
   if(!games.length){
     document.getElementById('sl-record').innerHTML='<div class="wl-stat wins"><div class="wl-num">0</div><div class="wl-lbl">Wins</div></div><div class="wl-stat loss"><div class="wl-num">0</div><div class="wl-lbl">Losses</div></div><div class="wl-stat ties"><div class="wl-num">0</div><div class="wl-lbl">Ties</div></div><div class="wl-stat pts"><div class="wl-num">0</div><div class="wl-lbl">Pts Scored</div></div>';
     document.getElementById('sl-table').innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--dimmer)">No games saved yet</td></tr>';
@@ -5159,6 +5313,7 @@ function saveEditedGame(){
   // ── Commit back to game record ──
   game.absent=newAbsent;
   game.playerStats=newPlayerStats;
+  game.updatedAt=Date.now(); // lets the season merge prefer this edit over an older copy on another device
 
   // ── Recalculate MVP (best score among present players) ──
   var topPlayer='',topScore=-Infinity;
@@ -6924,6 +7079,24 @@ function idbPutPhotos(map){
     });
   });
 }
+/* Generic key/value access to the same store — the sync outbox lives here too, because a queued
+   photo upload can be bigger than localStorage will accept. */
+function idbKvGet(key){
+  return openPhotosDb().then(function(db){
+    if(!db)return null;
+    return new Promise(function(res){
+      try{var tx=db.transaction('kv','readonly');var r=tx.objectStore('kv').get(key);r.onsuccess=function(){res(r.result==null?null:r.result);};r.onerror=function(){res(null);};}catch(e){res(null);}
+    });
+  });
+}
+function idbKvPut(key,val){
+  return openPhotosDb().then(function(db){
+    if(!db)return false;
+    return new Promise(function(res){
+      try{var tx=db.transaction('kv','readwrite');var st=tx.objectStore('kv');if(val==null)st.delete(key);else st.put(val,key);tx.oncomplete=function(){res(true);};tx.onerror=function(){res(false);};}catch(e){res(false);}
+    });
+  });
+}
 function loadPhotos(){
   if(PHOTOS_CACHE)return PHOTOS_CACHE;
   try{PHOTOS_CACHE=JSON.parse(localStorage.getItem(LS_PHOTOS))||{};}catch(e){PHOTOS_CACHE={};}
@@ -7087,12 +7260,14 @@ function fmtAgo(ts){
 }
 function renderCloudStatus(){
   var el=document.getElementById('cloud-status');if(!el)return;
-  if(!CURRENT_USER){el.textContent='';return;}
+  if(!CURRENT_USER&&!(typeof syncOwnerId==='function'&&syncOwnerId())){el.textContent='';return;}
   var parts=[];
   var last=parseInt(localStorage.getItem(LS_LAST_SYNC)||'0',10);
   var pending=(typeof SYNC_ENGINE!=='undefined'&&SYNC_ENGINE.queue)?SYNC_ENGINE.queue.length:0;
-  parts.push('<span class="'+(pending?'cs-bad':'')+'">☁ '+(pending?pending+' waiting to upload':'synced '+fmtAgo(last))+'</span>');
-  if(!navigator.onLine)parts.push('<span class="cs-bad">offline</span>');
+  var offline=!navigator.onLine;
+  parts.push('<span class="'+(pending?'cs-bad':'')+'">☁ '+(pending?pending+(offline?' saved here, upload when online':' waiting to upload'):'synced '+fmtAgo(last))+'</span>');
+  if(offline)parts.push('<span class="cs-bad">offline</span>');
+  else if(!CURRENT_USER)parts.push('<span class="cs-bad">reconnecting to account…</span>');
   if(isPro()){
     var end=localStorage.getItem(LS_PRO_END);var endD=end?new Date(end):null;
     if(endD&&!isNaN(endD)){var days=Math.round((endD-Date.now())/86400e3);parts.push('<span class="'+(days<0?'cs-bad':'')+'">★ Pro '+(days<0?'renewal overdue':days<=7?'renews in '+days+'d':'through '+endD.toLocaleDateString('en-US',{month:'short',day:'numeric'}))+'</span>');}
@@ -7249,13 +7424,16 @@ function sendSeasonReportCards(){
    Replaces "re-save each thing to force an upload".
    ══════════════════════════════════════════════════════════════ */
 function syncNow(){
-  if(!CURRENT_USER||!syncOwnerId()){showToast('⚠️ Sign in to sync');return;}
+  if(!syncOwnerId()){showToast('⚠️ Sign in to sync');return;}
   if(typeof gameInProgress==='function'&&gameInProgress()){showToast('⚠️ Finish or pause the live game before syncing');return;}
+  if(!navigator.onLine){var pend=SYNC_ENGINE.queue.length;showToast('📴 You\'re offline — '+(pend?pend+' change'+(pend===1?'':'s')+' saved on this device, uploading when you reconnect':'everything is saved on this device'));return;}
+  if(!CURRENT_USER){showToast('☁️ Reconnecting to your account…');ensureAuthClient().then(function(){setTimeout(function(){if(CURRENT_USER)syncNow();else showToast('⚠️ Sign in to sync');},1500);});return;}
   var tid=ACTIVE_TEAM_ID||'default',n=0;
   try{
     var roster=loadRosterData();if(roster&&roster.length){SYNC_ENGINE.queueChange(tid,'roster',roster);n++;}
     SYNC_ENGINE.queueChange(tid,'colors',{primary:TC.primary,secondary:TC.secondary});n++;
     var notes=JSON.parse(localStorage.getItem(currentNotesKey())||'{}');if(Object.keys(notes).length){SYNC_ENGINE.queueChange(tid,'notes',notes);n++;}
+    var scout=loadScoutMap();if(Object.keys(scout).length){SYNC_ENGINE.queueChange('_global','scouting',scout);n++;}
     if(isPro()){
       var season=loadSeason();if(season&&season.length){SYNC_ENGINE.queueChange(tid,'season',season);n++;}
       var photos=loadPhotos();if(Object.keys(photos).length){SYNC_ENGINE.queueChange(tid,'photos',photos);n++;}
@@ -11514,31 +11692,58 @@ var SYNC_ENGINE={
   _loaded:false,
   MAX_BACKOFF_MS:5*60*1000,
 
-  /* Persist the pending queue so an app kill / offline stretch never loses a change.
-     (The queue used to live only in memory and items were dropped after ~2 min offline.) */
+  /* Persist the pending queue (the "outbox") so an app kill / offline stretch never loses a change.
+     Two copies: IndexedDB is the durable one (a queued photo map can exceed the localStorage
+     quota, which used to drop the whole queue with a console warning), and localStorage keeps
+     the small items as a synchronous fallback for the kill-while-backgrounded case. Both are
+     read on load and unioned by team+type, newest wins. */
   loadQueue:function(){
     if(this._loaded)return;
     this._loaded=true;
+    var self=this;
     try{
       var raw=localStorage.getItem(LS_SYNC_QUEUE);
       var arr=raw?JSON.parse(raw):[];
-      if(Array.isArray(arr)&&arr.length){this.queue=arr;this.scheduleSync();}
+      if(Array.isArray(arr)&&arr.length)this.queue=this.mergeQueues(this.queue,arr);
+    }catch(e){}
+    if(this.queue.length)this.scheduleSync();
+    try{
+      idbKvGet('syncQueue').then(function(arr){
+        if(Array.isArray(arr)&&arr.length){self.queue=self.mergeQueues(self.queue,arr);}
+        if(self.queue.length){self.scheduleSync();}
+        try{renderCloudStatus();}catch(e){}
+      });
     }catch(e){}
   },
+  mergeQueues:function(a,b){
+    var map={};
+    [a,b].forEach(function(arr){(arr||[]).forEach(function(it){
+      if(!it||!it.teamId||!it.dataType)return;
+      var k=it.teamId+':'+it.dataType;
+      if(!map[k]||(it.ts||0)>(map[k].ts||0))map[k]=it;
+    });});
+    return Object.keys(map).map(function(k){return map[k];}).sort(function(x,y){return (x.ts||0)-(y.ts||0);});
+  },
   persistQueue:function(){
+    var q=this.queue;
     try{
-      if(this.queue.length)localStorage.setItem(LS_SYNC_QUEUE,JSON.stringify(this.queue));
+      // localStorage: small items only (photos go to IndexedDB), never let a quota error take the rest down
+      var small=q.filter(function(it){try{return JSON.stringify(it).length<=200000;}catch(e){return false;}});
+      if(small.length)localStorage.setItem(LS_SYNC_QUEUE,JSON.stringify(small));
       else localStorage.removeItem(LS_SYNC_QUEUE);
-    }catch(e){console.warn('[Sync] could not persist queue (quota?)',e);}
+    }catch(e){console.warn('[Sync] localStorage queue copy skipped (quota?)',e&&e.name);}
+    try{idbKvPut('syncQueue',q.length?q:null);}catch(e){}
+    try{renderCloudStatus();}catch(e){}
   },
   clearLocalSyncState:function(){
     this.queue=[];this._retryCount={};
     try{
       var del=[];
-      for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('ff_sync_ver:')===0)del.push(k);}
+      for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&(k.indexOf('ff_sync_ver:')===0||k.indexOf(LS_TOMB_PREFIX)===0))del.push(k);}
       del.forEach(function(k){localStorage.removeItem(k);});
       localStorage.removeItem(LS_SYNC_QUEUE);
     }catch(e){}
+    try{idbKvPut('syncQueue',null);}catch(e){}
   },
 
   /* Queue a data change for sync */
@@ -11596,21 +11801,20 @@ var SYNC_ENGINE={
         self.queue.shift();
         delete self._retryCount[key];
 
-        if(result.conflict&&result.server_data){
-          if(item.dataType==='season'){
-            // Never let the cloud copy delete a locally saved game: merge by game id, then
-            // upload the merged season on top of the server version we just learned about.
-            var merged=mergeSeasons(item.data,result.server_data);
-            applyCloudData(item.teamId,'season',merged);
-            if(merged.length!==result.server_data.length){
-              self.queue.unshift({teamId:item.teamId,dataType:'season',data:merged,localVersion:result.server_version,ts:Date.now()});
-            }
-            showToast('☁️ Season merged with cloud copy');
-          }else{
-            applyCloudData(item.teamId,item.dataType,result.server_data);
-            showToast('☁️ Cloud data was newer — updated locally');
+        if(result.conflict&&result.server_data!=null){
+          // Another device wrote this document since we last saw it. Never let either copy
+          // simply overwrite the other: merge record-by-record (games by id, players by name,
+          // notes by player, teams by id, newest scouting note wins), apply the merge locally,
+          // and if our side contributed anything the cloud lacked, upload the merged document
+          // on top of the server version we just learned about.
+          var merged=mergeCloudRecord(item.teamId,item.dataType,item.data,result.server_data,result.server_modified_at,item.ts);
+          applyCloudData(item.teamId,item.dataType,merged);
+          var differs=false;try{differs=JSON.stringify(merged)!==JSON.stringify(result.server_data);}catch(e){differs=true;}
+          if(differs){
+            self.queue.unshift({teamId:item.teamId,dataType:item.dataType,data:merged,localVersion:result.server_version,ts:Date.now()});
           }
-          if(item.teamId===ACTIVE_TEAM_ID&&!gameInProgress()){try{if(typeof renderSeasonScreen==='function')renderSeasonScreen();}catch(e){}}
+          showToast('☁️ '+syncTypeLabel(item.dataType)+' merged with the cloud copy');
+          refreshUIAfterCloudApply(item.teamId,item.dataType);
         }
         self.persistQueue();
         self.syncInProgress=false;
@@ -11656,8 +11860,6 @@ var SYNC_ENGINE={
     if(!token)return;
     var self=this;
     this.loadQueue();
-    var pendingKeys={};
-    this.queue.forEach(function(q){pendingKeys[q.teamId+':'+q.dataType]=true;});
 
     fetch(SYNC_API_BASE+'/download-coach-data?all=true',{
       method:'GET',
@@ -11667,35 +11869,44 @@ var SYNC_ENGINE={
     .then(function(result){
       if(!result.success||!result.items||result.items.length===0)return;
       showSyncIndicator('syncing');
-      var applied=0;
+      var applied=0,queueTouched=false;
       result.items.forEach(function(item){
         var versionKey='ff_sync_ver:'+item.team_id+':'+item.data_type;
         var localVer=parseInt(localStorage.getItem(versionKey)||'0',10);
         if(item.version<=localVer)return; // local already at/after this version
+        var pend=null;
+        for(var pi=0;pi<self.queue.length;pi++){var q=self.queue[pi];if(q.teamId===item.team_id&&q.dataType===item.data_type){pend=q;break;}}
+        if(pend){
+          // A local change for this document is still waiting to upload. Fold the cloud copy
+          // into it now (record-level merge) and re-base the upload onto the cloud version, so
+          // it goes up cleanly on the first try instead of bouncing as a conflict.
+          var mergedP=mergeCloudRecord(item.team_id,item.data_type,pend.data,item.data,item.last_modified_at,pend.ts);
+          pend.data=mergedP;pend.localVersion=item.version;pend.ts=Date.now();
+          applyCloudData(item.team_id,item.data_type,mergedP);
+          localStorage.setItem(versionKey,String(item.version));
+          queueTouched=true;applied++;
+          return;
+        }
         if(item.data_type==='season'){
-          // Merge instead of replace so games saved offline (still queued) survive
+          // Merge instead of replace so games saved while signed out / offline survive
           var localSeason=[];try{localSeason=JSON.parse(localStorage.getItem('ff_season_'+item.team_id)||'[]')||[];}catch(e){}
           var merged=mergeSeasons(localSeason,item.data||[]);
           applyCloudData(item.team_id,'season',merged);
           localStorage.setItem(versionKey,String(item.version));
-          if(merged.length!==(item.data||[]).length){
-            // Local had games the cloud lacks — push the merged copy up
-            self.queue=self.queue.filter(function(q){return !(q.teamId===item.team_id&&q.dataType==='season');});
+          var diff=false;try{diff=JSON.stringify(merged)!==JSON.stringify(item.data||[]);}catch(e){diff=true;}
+          if(diff){
+            // Local had games (or edits) the cloud lacks — push the merged copy up
             self.queue.push({teamId:item.team_id,dataType:'season',data:merged,localVersion:item.version,ts:Date.now()});
-            self.persistQueue();self.scheduleSync();
+            queueTouched=true;
           }
           applied++;
-          return;
-        }
-        if(pendingKeys[item.team_id+':'+item.data_type]){
-          // A local change for this exact document is still waiting to upload — don't clobber
-          // it; the upload will resolve the conflict (server returns its copy if newer).
           return;
         }
         applyCloudData(item.team_id,item.data_type,item.data);
         localStorage.setItem(versionKey,String(item.version));
         applied++;
       });
+      if(queueTouched){self.persistQueue();self.scheduleSync();}
       if(applied>0){
         showToast('☁️ Restored '+applied+' items from cloud');
         if(gameInProgress()){
@@ -11717,6 +11928,7 @@ var SYNC_ENGINE={
           if(typeof renderAll==='function')renderAll();
           if(typeof renderRosterScreen==='function')renderRosterScreen();
           if(typeof renderSeasonScreen==='function')renderSeasonScreen();
+          if(typeof renderScoutPanel==='function')renderScoutPanel();
         }catch(e){console.error('[Sync] UI refresh after download failed:',e);}
         }
       }
@@ -11737,14 +11949,91 @@ function gameInProgress(){
   var m=document.getElementById('screen-main');
   return !!(m&&m.classList.contains('active')&&G&&G.team&&!G.finalized);
 }
-/* Union of two season arrays by game id (newest first). Games are immutable once saved,
-   so a union is always safe; ids collide only for the same game. */
+/* Union of two season arrays by game id (newest first). A game saved on one device is never
+   removed by the other's copy; when both have the same game, the copy edited most recently
+   (game.updatedAt, set by Edit Game) wins so a stat fix made on the iPad reaches the phone. */
 function mergeSeasons(a,b){
   var out=[],seen={};
-  function add(g){if(!g)return;var id=g.id!=null?String(g.id):(g.date||'')+'|'+(g.opp||'')+'|'+g.us+'|'+g.them;if(seen[id])return;seen[id]=1;out.push(g);}
+  function add(g){
+    if(!g)return;
+    var id=g.id!=null?String(g.id):(g.date||'')+'|'+(g.opp||'')+'|'+g.us+'|'+g.them;
+    if(seen[id]!=null){var i=seen[id];if((g.updatedAt||0)>(out[i].updatedAt||0))out[i]=g;return;}
+    seen[id]=out.length;out.push(g);
+  }
   (Array.isArray(a)?a:[]).forEach(add);(Array.isArray(b)?b:[]).forEach(add);
   out.sort(function(x,y){return (parseInt(y.id,10)||0)-(parseInt(x.id,10)||0);});
   return out;
+}
+
+/* ── Record-level merging for every synced document ──
+   The server is last-write-wins per DOCUMENT (whole roster, whole notes map…). Two devices
+   editing offline therefore used to lose one side's work entirely. These helpers merge at the
+   record level instead; the caller re-uploads the merged document on top of the server version. */
+var LS_TOMB_PREFIX='ff_sync_tomb:';
+function rosterKeyOf(p){if(!p)return '';return String(p.name||((p.first||'')+' '+(p.last||''))).trim().toLowerCase().replace(/\s+/g,' ');}
+function teamKeyOf(t){return t&&t.id!=null?String(t.id):'';}
+function playKeyOf(p){return p?(p.id!=null?String(p.id):String(p.name||'')):'';}
+/* Remember what was deleted locally (and when), so a merge doesn't resurrect it from a cloud
+   copy that predates the deletion. Entries expire after 30 days or when the key comes back. */
+function recordTombstones(teamId,type,prevArr,nextArr,keyFn){
+  try{
+    var next={};(Array.isArray(nextArr)?nextArr:[]).forEach(function(x){var k=keyFn(x);if(k)next[k]=1;});
+    var lsKey=LS_TOMB_PREFIX+teamId+':'+type;
+    var tomb=JSON.parse(localStorage.getItem(lsKey)||'{}')||{};
+    var now=Date.now(),changed=false;
+    (Array.isArray(prevArr)?prevArr:[]).forEach(function(x){var k=keyFn(x);if(k&&!next[k]&&!tomb[k]){tomb[k]=now;changed=true;}});
+    Object.keys(tomb).forEach(function(k){if(next[k]||now-tomb[k]>30*86400e3){delete tomb[k];changed=true;}});
+    if(changed){if(Object.keys(tomb).length)localStorage.setItem(lsKey,JSON.stringify(tomb));else localStorage.removeItem(lsKey);}
+  }catch(e){}
+}
+function loadTombstones(teamId,type){try{return JSON.parse(localStorage.getItem(LS_TOMB_PREFIX+teamId+':'+type)||'{}')||{};}catch(e){return {};}}
+/* Local records first (local wins on a shared key), then server-only records — unless we
+   deleted that record here after the server last wrote, in which case it stays deleted. */
+function mergeByKey(local,server,keyFn,tomb,serverModifiedAt){
+  var out=[],seen={};
+  var smt=serverModifiedAt?(new Date(serverModifiedAt).getTime()||0):0;
+  (Array.isArray(local)?local:[]).forEach(function(x){var k=keyFn(x);if(!k||seen[k])return;seen[k]=1;out.push(x);});
+  (Array.isArray(server)?server:[]).forEach(function(x){
+    var k=keyFn(x);if(!k||seen[k])return;
+    if(tomb&&tomb[k]&&tomb[k]>=smt)return;
+    seen[k]=1;out.push(x);
+  });
+  return out;
+}
+function mergeCloudRecord(teamId,dataType,local,server,serverModifiedAt,localTs){
+  try{
+    switch(dataType){
+      case 'season':  return mergeSeasons(local,server);
+      case 'roster':  return mergeByKey(local,server,rosterKeyOf,loadTombstones(teamId,'roster'),serverModifiedAt);
+      case 'teams':   return mergeByKey(local,server,teamKeyOf,loadTombstones(teamId,'teams'),serverModifiedAt);
+      case 'plays':   return mergeByKey(local,server,playKeyOf,null,null);
+      case 'notes':   return Object.assign({},(server&&typeof server==='object')?server:{},(local&&typeof local==='object')?local:{});
+      case 'scouting':return mergeScoutMaps(server,local);
+      case 'photos':{
+        var out=Object.assign({},(server&&typeof server==='object')?server:{});
+        Object.keys((local&&typeof local==='object')?local:{}).forEach(function(k){if(typeof local[k]==='string'&&local[k].indexOf('data:image/')===0)out[k]=local[k];});
+        return out;
+      }
+      case 'colors':{
+        var smt=serverModifiedAt?(new Date(serverModifiedAt).getTime()||0):0;
+        return (localTs||0)>smt?local:server;
+      }
+      default: return server;
+    }
+  }catch(e){console.warn('[Sync] merge failed, keeping cloud copy',dataType,e);return server;}
+}
+function syncTypeLabel(t){return ({roster:'Roster',season:'Season',notes:'Player notes',colors:'Team colors',photos:'Photos',plays:'Playbook',teams:'Teams list',scouting:'Scouting notes',settings:'Settings'})[t]||t;}
+/* Re-read whatever a cloud apply just changed into the live UI (never mid-game). */
+function refreshUIAfterCloudApply(teamId,dataType){
+  try{
+    if(gameInProgress())return;
+    var active=(teamId===ACTIVE_TEAM_ID||teamId==='_global');
+    if(dataType==='teams'){var lbl=document.getElementById('tsw-name');if(lbl)lbl.textContent=getActiveTeamName();}
+    if(active&&dataType==='roster'){LIVE_ROSTER=loadRosterData();rebuildFromRoster();if(typeof buildQBList==='function')buildQBList();if(typeof buildAbsentList==='function')buildAbsentList();if(typeof renderRosterScreen==='function')renderRosterScreen();}
+    if(active&&dataType==='notes'&&typeof loadNotes==='function')loadNotes();
+    if(active&&dataType==='colors'){setActiveTeam(ACTIVE_TEAM_ID);if(typeof applyTheme==='function')applyTheme();}
+    if(active&&(dataType==='season'||dataType==='scouting')){if(typeof renderSeasonScreen==='function')renderSeasonScreen();if(typeof renderScoutPanel==='function')renderScoutPanel();}
+  }catch(e){console.warn('[Sync] UI refresh after merge failed',e);}
 }
 
 /* ── Apply cloud data to localStorage ── */
@@ -11784,6 +12073,9 @@ function applyCloudData(teamId,dataType,data){
       case 'teams':
         localStorage.setItem(LS_TEAMS,JSON.stringify(data));
         break;
+      case 'scouting':
+        if(data&&typeof data==='object'&&!Array.isArray(data))localStorage.setItem(LS_SCOUT,JSON.stringify(data));
+        break;
       case 'settings':
         // Apply individual settings
         if(data.light_mode!==undefined)localStorage.setItem('ff_light_mode',data.light_mode);
@@ -11813,11 +12105,17 @@ function showSyncIndicator(state){
   }
 }
 
-/* ── Hook into existing save functions ── */
+/* ── Hook into existing save functions ──
+   Gate on syncOwnerId() (the account this device belongs to), NOT on CURRENT_USER: when the
+   PWA is launched with no signal the auth SDK never comes up and CURRENT_USER stays null, so
+   every change made that session was never even queued. Queued items upload once the device
+   is back online and the session is restored. isPro() is a local flag, so it works offline. */
 var _origSaveRosterData=saveRosterData;
 saveRosterData=function(roster){
+  var prev=null;try{prev=JSON.parse(localStorage.getItem(LS_ROSTER)||'null');}catch(e){}
   _origSaveRosterData(roster);
-  if(CURRENT_USER&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
+  if(syncOwnerId()&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
+    recordTombstones(ACTIVE_TEAM_ID,'roster',prev,roster,rosterKeyOf);
     SYNC_ENGINE.queueChange(ACTIVE_TEAM_ID,'roster',roster);
   }
 };
@@ -11826,7 +12124,7 @@ var _origSaveSeason=saveSeason;
 saveSeason=function(games){
   _origSaveSeason(games);
   // season sync is Pro-only
-  if(CURRENT_USER&&isPro()&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
+  if(syncOwnerId()&&isPro()&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
     SYNC_ENGINE.queueChange(ACTIVE_TEAM_ID,'season',games);
   }
 };
@@ -11834,17 +12132,19 @@ saveSeason=function(games){
 var _origSaveTeamColors=saveTeamColors;
 saveTeamColors=function(){
   _origSaveTeamColors();
-  if(CURRENT_USER&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
+  if(syncOwnerId()&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
     SYNC_ENGINE.queueChange(ACTIVE_TEAM_ID,'colors',{primary:TC.primary,secondary:TC.secondary});
   }
 };
 
 var _origSaveTeams=saveTeams;
 saveTeams=function(teams){
+  var prev=null;try{prev=JSON.parse(localStorage.getItem(LS_TEAMS)||'null');}catch(e){}
   _origSaveTeams(teams);
   // 'teams' is a Pro-only sync type server-side; queuing it for Lite users produced a
   // guaranteed 403 that blocked the queue.
-  if(CURRENT_USER&&isPro()){
+  if(syncOwnerId()&&isPro()){
+    recordTombstones('_global','teams',prev,teams,teamKeyOf);
     SYNC_ENGINE.queueChange('_global','teams',teams);
   }
 };
@@ -11853,7 +12153,7 @@ saveTeams=function(teams){
 var _origSaveNote=saveNote;
 saveNote=function(name,val){
   _origSaveNote(name,val);
-  if(CURRENT_USER&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
+  if(syncOwnerId()&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
     try{
       var allNotes=JSON.parse(localStorage.getItem(currentNotesKey())||'{}');
       SYNC_ENGINE.queueChange(ACTIVE_TEAM_ID,'notes',allNotes);
@@ -11865,7 +12165,7 @@ saveNote=function(name,val){
 var _origSavePhotos=savePhotos;
 savePhotos=function(p){
   _origSavePhotos(p);
-  if(CURRENT_USER&&isPro()&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
+  if(syncOwnerId()&&isPro()&&typeof ACTIVE_TEAM_ID!=='undefined'&&ACTIVE_TEAM_ID){
     SYNC_ENGINE.queueChange(ACTIVE_TEAM_ID,'photos',p);
   }
 };
@@ -11873,7 +12173,7 @@ savePhotos=function(p){
 /* ── Plays sync ── */
 // Queue local plays on first login/session-restore if they've never reached the cloud
 function syncPlaysIfNeeded(){
-  if(!CURRENT_USER||!isPro())return;
+  if(!syncOwnerId()||!isPro())return;
   try{
     var existingPlays=JSON.parse(localStorage.getItem('ff_plays')||'null');
     if(!existingPlays||(Array.isArray(existingPlays)&&existingPlays.length===0))return;
@@ -11888,14 +12188,33 @@ function syncPlaysIfNeeded(){
 
 // Quarter clock: re-derive from the deadline the moment the app is foregrounded
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&timerRunning){try{_lastTickSec=-1;tickTimer();}catch(e){}}});
+/* If the app was launched offline the Supabase SDK <script> never loaded and sbClient is null.
+   Load it on demand when connectivity returns so the restored session can drain the outbox. */
+var SUPABASE_SDK_URL='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.0/dist/umd/supabase.min.js';
+function ensureAuthClient(){
+  if(sbClient)return Promise.resolve(true);
+  if(typeof window.supabase!=='undefined'&&window.supabase.createClient){try{initSupabaseAuth();}catch(e){}return Promise.resolve(!!sbClient);}
+  return new Promise(function(res){
+    try{
+      var s=document.createElement('script');s.src=SUPABASE_SDK_URL;s.crossOrigin='anonymous';
+      s.onload=function(){try{initSupabaseAuth();}catch(e){}res(!!sbClient);};
+      s.onerror=function(){res(false);};
+      document.head.appendChild(s);
+    }catch(e){res(false);}
+  });
+}
 // Resume uploads as soon as connectivity returns (retry timers may be minutes out)
-window.addEventListener('online',function(){try{SYNC_ENGINE._retryCount={};SYNC_ENGINE.scheduleSync(1000);}catch(e){}});
+window.addEventListener('online',function(){
+  try{
+    ensureAuthClient().then(function(){SYNC_ENGINE._retryCount={};SYNC_ENGINE.scheduleSync(1000);try{renderCloudStatus();}catch(e){}});
+  }catch(e){}
+});
 // Flush pending sync when the app is backgrounded (best-effort)
 document.addEventListener('visibilitychange',function(){if(document.hidden){try{SYNC_ENGINE.persistQueue();}catch(e){}}});
 
 // Detect plays saved by playdesigner.html while it's open in another tab/window
 window.addEventListener('storage',function(e){
-  if(e.key==='ff_plays'&&CURRENT_USER&&isPro()){
+  if(e.key==='ff_plays'&&syncOwnerId()&&isPro()){
     try{
       var plays=JSON.parse(e.newValue||'[]');
       SYNC_ENGINE.queueChange('_global','plays',plays);
