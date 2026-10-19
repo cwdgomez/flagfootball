@@ -1405,6 +1405,15 @@ body.sun-mode .player-card{background:#F8F8F8;border-color:#CCC;}
 .psc-badge.blue-badge .psc-badge-label{color:#a5b4fc;}
 .psc-badge.red-badge{background:linear-gradient(180deg,rgba(239,68,68,.16) 0%,rgba(239,68,68,.04) 100%);border-color:rgba(239,68,68,.42);}
 .psc-badge.red-badge .psc-badge-label{color:#f87171;}
+.psc-badge.orange-badge{background:linear-gradient(180deg,rgba(249,115,22,.2) 0%,rgba(249,115,22,.04) 100%);border-color:rgba(249,115,22,.5);box-shadow:0 6px 22px rgba(249,115,22,.18), inset 0 1px 0 rgba(255,255,255,.1);}
+.psc-badge.orange-badge .psc-badge-label{color:#fb923c;}
+/* Interception callout under the title pill — INTs are the play parents remember */
+.psc-int-callout{display:inline-flex;align-items:center;gap:8px;margin:2px 0 8px;padding:6px 14px 6px 10px;border-radius:999px;background:linear-gradient(110deg,rgba(249,115,22,.28),rgba(249,115,22,.10));border:1px solid rgba(249,115,22,.65);box-shadow:0 4px 18px rgba(249,115,22,.28);font-family:'Barlow Condensed',sans-serif;color:#fff;}
+.psc-int-callout svg{width:16px;height:16px;color:#fb923c;flex:none;}
+.psc-int-callout span{font-size:13px;font-weight:800;letter-spacing:2.5px;}
+.psc-int-callout em{font-style:normal;font-size:10px;font-weight:800;letter-spacing:2px;color:#fb923c;padding-left:8px;border-left:1px solid rgba(249,115,22,.5);}
+.psc-stat-tile.has-int{border-color:rgba(249,115,22,.55);background:linear-gradient(180deg,rgba(249,115,22,.12) 0%,rgba(249,115,22,.02) 100%);box-shadow:0 10px 28px rgba(249,115,22,.16), inset 0 1px 0 rgba(255,255,255,.1);}
+.psc-top-ribbon.psc-int-ribbon{background:linear-gradient(135deg,#fb923c,#c2410c);color:#fff;}
 
 /* ── Best Performance scoreboard ──────────────────────────── */
 .psc-best-game{margin:22px 14px 0;background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,rgba(255,255,255,.02) 100%);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:16px 18px 18px;position:relative;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);}
@@ -3341,7 +3350,10 @@ function renderStats(){
     if(isQB){
       pills='<div class="sp qbtd">'+st.qbTDs+'TD</div>'
            +'<div class="sp qbint">'+st.qbInts+'INT</div>'
-           +'<div class="sp qbcv">'+st.qbConvs+'CV</div>';
+           +'<div class="sp qbcv">'+st.qbConvs+'CV</div>'
+           // A QB who plays defense too: show the picks he CAUGHT, not just the ones thrown
+           +(st.ints?'<div class="sp i">'+st.ints+'I</div>':'')
+           +(st.flags?'<div class="sp f">'+st.flags+'F</div>':'');
     } else {
       var cv=st.conv1+st.conv2;
       pills='<div class="sp f">'+st.flags+'F</div>'
@@ -4269,7 +4281,9 @@ function openSeasonRecap(id,ev){
     opp:game.opp,
     date:game.date,
     qb:game.qb||null,
-    qbStats:game.playerStats[game.qb]||null
+    qbStats:game.playerStats[game.qb]||null,
+    playerStats:game.playerStats||{},
+    absent:absentList
   });
 }
 function rcRectPath(ctx,x,y,w,h,r){
@@ -4316,10 +4330,11 @@ function buildRecapCanvas(us,them,mvps,games,gameCtx){
   function buildQBStory(qbName,qbSt){
     var first=firstName(qbName);
     if(!qbSt)return first+' led the team today! Keep grinding!';
-    var td=qbSt.qbTDs||0,fl=qbSt.flags||0,ni=qbSt.qbInts||0,cv=qbSt.qbConvs||0;
+    var td=qbSt.qbTDs||0,fl=qbSt.flags||0,ni=qbSt.qbInts||0,cv=qbSt.qbConvs||0,pk=qbSt.ints||0;
     var opener=td>=5?'was on fire today!':td>=3?'had a fantastic game!':td>=1?'had a great game!':'led the offense today!';
     var parts=[];
     if(td>0)parts.push('threw '+td+' TD'+(td>1?' passes':' pass'));
+    if(pk>0)parts.push('picked off '+pk+' pass'+(pk>1?'es':'')+' on defense');
     if(cv>0)parts.push('connected on '+cv+' conversion'+(cv>1?'s':''));
     if(fl>0)parts.push('pulled '+fl+' flag'+(fl>1?'s':'')+' on defense');
     if(ni>0)parts.push('threw '+ni+' INT'+(ni>1?'s':''));
@@ -4506,10 +4521,17 @@ function buildRecapCanvas(us,them,mvps,games,gameCtx){
 
     // QB stat line
     if(rcQbStats){
-      var qbTd=rcQbStats.qbTDs||0,qbNi=rcQbStats.qbInts||0,qbCv=rcQbStats.qbConvs||0,qbFl=rcQbStats.flags||0;
+      var qbTd=rcQbStats.qbTDs||0,qbNi=rcQbStats.qbInts||0,qbCv=rcQbStats.qbConvs||0,qbFl=rcQbStats.flags||0,qbPick=rcQbStats.ints||0;
       ctx.fillStyle='rgba(255,255,255,0.5)';
       ctx.font='500 14px "Barlow Condensed",sans-serif';
-      ctx.fillText(qbTd+' TDs  \u2022  '+qbNi+' INTs  \u2022  '+qbCv+' Convs  \u2022  '+qbFl+' Flags',qbBoxX+18,qbBoxY+76);
+      // "INTs" alone was ambiguous for a QB who also plays defense — say which direction
+      var qbLine=qbTd+' TDs  \u2022  '+qbNi+' INTs thrown  \u2022  '+qbCv+' Convs  \u2022  '+qbFl+' Flags';
+      ctx.fillText(qbLine,qbBoxX+18,qbBoxY+76);
+      if(qbPick>0){
+        var qbLineW=ctx.measureText(qbLine).width;
+        ctx.fillStyle=INT_COLOR;ctx.font='700 14px "Barlow Condensed",sans-serif';
+        ctx.fillText('  \u2022  '+qbPick+' INT'+(qbPick>1?'s':'')+' CAUGHT',qbBoxX+18+qbLineW,qbBoxY+76);
+      }
     }
 
     // Story blurb — word-wrapped below the QB box
@@ -4536,6 +4558,39 @@ function buildRecapCanvas(us,them,mvps,games,gameCtx){
   ctx.fillStyle=rgba(secondary,0.9);
   ctx.font='bold 44px "Bebas Neue",sans-serif';
   ctx.fillText(recStr,W/2,recY+42);
+
+  // ── TAKEAWAYS — every player who picked off a pass, not just the top-3 performers ──
+  var intPlayers=[];
+  try{
+    if(gameCtx&&gameCtx.playerStats){
+      var absentL=gameCtx.absent||[];
+      Object.keys(gameCtx.playerStats).forEach(function(n){var v=(gameCtx.playerStats[n]||{}).ints||0;if(v>0&&absentL.indexOf(n)<0)intPlayers.push({name:n,n:v});});
+    }else if(typeof G!=='undefined'&&G&&G.stats){
+      (ALL_PLAYERS||[]).forEach(function(n){if(isAbsent(n)||!G.stats[n])return;var v=0;for(var q=1;q<=G.quarters;q++)v+=(G.stats[n][q]||{}).ints||0;if(v>0)intPlayers.push({name:n,n:v});});
+    }
+  }catch(e){}
+  if(intPlayers.length){
+    intPlayers.sort(function(a,b){return b.n-a.n;});
+    var tkY=recY+56,tkH=46,tkX=60,tkW=W-120; // sits between the record and the footer line (H-60)
+    rcRectPath(ctx,tkX,tkY,tkW,tkH,12);
+    var tkGrad=ctx.createLinearGradient(tkX,0,tkX+tkW,0);
+    tkGrad.addColorStop(0,'rgba(249,115,22,0.22)');tkGrad.addColorStop(1,'rgba(249,115,22,0.06)');
+    ctx.fillStyle=tkGrad;ctx.fill();
+    rcRectPath(ctx,tkX,tkY,tkW,tkH,12);
+    ctx.strokeStyle='rgba(249,115,22,0.6)';ctx.lineWidth=1.5;ctx.stroke();
+    drawTargetIcon(ctx,tkX+26,tkY+tkH/2,11,INT_COLOR);
+    ctx.textAlign='left';
+    ctx.fillStyle=INT_COLOR;
+    ctx.font='bold 13px "Barlow Condensed",sans-serif';ctx.letterSpacing='3px';
+    ctx.fillText('INTERCEPTIONS',tkX+48,tkY+17);
+    ctx.letterSpacing='0px';
+    var names=intPlayers.map(function(p){return firstName(p.name).toUpperCase()+(p.n>1?' ×'+p.n:'');}).join('   •   ');
+    ctx.fillStyle='#ffffff';
+    ctx.font='bold 20px "Bebas Neue",sans-serif';
+    // shrink to fit if a lot of players got picks
+    while(ctx.measureText(names).width>tkW-70&&parseInt(ctx.font,10)>13){ctx.font='bold '+(parseInt(ctx.font,10)-1)+'px "Bebas Neue",sans-serif';}
+    ctx.fillText(names,tkX+48,tkY+38);
+  }
 
   // ── Branding footer ──
   var footY=H-50;
@@ -5907,6 +5962,47 @@ function closeProStatCard(){
   _scGameId=null;
 }
 
+/* ── INT ("takeaway") callout shared by the canvas cards ─────────────────────
+   Draws a wide orange banner: target icon · "INTERCEPTION ×N" · "BALL HAWK".
+   Orange (#F97316) is the INT colour used on the stat tiles so it reads as the
+   same stat everywhere. Height is 86px. */
+var INT_COLOR='#F97316';
+function drawTargetIcon(ctx,cx,cy,r,color){
+  ctx.save();
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=Math.max(2,r*0.16);
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,r*0.5,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,r*0.12,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+function drawTakeawayBanner(ctx,x,y,w,count,accent){
+  var h=86;
+  ctx.save();
+  var g=ctx.createLinearGradient(x,y,x+w,y);
+  g.addColorStop(0,'rgba(249,115,22,.22)');g.addColorStop(1,'rgba(249,115,22,.06)');
+  _roundRect(ctx,x,y,w,h,14);ctx.fillStyle=g;ctx.fill();
+  _roundRect(ctx,x,y,w,h,14);ctx.strokeStyle='rgba(249,115,22,.65)';ctx.lineWidth=2;ctx.stroke();
+  // accent stripe on the left edge
+  ctx.fillStyle=INT_COLOR;_roundRect(ctx,x,y,8,h,{tl:14,bl:14,tr:0,br:0});ctx.fill();
+  drawTargetIcon(ctx,x+58,y+h/2,22,INT_COLOR);
+  ctx.textAlign='left';ctx.textBaseline='alphabetic';
+  ctx.font='900 40px "Bebas Neue",sans-serif';ctx.fillStyle='#ffffff';
+  ctx.shadowColor='rgba(249,115,22,.55)';ctx.shadowBlur=14;
+  ctx.fillText('INTERCEPTION'+(count>1?'S ×'+count:''),x+98,y+54);
+  ctx.shadowBlur=0;ctx.shadowColor='transparent';
+  // right-side label
+  ctx.textAlign='right';
+  ctx.font='700 16px "Barlow Condensed",sans-serif';ctx.letterSpacing='4px';
+  ctx.fillStyle=INT_COLOR;
+  ctx.fillText(count>=2?'BALL HAWK':'TAKEAWAY',x+w-24,y+38);
+  ctx.font='700 13px "Barlow Condensed",sans-serif';ctx.letterSpacing='2px';
+  ctx.fillStyle='rgba(255,255,255,.45)';
+  ctx.fillText('PICKED OFF THE PASS',x+w-24,y+62);
+  ctx.letterSpacing='0px';
+  ctx.restore();
+  return h;
+}
+
 // renderStatCard — draws one player's image stat card onto #statcard-canvas.
 // Called with just a name for LIVE game cards (reads from G.stats).
 // Called with (name, savedGame) for SEASON history cards (reads from savedGame.playerStats).
@@ -6182,6 +6278,13 @@ function renderStatCard(name, savedGame){
       {val:c,lbl:'CATCHES',color:'#A855F7'},
       {val:f,lbl:'FLAG PULLS',color:'#3B82F6'}
     ];
+    // A QB who picked one off on defense never had a tile for it — the card only showed
+    // INTs THROWN. Give the interception a tile by replacing the least-used of his
+    // non-passing tiles (rush TDs / catches / conversions), never the TD passes.
+    if(ii>0){
+      var swapIdx=[3,4,1].sort(function(a,b){return statList[a].val-statList[b].val;})[0];
+      statList[swapIdx]={val:ii,lbl:'INTERCEPTIONS',color:'#F97316'};
+    }
   }else{
     statList=[
       {val:t,lbl:'TOUCHDOWNS',color:'#22C55E'},
@@ -6288,6 +6391,10 @@ function renderStatCard(name, savedGame){
   ctx.letterSpacing='1px';
   ctx.fillText('OFF '+offSnaps+'  •  DEF '+defSnaps+'  SNAPS',startX+gridW-24,barY+30);
   ctx.letterSpacing='0px';
+
+  // ── TAKEAWAY CALLOUT — an interception is the play parents remember, so it gets its
+  //    own banner under the rating bar instead of being one tile among six. ──
+  if(ii>0)drawTakeawayBanner(ctx,startX,barY+124,gridW,ii,s);
 
   // ── FOOTER ──
   var footY=H-80;
@@ -9618,6 +9725,7 @@ function renderPlayerSeasonCard(name){
   if(allTDs>=10) badges.push({icon:'🏆',label:'10 TD Club',cls:'gold-badge'});
   if(allTDs>=5&&allTDs<10) badges.push({icon:'🎯',label:'5 TD Club',cls:'blue-badge'});
   if(totals.ints>=3) badges.push({icon:'🛡️',label:'Shutdown Corner',cls:'blue-badge'});
+  else if(totals.ints>=1) badges.push({icon:'🎯',label:'Ball Hawk'+(totals.ints>1?' x'+totals.ints:''),cls:'orange-badge'});
   if(totals.flags>=8) badges.push({icon:'🚩',label:'Flag Machine',cls:'green-badge'});
   if(totals.catches>=10) badges.push({icon:'🙌',label:'Sure Hands',cls:'green-badge'});
   if(totals.wins===totals.gp&&totals.gp>=3) badges.push({icon:'🔐',label:'Undefeated',cls:'gold-badge'});
@@ -9629,6 +9737,7 @@ function renderPlayerSeasonCard(name){
     var lines=[];
     lines.push(fn+' played in '+totals.gp+' game'+(totals.gp!==1?'s':'')+' this season');
     if(allTDs>0) lines.push('found the end zone '+allTDs+' time'+(allTDs!==1?'s':''));
+    if(totals.ints>0) lines.push('picked off '+totals.ints+' pass'+(totals.ints!==1?'es':''));
     if(totals.flags>0) lines.push('ripped '+totals.flags+' flag'+(totals.flags!==1?'s':'')+' on defense');
     if(totals.mvp>0) lines.push('earned MVP '+(totals.mvp===1?'once':totals.mvp+' times'));
     var record=totals.wins+'-'+totals.losses+(totals.ties?'-'+totals.ties:'');
@@ -9689,7 +9798,9 @@ function renderPlayerSeasonCard(name){
     flags:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V4"/><path d="M4 4h12l-2 4 2 4H4"/></svg>',
     ints:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6 6 1-4.5 4.5 1 6L12 17l-5.5 2.5 1-6L3 9l6-1z"/></svg>',
     blocks:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>',
-    conv:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>'
+    conv:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+    // same target glyph as the live-game INT button, so the callout reads as that stat
+    intTarget:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg>'
   };
 
   // ── Build HTML ────────────────────────────────────────────
@@ -9727,6 +9838,10 @@ function renderPlayerSeasonCard(name){
       +(jersey?'<div class="psc-jersey-corner">#'+escHtml(String(jersey))+'</div>':'')
     +'</div>'
     +'<div class="psc-title-pill"><span class="star">★</span>'+escHtml(title)+'<span class="star">★</span></div>'
+    +(totals.ints>0?'<div class="psc-int-callout">'+ICONS.intTarget+'<span>'+totals.ints+' INTERCEPTION'+(totals.ints!==1?'S':'')+'</span><em>'
+        // when INTs are already the headline stat the rank chip + title say so; otherwise show where he ranks on the team for picks
+        +(dominantStat==='ints'?'TAKEAWAY'+(totals.ints>1?'S':''):(function(){var r=teamRankFor('ints');return r>0?'#'+r+' ON TEAM':'TAKEAWAY';})())
+        +'</em></div>':'')
     +'<div class="psc-player-name">'+escHtml(dispName(name)).toUpperCase()+'</div>'
     +'<div class="psc-player-sub">'
       +(jersey?'<b>#'+escHtml(String(jersey))+'</b> · ':'')
@@ -9760,9 +9875,10 @@ function renderPlayerSeasonCard(name){
     +'<div class="psc-stats-grid">';
   statDefs.forEach(function(sd){
     var isTop=(sd.key===dominantStat) && sd.val>0;
+    var isInt=(sd.key==='ints') && sd.val>0 && !isTop; // INTs always get called out, even when not the top stat
     var barW=Math.round((sd.val/maxStatVal)*100);
-    html+='<div class="psc-stat-tile'+(isTop?' is-top':'')+'" style="--tile-color:'+sd.color+'">'
-      +(isTop?'<div class="psc-top-ribbon">Top Stat</div>':'')
+    html+='<div class="psc-stat-tile'+(isTop?' is-top':'')+(isInt?' has-int':'')+'" style="--tile-color:'+sd.color+'">'
+      +(isTop?'<div class="psc-top-ribbon">Top Stat</div>':isInt?'<div class="psc-top-ribbon psc-int-ribbon">Takeaway</div>':'')
       +'<div class="psc-stat-icon">'+ICONS[sd.key]+'</div>'
       +'<span class="psc-stat-val" id="psc-sv-'+sd.key+'">'+(sd.val>0?0:0)+'</span>'
       +'<span class="psc-stat-lbl">'+sd.label+'</span>'
@@ -10164,14 +10280,16 @@ function sharePlayerSeasonCard(recapText){
       var sx=40+(i%3)*(sgW+10);
       var sy=sgY+Math.floor(i/3)*(sgH+10);
       var isTop=(sd.k===d.dominantStat) && sd.v>0;
+      var isInt=(sd.k==='ints') && sd.v>0 && !isTop; // INTs always get the ribbon treatment
       rr(sx,sy,sgW,sgH,14);
       var tg=ctx.createLinearGradient(sx,sy,sx,sy+sgH);
       if(isTop){tg.addColorStop(0,'rgba(255,215,0,.18)');tg.addColorStop(1,'rgba(255,215,0,.04)');}
+      else if(isInt){tg.addColorStop(0,'rgba(249,115,22,.2)');tg.addColorStop(1,'rgba(249,115,22,.04)');}
       else{tg.addColorStop(0,'rgba(255,255,255,.06)');tg.addColorStop(1,'rgba(255,255,255,.02)');}
       ctx.fillStyle=tg;ctx.fill();
       rr(sx,sy,sgW,sgH,14);
-      ctx.strokeStyle=isTop?'rgba(255,215,0,.5)':'rgba(255,255,255,.1)';
-      ctx.lineWidth=isTop?1.5:1;ctx.stroke();
+      ctx.strokeStyle=isTop?'rgba(255,215,0,.5)':isInt?'rgba(249,115,22,.6)':'rgba(255,255,255,.1)';
+      ctx.lineWidth=(isTop||isInt)?1.5:1;ctx.stroke();
       // Value
       ctx.textAlign='center';ctx.fillStyle=isTop?sec:(sd.v>0?sd.c:'rgba(255,255,255,.22)');
       if(isTop){ctx.shadowColor=sec;ctx.shadowBlur=14;}
@@ -10189,17 +10307,18 @@ function sharePlayerSeasonCard(recapText){
         ctx.fillStyle=isTop?sec:sd.c;
         ctx.fillRect(sx+12,sy+sgH-10,barW,3);
       }
-      // Top-stat ribbon
-      if(isTop){
+      // Top-stat / takeaway ribbon
+      if(isTop||isInt){
         ctx.save();
         ctx.translate(sx+sgW-8,sy+8);
         ctx.rotate(35*Math.PI/180);
         rr(-30,-9,80,18,3);
         var rg=ctx.createLinearGradient(-30,0,50,0);
-        rg.addColorStop(0,sec);rg.addColorStop(1,'#b8860b');
+        if(isTop){rg.addColorStop(0,sec);rg.addColorStop(1,'#b8860b');}
+        else{rg.addColorStop(0,'#fb923c');rg.addColorStop(1,'#c2410c');}
         ctx.fillStyle=rg;ctx.fill();
-        ctx.fillStyle='#0a0a0a';ctx.font='900 9px "Barlow Condensed",Arial,sans-serif';
-        ctx.textAlign='center';ctx.fillText('TOP STAT',10,4);
+        ctx.fillStyle=isTop?'#0a0a0a':'#ffffff';ctx.font='900 9px "Barlow Condensed",Arial,sans-serif';
+        ctx.textAlign='center';ctx.fillText(isTop?'TOP STAT':'TAKEAWAY',10,4);
         ctx.restore();
       }
     });
@@ -10217,7 +10336,8 @@ function sharePlayerSeasonCard(recapText){
       var palMap={'gold-badge':{bg1:'rgba(255,215,0,.18)',bg2:'rgba(255,215,0,.04)',br:'rgba(255,215,0,.5)',tx:sec},
                   'green-badge':{bg1:'rgba(34,197,94,.18)',bg2:'rgba(34,197,94,.04)',br:'rgba(34,197,94,.5)',tx:'#4ade80'},
                   'blue-badge':{bg1:'rgba(99,102,241,.2)',bg2:'rgba(99,102,241,.04)',br:'rgba(99,102,241,.5)',tx:'#a5b4fc'},
-                  'red-badge':{bg1:'rgba(239,68,68,.18)',bg2:'rgba(239,68,68,.04)',br:'rgba(239,68,68,.45)',tx:'#f87171'}};
+                  'red-badge':{bg1:'rgba(239,68,68,.18)',bg2:'rgba(239,68,68,.04)',br:'rgba(239,68,68,.45)',tx:'#f87171'},
+                  'orange-badge':{bg1:'rgba(249,115,22,.2)',bg2:'rgba(249,115,22,.04)',br:'rgba(249,115,22,.5)',tx:'#fb923c'}};
       for(var bi=0;bi<bShown;bi++){
         var row=Math.floor(bi/perRow);
         var col=bi%perRow;
@@ -11023,7 +11143,8 @@ function _pscRenderPrintCanvas(d,photoImg){
     var palMap={'gold-badge':{bg1:'rgba(255,215,0,.18)',bg2:'rgba(255,215,0,.04)',br:'rgba(255,215,0,.5)',tx:sec},
                 'green-badge':{bg1:'rgba(34,197,94,.18)',bg2:'rgba(34,197,94,.04)',br:'rgba(34,197,94,.5)',tx:'#4ade80'},
                 'blue-badge':{bg1:'rgba(99,102,241,.2)',bg2:'rgba(99,102,241,.04)',br:'rgba(99,102,241,.5)',tx:'#a5b4fc'},
-                'red-badge':{bg1:'rgba(239,68,68,.18)',bg2:'rgba(239,68,68,.04)',br:'rgba(239,68,68,.45)',tx:'#f87171'}};
+                'red-badge':{bg1:'rgba(239,68,68,.18)',bg2:'rgba(239,68,68,.04)',br:'rgba(239,68,68,.45)',tx:'#f87171'},
+                'orange-badge':{bg1:'rgba(249,115,22,.2)',bg2:'rgba(249,115,22,.04)',br:'rgba(249,115,22,.5)',tx:'#fb923c'}};
     for(var bi=0;bi<bShown;bi++){
       var bx=startX+bi*(bWid+bGap);
       var by=bdY;
