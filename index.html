@@ -219,9 +219,9 @@ nav{
 
 .scroll-hint{
   margin-top:36px;display:flex;flex-direction:column;align-items:center;gap:5px;
-  animation:fadeUp .7s .75s ease both;color:rgba(255,215,0,.25);
+  animation:fadeUp .7s .75s ease both;color:rgba(255,215,0,.62);
 }
-.scroll-hint span{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;}
+.scroll-hint span{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#FFD700;}
 .scroll-line{width:1px;height:32px;background:linear-gradient(180deg,rgba(255,215,0,.35),transparent);
   animation:scrollDrop 2s ease-in-out infinite;}
 @keyframes scrollDrop{0%,100%{transform:scaleY(1);opacity:.45;}50%{transform:scaleY(1.35);opacity:1;}}
@@ -487,11 +487,11 @@ footer{
   padding:24px 20px;padding-bottom:max(24px,calc(env(safe-area-inset-bottom) + 16px));
 }
 .foot-main{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
-.foot-logo{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:4px;color:rgba(255,215,0,.32);}
+.foot-logo{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:4px;color:rgba(255,215,0,.62);}
 .foot-note{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;
-  color:rgba(255,255,255,.15);text-transform:uppercase;}
+  color:rgba(255,255,255,.55);text-transform:uppercase;}
 .foot-link{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;
-  color:rgba(255,215,0,.32);text-decoration:none;text-transform:uppercase;transition:color .2s;}
+  color:rgba(255,215,0,.62);text-decoration:none;text-transform:uppercase;transition:color .2s;}
 .foot-link:hover{color:var(--gold);}
 .foot-legal{
   display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;
@@ -505,10 +505,12 @@ footer{
 .foot-contact a{color:rgba(255,215,0,.82);text-decoration:none;transition:color .2s;}
 .foot-contact a:hover{color:#FFD700;}
 .foot-copy{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;
-  color:rgba(255,255,255,.45);text-transform:uppercase;margin-top:8px;}
+  color:rgba(255,255,255,.58);text-transform:uppercase;margin-top:8px;}
 
 /* ── ANIMATIONS ── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+/* Entrance: slide only. Fading text in from opacity 0 made axe (and CI) read near-black text
+   on the hero for the first ~1.5s; a slide reads the same to the eye and is always legible. */
+@keyframes fadeUp{from{opacity:.92;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
 .reveal{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease;}
 .reveal.visible{opacity:1;transform:translateY(0);}
 
@@ -699,7 +701,7 @@ footer{
 .faq-sec{position:relative;z-index:10;padding:70px 20px 60px;}
 @media(max-width:480px){.faq-sec{padding:50px 16px 44px;}}
 .faq-inner{max-width:760px;margin:0 auto;}
-.faq-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:6px;color:rgba(255,215,0,.45);text-transform:uppercase;margin-bottom:12px;text-align:center;}
+.faq-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:6px;color:rgba(255,215,0,.62);text-transform:uppercase;margin-bottom:12px;text-align:center;}
 .faq-heading{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,44px);letter-spacing:3px;color:#fff;text-align:center;margin-bottom:36px;}
 .faq-heading span{color:var(--gold);}
 .faq-item{border-bottom:1px solid rgba(255,255,255,.07);overflow:hidden;}

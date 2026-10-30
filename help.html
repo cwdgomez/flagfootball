@@ -24,7 +24,7 @@
 <style>
 :root{
   --p:#AA0000;--s:#FFD700;--dark:#080808;--dark2:#0E0E0E;--dark3:#1a1a1a;--dark4:#242424;--sur:#181818;
-  --txt:#f2f2f2;--dim:#888;--dimmer:#767676;
+  --txt:#f2f2f2;--dim:#888;--dimmer:#8f8f8f;
   --green:#22C55E;--blue:#3B82F6;--purple:#A855F7;--teal:#14B8A6;--orange:#F97316;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -250,6 +250,8 @@ hr.div{border:none;border-top:1px solid var(--dark3);margin:8px 0 4px;}
 .back-btn:focus-visible{border-radius:8px;}
 .toc-btn:focus-visible{border-radius:20px;}
 .search-input:focus-visible{outline:2px solid rgba(255,215,0,.5);outline-offset:0;border-radius:10px;}
+/* ── a11y: WCAG 2.1 AA contrast (axe color-contrast / link-in-text-block) ── */
+p a,li a,.cmd-note a,.help-footer a,.sec a,.hl-text a{text-decoration:underline !important;text-underline-offset:2px;text-decoration-thickness:1px;}
 </style>
 </head>
 <body>
