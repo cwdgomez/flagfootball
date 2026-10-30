@@ -337,7 +337,14 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .pnum{width:29px;height:29px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;flex-shrink:0;}
 .pname-wrap{display:flex;flex-direction:column;}
 .pname{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;color:var(--txt);line-height:1.1;}
-.qb-tag{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:2px;color:var(--s);text-transform:uppercase;}
+.qb-tag{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:2px;color:var(--s);text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.qb-tag.qb-tag-past{color:var(--dimmer);}
+.qb-switch-btn{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.4);border-radius:6px;color:var(--s);font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:1.5px;padding:2px 7px;cursor:pointer;text-transform:uppercase;}
+.qb-pick-list{display:flex;flex-direction:column;gap:6px;margin:4px 0 14px;max-height:50vh;overflow-y:auto;}
+.qb-pick{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--dark3);border:1px solid var(--dark5);border-radius:10px;padding:11px 12px;color:var(--txt);font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;cursor:pointer;}
+.qb-pick:active{border-color:rgba(255,215,0,.5);}
+.qb-pick-num{min-width:34px;color:var(--dim);font-size:13px;}
+.qb-pick-tag{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--gold);text-transform:uppercase;}
 .jersey-badge{display:inline-flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;border-radius:6px;padding:1px 7px;margin-left:5px;border:1px solid;line-height:1.4;vertical-align:middle;}
 .pqs{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
 .sp{background:var(--dark3);border-radius:5px;padding:2px 6px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--dimmer);min-width:24px;text-align:center;}
@@ -355,6 +362,10 @@ input[type="color"]{width:38px;height:32px;border:1px solid var(--dark5);border-
 .player-card.expanded.is-qb .stat-btns{grid-template-columns:repeat(3,1fr);}
 .stb{background:var(--dark3);border:1px solid var(--dark5);border-radius:10px;padding:12px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:background .15s,transform .1s;user-select:none;min-height:48px;}
 .stb:active{transform:scale(.86);box-shadow:0 0 12px rgba(255,215,0,.3);}
+.stb{position:relative;}
+.stb-minus{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:1px solid rgba(239,68,68,.55);background:var(--dark2);color:#ef4444;font-size:15px;line-height:1;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;box-shadow:0 2px 6px rgba(0,0,0,.5);}
+.stb-minus:active{background:rgba(239,68,68,.25);}
+.stat-btns-hint{grid-column:1/-1;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--dimmer);letter-spacing:.5px;text-align:center;padding-top:2px;}
 .stb .bi{font-size:16px;display:flex;align-items:center;justify-content:center;line-height:1;}
 .nav-tab svg,.trend-title svg,.season-title svg,.roster-title svg{display:inline-block;vertical-align:-3px;margin-right:4px;}
 .sact-btn svg,.egm-save svg,.roster-save-btn svg,.end-game-btn svg,.ghc-cards svg,.ghc-edit svg,.ghc-del svg,.statcard-dl-btn svg,.statcard-share-btn svg,.recap-share-btn svg,.statcoach-copy-btn svg{display:inline-block;vertical-align:-2px;margin-right:3px;}
@@ -3462,7 +3473,8 @@ function renderStats(){
            +(st.flags?'<div class="sp f">'+st.flags+'F</div>':'');
     } else {
       var cv=st.conv1+st.conv2;
-      pills='<div class="sp f">'+st.flags+'F</div>'
+      pills=(hasQBStats(name)?'<div class="sp qbtd">'+st.qbTDs+'TD</div><div class="sp qbint">'+st.qbInts+'INT</div>':'')
+           +'<div class="sp f">'+st.flags+'F</div>'
            +'<div class="sp" style="color:'+s+';background:'+rgba(s,.12)+'">'+st.catches+'C</div>'
            +'<div class="sp t">'+st.tds+'TD</div>'
            +'<div class="sp i">'+st.ints+'I</div>'
@@ -3478,24 +3490,31 @@ function renderStats(){
     var btns='';
     if(isQB){
       btns='<div class="stat-section-lbl">'+uiIcon('bolt',12)+' QB Stats</div>'
-        +'<div class="stb qbt" onclick="logStat(\''+escA(name)+'\',\'qbTDs\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><ellipse cx="12" cy="12" rx="9" ry="5.5" transform="rotate(-45 12 12)"/><path d="M9.5 9.5l1.5 1.5M12 9l1.5 1.5M9 12l1.5 1.5"/></svg></div><div class="bl2">TD Pass</div><div class="bc">'+st.qbTDs+'</div></div>'
-        +'<div class="stb qbi" onclick="logStat(\''+escA(name)+'\',\'qbInts\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="bl2">INT</div><div class="bc">'+st.qbInts+'</div></div>'
-        +'<div class="stb qbc" onclick="logStat(\''+escA(name)+'\',\'qbConvs\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="bl2">Conv Pass</div><div class="bc">'+st.qbConvs+'</div></div>'
+        +'<div class="stb qbt" data-n="'+esc(name)+'" data-k="qbTDs" onclick="logStat(\''+escA(name)+'\',\'qbTDs\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><ellipse cx="12" cy="12" rx="9" ry="5.5" transform="rotate(-45 12 12)"/><path d="M9.5 9.5l1.5 1.5M12 9l1.5 1.5M9 12l1.5 1.5"/></svg></div><div class="bl2">TD Pass</div><div class="bc">'+st.qbTDs+'</div>'+stbMinus(name,'qbTDs',st.qbTDs)+'</div>'
+        +'<div class="stb qbi" data-n="'+esc(name)+'" data-k="qbInts" onclick="logStat(\''+escA(name)+'\',\'qbInts\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="bl2">INT</div><div class="bc">'+st.qbInts+'</div>'+stbMinus(name,'qbInts',st.qbInts)+'</div>'
+        +'<div class="stb qbc" data-n="'+esc(name)+'" data-k="qbConvs" onclick="logStat(\''+escA(name)+'\',\'qbConvs\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="bl2">Conv Pass</div><div class="bc">'+st.qbConvs+'</div>'+stbMinus(name,'qbConvs',st.qbConvs)+'</div>'
         +'<div class="stat-section-lbl">Receiving / Defense</div>'
-        +'<div class="stb" style="'+scStyle+'" onclick="logStat(\''+escA(name)+'\',\'catches\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><ellipse cx="12" cy="12" rx="9" ry="5.5" transform="rotate(-45 12 12)"/><path d="M9.5 9.5l1.5 1.5M12 9l1.5 1.5M9 12l1.5 1.5"/></svg></div><div class="bl2">Catch</div><div class="bc" style="color:'+s+'">'+st.catches+'</div></div>'
-        +'<div class="stb sf" onclick="logStat(\''+escA(name)+'\',\'flags\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d="M4 22V4"/><path d="M4 4c4-2 8 2 12 0v9c-4 2-8-2-12 0"/></svg></div><div class="bl2">Flag Pull</div><div class="bc">'+st.flags+'</div></div>'
-        +'<div class="stb si" onclick="logStat(\''+escA(name)+'\',\'ints\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></div><div class="bl2">INT</div><div class="bc">'+st.ints+'</div></div>'
-        +'<div class="stb st" onclick="logStat(\''+escA(name)+'\',\'tds\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="bl2">TD Rec</div><div class="bc">'+st.tds+'</div></div>'
-        +'<div class="stb sfu" onclick="logStat(\''+escA(name)+'\',\'fumbles\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx="12" cy="8" r="4"/><path d="M8 12c-2 2-2 5 0 6s6 1 8-1"/><path d="M14 19l2 2 2-2"/></svg></div><div class="bl2">Fumble</div><div class="bc">'+st.fumbles+'</div></div>';
+        +'<div class="stb" style="'+scStyle+'" data-n="'+esc(name)+'" data-k="catches" onclick="logStat(\''+escA(name)+'\',\'catches\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><ellipse cx="12" cy="12" rx="9" ry="5.5" transform="rotate(-45 12 12)"/><path d="M9.5 9.5l1.5 1.5M12 9l1.5 1.5M9 12l1.5 1.5"/></svg></div><div class="bl2">Catch</div><div class="bc" style="color:'+s+'">'+st.catches+'</div>'+stbMinus(name,'catches',st.catches)+'</div>'
+        +'<div class="stb sf" data-n="'+esc(name)+'" data-k="flags" onclick="logStat(\''+escA(name)+'\',\'flags\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d="M4 22V4"/><path d="M4 4c4-2 8 2 12 0v9c-4 2-8-2-12 0"/></svg></div><div class="bl2">Flag Pull</div><div class="bc">'+st.flags+'</div>'+stbMinus(name,'flags',st.flags)+'</div>'
+        +'<div class="stb si" data-n="'+esc(name)+'" data-k="ints" onclick="logStat(\''+escA(name)+'\',\'ints\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></div><div class="bl2">INT</div><div class="bc">'+st.ints+'</div>'+stbMinus(name,'ints',st.ints)+'</div>'
+        +'<div class="stb st" data-n="'+esc(name)+'" data-k="tds" onclick="logStat(\''+escA(name)+'\',\'tds\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="bl2">TD Rec</div><div class="bc">'+st.tds+'</div>'+stbMinus(name,'tds',st.tds)+'</div>'
+        +'<div class="stb sfu" data-n="'+esc(name)+'" data-k="fumbles" onclick="logStat(\''+escA(name)+'\',\'fumbles\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx="12" cy="8" r="4"/><path d="M8 12c-2 2-2 5 0 6s6 1 8-1"/><path d="M14 19l2 2 2-2"/></svg></div><div class="bl2">Fumble</div><div class="bc">'+st.fumbles+'</div>'+stbMinus(name,'fumbles',st.fumbles)+'</div>';
     } else {
-      btns='<div class="stb" style="'+scStyle+'" onclick="logStat(\''+escA(name)+'\',\'catches\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><ellipse cx="12" cy="12" rx="9" ry="5.5" transform="rotate(-45 12 12)"/><path d="M9.5 9.5l1.5 1.5M12 9l1.5 1.5M9 12l1.5 1.5"/></svg></div><div class="bl2">Catch</div><div class="bc" style="color:'+s+'">'+st.catches+'</div></div>'
-        +'<div class="stb sf" onclick="logStat(\''+escA(name)+'\',\'flags\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d="M4 22V4"/><path d="M4 4c4-2 8 2 12 0v9c-4 2-8-2-12 0"/></svg></div><div class="bl2">Flag Pull</div><div class="bc">'+st.flags+'</div></div>'
-        +'<div class="stb sbl" onclick="logStat(\''+escA(name)+'\',\'blocks\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="bl2">Deflect</div><div class="bc">'+st.blocks+'</div></div>'
-        +'<div class="stb si" onclick="logStat(\''+escA(name)+'\',\'ints\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></div><div class="bl2">INT</div><div class="bc">'+st.ints+'</div></div>'
-        +'<div class="stb st" onclick="logStat(\''+escA(name)+'\',\'tds\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="bl2">TD</div><div class="bc">'+st.tds+'</div></div>'
-        +'<div class="stb scv" onclick="logStat(\''+escA(name)+'\',\'conv1\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><path d="M9 10.5 12 8l3 2.5"/></svg></div><div class="bl2">1pt Conv</div><div class="bc">'+st.conv1+'</div></div>'
-        +'<div class="stb scv" onclick="logStat(\''+escA(name)+'\',\'conv2\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx="12" cy="12" r="9"/><path d="M9 9.5a3 3 0 0 1 6 0c0 2-3 3-3 5"/><circle cx="12" cy="16.5" r=".75" fill="currentColor" stroke="none"/></svg></div><div class="bl2">2pt Conv</div><div class="bc">'+st.conv2+'</div></div>'
-        +'<div class="stb sfu" onclick="logStat(\''+escA(name)+'\',\'fumbles\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx="12" cy="8" r="4"/><path d="M8 12c-2 2-2 5 0 6s6 1 8-1"/><path d="M14 19l2 2 2-2"/></svg></div><div class="bl2">Fumble</div><div class="bc">'+st.fumbles+'</div></div>';
+      btns='<div class="stb" style="'+scStyle+'" data-n="'+esc(name)+'" data-k="catches" onclick="logStat(\''+escA(name)+'\',\'catches\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><ellipse cx="12" cy="12" rx="9" ry="5.5" transform="rotate(-45 12 12)"/><path d="M9.5 9.5l1.5 1.5M12 9l1.5 1.5M9 12l1.5 1.5"/></svg></div><div class="bl2">Catch</div><div class="bc" style="color:'+s+'">'+st.catches+'</div>'+stbMinus(name,'catches',st.catches)+'</div>'
+        +'<div class="stb sf" data-n="'+esc(name)+'" data-k="flags" onclick="logStat(\''+escA(name)+'\',\'flags\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d="M4 22V4"/><path d="M4 4c4-2 8 2 12 0v9c-4 2-8-2-12 0"/></svg></div><div class="bl2">Flag Pull</div><div class="bc">'+st.flags+'</div>'+stbMinus(name,'flags',st.flags)+'</div>'
+        +'<div class="stb sbl" data-n="'+esc(name)+'" data-k="blocks" onclick="logStat(\''+escA(name)+'\',\'blocks\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="bl2">Deflect</div><div class="bc">'+st.blocks+'</div>'+stbMinus(name,'blocks',st.blocks)+'</div>'
+        +'<div class="stb si" data-n="'+esc(name)+'" data-k="ints" onclick="logStat(\''+escA(name)+'\',\'ints\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></div><div class="bl2">INT</div><div class="bc">'+st.ints+'</div>'+stbMinus(name,'ints',st.ints)+'</div>'
+        +'<div class="stb st" data-n="'+esc(name)+'" data-k="tds" onclick="logStat(\''+escA(name)+'\',\'tds\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="bl2">TD</div><div class="bc">'+st.tds+'</div>'+stbMinus(name,'tds',st.tds)+'</div>'
+        +'<div class="stb scv" data-n="'+esc(name)+'" data-k="conv1" onclick="logStat(\''+escA(name)+'\',\'conv1\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><path d="M9 10.5 12 8l3 2.5"/></svg></div><div class="bl2">1pt Conv</div><div class="bc">'+st.conv1+'</div>'+stbMinus(name,'conv1',st.conv1)+'</div>'
+        +'<div class="stb scv" data-n="'+esc(name)+'" data-k="conv2" onclick="logStat(\''+escA(name)+'\',\'conv2\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx="12" cy="12" r="9"/><path d="M9 9.5a3 3 0 0 1 6 0c0 2-3 3-3 5"/><circle cx="12" cy="16.5" r=".75" fill="currentColor" stroke="none"/></svg></div><div class="bl2">2pt Conv</div><div class="bc">'+st.conv2+'</div>'+stbMinus(name,'conv2',st.conv2)+'</div>'
+        +'<div class="stb sfu" data-n="'+esc(name)+'" data-k="fumbles" onclick="logStat(\''+escA(name)+'\',\'fumbles\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx="12" cy="8" r="4"/><path d="M8 12c-2 2-2 5 0 6s6 1 8-1"/><path d="M14 19l2 2 2-2"/></svg></div><div class="bl2">Fumble</div><div class="bc">'+st.fumbles+'</div>'+stbMinus(name,'fumbles',st.fumbles)+'</div>';
+      if(hasQBStats(name)){
+        // Former QB: keep the passing buttons so a wrong tap can still be fixed
+        btns+='<div class="stat-section-lbl">'+uiIcon('bolt',12)+' Passing (earlier at QB)</div>'
+        +'<div class="stb qbt" data-n="'+esc(name)+'" data-k="qbTDs" onclick="logStat(\''+escA(name)+'\',\'qbTDs\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><ellipse cx="12" cy="12" rx="9" ry="5.5" transform="rotate(-45 12 12)"/><path d="M9.5 9.5l1.5 1.5M12 9l1.5 1.5M9 12l1.5 1.5"/></svg></div><div class="bl2">TD Pass</div><div class="bc">'+st.qbTDs+'</div>'+stbMinus(name,'qbTDs',st.qbTDs)+'</div>'
+        +'<div class="stb qbi" data-n="'+esc(name)+'" data-k="qbInts" onclick="logStat(\''+escA(name)+'\',\'qbInts\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="bl2">INT</div><div class="bc">'+st.qbInts+'</div>'+stbMinus(name,'qbInts',st.qbInts)+'</div>'
+        +'<div class="stb qbc" data-n="'+esc(name)+'" data-k="qbConvs" onclick="logStat(\''+escA(name)+'\',\'qbConvs\',event)"><div class="bi"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="bl2">Conv Pass</div><div class="bc">'+st.qbConvs+'</div>'+stbMinus(name,'qbConvs',st.qbConvs)+'</div>';
+      }
     }
 
     var card=document.createElement('div');
@@ -3510,7 +3529,7 @@ function renderStats(){
               +'<div class="pname">'+esc(dn)+'</div>'
               +'<span class="jersey-badge" style="background:'+rgba(numBg,.15)+';border-color:'+rgba(numBg,.4)+';color:'+numBg+'">#'+num+'</span>'
             +'</div>'
-            +(isQB?'<div class="qb-tag">Quarterback</div>':'')
+            +(isQB?'<div class="qb-tag">Quarterback <button type="button" class="qb-switch-btn" onclick="openQBSwitch(event)">Switch</button></div>':(hasQBStats(name)?'<div class="qb-tag qb-tag-past">Threw earlier</div>':''))
           +'</div>'
         +'</div>'
         +'<div class="pqs">'+pills+'</div>'
@@ -3590,12 +3609,79 @@ function renderNeedsAction(){
 
 function toggleP(name){G.expP=G.expP===name?null:name;renderStats();}
 
-function logStat(name,key,ev){
+/* ── QB SWITCHING ──
+   Coaches rotate quarterbacks mid-game. G.qb is "who is QB right now" (gets the QB buttons
+   and the QB badge); anyone who threw this game keeps their passing stats in their own
+   bucket, keeps QB buttons available for corrections, and shows in the Summary QB section. */
+function hasQBStats(name){
+  if(!G||!G.stats||!G.stats[name])return false;
+  for(var q=1;q<=(G.quarters||4);q++){var st=G.stats[name][q];if(st&&((st.qbTDs||0)+(st.qbInts||0)+(st.qbConvs||0))>0)return true;}
+  return false;
+}
+function gameQBs(){
+  var out=[G.qb];
+  (ALL_PLAYERS||[]).forEach(function(n){if(n!==G.qb&&hasQBStats(n))out.push(n);});
+  return out;
+}
+function openQBSwitch(ev){
   if(ev&&ev.stopPropagation)ev.stopPropagation();
-  G.stats[name][G.cq][key]++;
-  G.last={type:'stat',name:name,key:key,q:G.cq};
-  var lbl={catches:'Catch',tds:'TD',flags:'Flag Pull',ints:'INT',conv1:'1pt Conv',conv2:'2pt Conv',qbTDs:'TD Pass',qbInts:'INT Thrown',qbConvs:'Conv Pass',fumbles:'Fumble',blocks:'Deflection'};
-  showToast(firstName(name)+' · '+(lbl[key]||key));
+  var opts=ALL_PLAYERS.filter(function(n){return n!==G.qb&&!isAbsent(n);});
+  if(!opts.length){showToast('No other players present to switch to');return;}
+  _sheetResolve=function(){};
+  _sheetOpen({title:'Switch quarterback',icon:'football',body:'Current QB: '+dispName(G.qb)+'. Their passing stats stay with them; the new QB gets the QB buttons from here on.',
+    customHtml:'<div class="qb-pick-list">'+opts.map(function(n){return '<button type="button" class="qb-pick" data-n="'+esc(n)+'" onclick="switchQB(this.getAttribute(\'data-n\'))"><span class="qb-pick-num">'+(jerseyNum(n)?'#'+esc(String(jerseyNum(n))):'')+'</span><span>'+esc(dispName(n))+'</span>'+(hasQBStats(n)?'<span class="qb-pick-tag">threw earlier</span>':'')+'</button>';}).join('')+'</div>',
+    btnsHtml:'<button type="button" class="sheet-btn wide" onclick="_sheetClose(false)">Cancel</button>'});
+}
+function switchQB(name){
+  if(!name||name===G.qb){_sheetClose(false);return;}
+  if(!G.qbHistory)G.qbHistory=[];
+  G.qbHistory.push({from:G.qb,to:name,q:G.cq,ts:Date.now()});
+  var prev=G.qb;G.qb=name;
+  // Keep the QB first in the list
+  ALL_PLAYERS=[G.qb].concat(ALL_PLAYERS.filter(function(n){return n!==G.qb;}));
+  G.expP=name;
+  _sheetClose(true);
+  showToast(firstName(name)+' is now QB (was '+firstName(prev)+')');
+  renderStats();renderNeedsAction();
+  if(G.tab==='summary')renderSummary();
+  try{broadcastGameStateToCoach();}catch(e){}
+  try{scheduleAutoSave();}catch(e){}
+}
+/* "−" corner control on a stat button (only when there is something to remove) */
+function stbMinus(name,key,count){
+  if(!(count>0))return '';
+  return '<button type="button" class="stb-minus" aria-label="Remove one" onclick="logStat(\''+escA(name)+'\',\''+key+'\',event,-1)">−</button>';
+}
+/* Press-and-hold any stat button = remove one (same as the − corner) */
+(function(){
+  var holdT=null,held=false;
+  function target(e){var el=e.target&&e.target.closest?e.target.closest('.stb'):null;return el&&!(e.target.closest&&e.target.closest('.stb-minus'))?el:null;}
+  document.addEventListener('pointerdown',function(e){
+    var el=target(e);if(!el)return;held=false;clearTimeout(holdT);
+    holdT=setTimeout(function(){
+      held=true;
+      var nm=el.getAttribute('data-n'),k=el.getAttribute('data-k');
+      if(!nm||!k)return;
+      try{if(navigator.vibrate)navigator.vibrate(30);}catch(x){}
+      logStat(nm,k,null,-1);
+    },600);
+  },true);
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){document.addEventListener(t,function(){clearTimeout(holdT);},true);});
+  document.addEventListener('click',function(e){if(held&&target(e)){e.stopPropagation();e.preventDefault();held=false;}},true);
+})();
+var STAT_LABELS={catches:'Catch',tds:'TD',flags:'Flag Pull',ints:'INT',conv1:'1pt Conv',conv2:'2pt Conv',qbTDs:'TD Pass',qbInts:'INT Thrown',qbConvs:'Conv Pass',fumbles:'Fumble',blocks:'Deflection'};
+/* delta: +1 (tap) or -1 (the small "−" on a stat button, or press-and-hold) — for fixing a
+   wrong tap after Undo is no longer pointing at it. Never goes below zero. */
+function logStat(name,key,ev,delta){
+  if(ev&&ev.stopPropagation)ev.stopPropagation();
+  delta=delta||1;
+  ensureGameBuckets();
+  var cur=G.stats[name][G.cq][key]||0;
+  if(delta<0&&cur<=0){showToast(firstName(name)+' has no '+(STAT_LABELS[key]||key)+' in Q'+G.cq+' to remove');return;}
+  G.stats[name][G.cq][key]=cur+delta;
+  G.last={type:'stat',name:name,key:key,q:G.cq,delta:delta};
+  var lbl=STAT_LABELS;
+  showToast((delta<0?'− ':'')+firstName(name)+' · '+(lbl[key]||key)+(delta<0?' removed':''));
   if(ev&&ev.currentTarget){ev.currentTarget.classList.add('pop');setTimeout(function(){try{ev.currentTarget.classList.remove('pop');}catch(e){}},240);}
   renderStats();
   renderNeedsAction();
@@ -3816,7 +3902,7 @@ function buildGameRecord(us,them){
     var score=qbt*5+t*10+ii*12+c*3+f*2+cv*4+qbc*4-qbi*3+bl*6-fu*4;
     playerStats[name]={catches:c,tds:t,flags:f,ints:ii,conv:cv,qbTDs:qbt,qbInts:qbi,qbConvs:qbc,fumbles:fu,blocks:bl,snapO:snapO,snapD:snapD,score:score};
   });
-  var game={id:Date.now(),date:G.date||new Date().toISOString().split('T')[0],team:G.team,opp:G.opp,us:us,them:them,quarters:G.quarters,qb:G.qb,mvp:mvps[0]?mvps[0].name:'',playerStats:playerStats,absent:G.absent.slice(),penUs:penUs,penThem:penThem};
+  var game={id:Date.now(),date:G.date||new Date().toISOString().split('T')[0],team:G.team,opp:G.opp,us:us,them:them,quarters:G.quarters,qb:G.qb,qbs:gameQBs(),qbHistory:(G.qbHistory||[]).slice(),mvp:mvps[0]?mvps[0].name:'',playerStats:playerStats,absent:G.absent.slice(),penUs:penUs,penThem:penThem};
   return {game:game,playerStats:playerStats,mvps:mvps};
 }
 // Once a game is saved to the season it must never be re-offered for "Resume" or saved
@@ -3890,8 +3976,18 @@ function mvpCalc(){
 function renderSummary(){
   var s=TC.secondary,p=TC.primary;
   var mvps=mvpCalc();
-  var qb=G.qb,qbTD=0,qbInt=0,qbCv=0;
-  for(var q=1;q<=G.quarters;q++){var st=G.stats[qb][q];qbTD+=st.qbTDs;qbInt+=st.qbInts;qbCv+=st.qbConvs;}
+  var qb=G.qb;
+  var qbCards=gameQBs().map(function(qn,qi){
+    var qbTD=0,qbInt=0,qbCv=0;
+    for(var q=1;q<=G.quarters;q++){var st=G.stats[qn][q]||{};qbTD+=st.qbTDs||0;qbInt+=st.qbInts||0;qbCv+=st.qbConvs||0;}
+    return '<div class="qb-sum-card" style="background:'+rgba(s,.06)+';border:1px solid '+rgba(s,.25)+';border-radius:13px'+(qi?';margin-top:8px':'')+'">'
+      +'<div class="qb-sum-hdr">'+(qi?'EARLIER AT QB · ':'QB · ')+esc(dispName(qn))+'</div>'
+      +'<div class="qb-stat-row">'
+        +'<div class="qb-stat gtd"><div class="qv">'+qbTD+'</div><div class="ql">TD Passes</div></div>'
+        +'<div class="qb-stat gcv"><div class="qv">'+qbCv+'</div><div class="ql">Conv</div></div>'
+        +'<div class="qb-stat gi"><div class="qv">'+qbInt+'</div><div class="ql">INTs</div></div>'
+      +'</div></div>';
+  }).join('');
 
   var qh='<th>Team</th>';
   for(var q2=1;q2<=G.quarters;q2++)qh+='<th>Q'+q2+'</th>';
@@ -3949,14 +4045,8 @@ function renderSummary(){
   document.getElementById('sum-content').innerHTML=
     '<div class="sum-lbl lbl-ic">'+uiIcon('trophy',14)+'Game Leaders</div>'
     +'<div class="podium-row">'+podiumHTML+'</div>'
-    +'<div class="sum-lbl lbl-ic">'+uiIcon('football',14)+'QB — '+esc(dispName(qb))+'</div>'
-    +'<div class="qb-sum-card" style="background:'+rgba(s,.06)+';border:1px solid '+rgba(s,.25)+';border-radius:13px">'
-      +'<div class="qb-sum-hdr">QB · '+esc(dispName(qb))+'</div>'
-      +'<div class="qb-stat-row">'
-        +'<div class="qb-stat gtd"><div class="qv">'+qbTD+'</div><div class="ql">TD Passes</div></div>'
-        +'<div class="qb-stat gcv"><div class="qv">'+qbCv+'</div><div class="ql">Conv</div></div>'
-        +'<div class="qb-stat gi"><div class="qv">'+qbInt+'</div><div class="ql">INTs</div></div>'
-      +'</div></div>'
+    +'<div class="sum-lbl lbl-ic">'+uiIcon('football',14)+(gameQBs().length>1?'Quarterbacks':'QB — '+esc(dispName(qb)))+'</div>'
+    +qbCards
     +(penUs+penThem>0?'<div class="sum-lbl lbl-ic">'+uiIcon('flag',14)+'Penalties</div><div style="display:flex;gap:16px;padding:10px 0;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;"><span style="color:#ef4444">'+esc(G.team)+': '+penUs+' flag'+(penUs!==1?'s':'')+'</span><span style="color:var(--dimmer)">|</span><span style="color:rgba(255,255,255,.65)">'+esc(G.opp)+': '+penThem+' flag'+(penThem!==1?'s':'')+'</span></div>':'')
     +'<div class="sum-lbl lbl-ic">'+uiIcon('chart',14)+'Score by Quarter</div>'
     +'<div class="qs-wrap"><table class="qt"><thead><tr>'+qh+'</tr></thead><tbody>'
@@ -4214,7 +4304,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&_sheetResol
 function undoLast(){
   if(!G.last)return;
   var a=G.last;
-  if(a.type==='stat'){G.stats[a.name][a.q][a.key]=Math.max(0,G.stats[a.name][a.q][a.key]-1);renderStats();}
+  if(a.type==='stat'){G.stats[a.name][a.q][a.key]=Math.max(0,G.stats[a.name][a.q][a.key]-(a.delta||1));renderStats();}
   else if(a.type==='score'){G.scores[a.team][a.qi]=Math.max(0,G.scores[a.team][a.qi]-a.pts);if(G.scoreLog&&G.scoreLog[a.team]&&G.scoreLog[a.team].length)G.scoreLog[a.team].pop();renderScore();}
   else if(a.type==='rotout'){var r=G.rots[a.name][a.q];r.history.pop();if(a.side==='off')r.offSnaps=Math.max(0,r.offSnaps-1);else r.defSnaps=Math.max(0,r.defSnaps-1);r.onField=a.side;renderRots();}
   else if(a.type==='rotin'){
@@ -5293,7 +5383,7 @@ function openEditGame(id,ev){
     var isAbsent=absentList.indexOf(name)>=0;
     var st=(!isAbsent&&game.playerStats[name])||{};
     var absent=isAbsent?'absent':'';
-    var isQB=name===game.qb;
+    var isQB=name===game.qb||((st.qbTDs||0)+(st.qbInts||0)+(st.qbConvs||0))>0;
     var quick=isQB
       ?[['qbTDs','QB TD'],['qbInts','QB INT'],['qbConvs','QB 2PT'],['flags','Flag']]
       :[['tds','TD'],['catches','Catch'],['flags','Flag'],['ints','INT']];
@@ -6288,6 +6378,7 @@ function renderStatCard(name, savedGame){
     allScores.forEach(function(m,i){if(m.name===name)rank=i;});
     dateStr2=savedGame.date?new Date(savedGame.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).toUpperCase():'';
     var st2=savedGame.playerStats[name]||{};
+    if(!isQB&&((st2.qbTDs||0)+(st2.qbInts||0)+(st2.qbConvs||0))>0)isQB=true; // threw earlier in the game
     c=st2.catches||0; t=st2.tds||0; f=st2.flags||0; ii=st2.ints||0;
     cv=st2.conv||0; qbt=st2.qbTDs||0; qbi=st2.qbInts||0; qbc=st2.qbConvs||0;
     fu=st2.fumbles||0; bl=st2.blocks||0; score=st2.score||0;
@@ -6295,7 +6386,7 @@ function renderStatCard(name, savedGame){
     teamName=savedGame.team||'US'; oppName=savedGame.opp||'OPP';
   }else{
     // Live game mode — read from current G.stats
-    isQB=(name===G.qb);
+    isQB=(name===G.qb)||hasQBStats(name);
     us=G.scores.us.reduce(function(a,b){return a+b;},0);
     them=G.scores.them.reduce(function(a,b){return a+b;},0);
     result=us>them?'WIN':us<them?'LOSS':'TIE';
@@ -7179,13 +7270,14 @@ var VIBE_PATTERNS={
   blocks:[15,8,15]
 };
 var _origLogStat=logStat;
-logStat=function(name,key,ev){
-  vibe(VIBE_PATTERNS[key]||[10],ev);
-  // Penalty buzzer for negative stats (Pro)
-  if(isPro()&&(key==='fumbles'||key==='qbInts'||key==='flags')){playPenaltySound();}
+logStat=function(name,key,ev,delta){
+  var removing=(delta||1)<0;
+  vibe(removing?[8]:(VIBE_PATTERNS[key]||[10]),ev);
+  // Penalty buzzer for negative stats (Pro) — not when removing a mistaken tap
+  if(!removing&&isPro()&&(key==='fumbles'||key==='qbInts'||key==='flags')){playPenaltySound();}
   // Flash the button that was tapped
   if(ev&&ev.target){ev.target.classList.remove('stat-btn-flash');void ev.target.offsetWidth;ev.target.classList.add('stat-btn-flash');}
-  _origLogStat(name,key,ev);
+  _origLogStat(name,key,ev,delta);
   syncPush();
 };
 var _origAddScore=addScore;
