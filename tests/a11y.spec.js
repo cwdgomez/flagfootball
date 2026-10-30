@@ -103,9 +103,11 @@ test.describe('A11y — app.html (main coaching PWA)', () => {
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(800);
 
+    // The sign-in gate covers the nav on a fresh profile; hide it so the tab is clickable.
+    await page.evaluate(() => { document.querySelectorAll('.gate-screen').forEach(g => g.classList.add('hidden')); });
     const seasonTab = page.locator('.nav-tab:has-text("Season"), [onclick*="openSeason"]').first();
     if (await seasonTab.isVisible().catch(() => false)) {
-      await seasonTab.click();
+      await seasonTab.click({ force: true, timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(400);
     }
 

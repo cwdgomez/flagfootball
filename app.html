@@ -5991,9 +5991,11 @@ function toggleRosterQB(idx){
 }
 function addRosterPlayer(){
   // Generate a unique placeholder (the old scheme produced 'Player X.' for every player past #9)
-  var used={};LIVE_ROSTER.forEach(function(p){used[(p.name||'').toLowerCase()]=1;});
+  // Set, not a plain object: names can come from a shared ?roster= link, and a plain {} keyed by
+  // user text is a prototype-pollution sink (CodeQL "remote property injection").
+  var used=new Set();LIVE_ROSTER.forEach(function(p){used.add((p.name||'').toLowerCase());});
   var n=LIVE_ROSTER.length+1,nm;
-  do{nm='Player '+(n<=26?String.fromCharCode(64+n):n)+'.';n++;}while(used[nm.toLowerCase()]);
+  do{nm='Player '+(n<=26?String.fromCharCode(64+n):n)+'.';n++;}while(used.has(nm.toLowerCase()));
   LIVE_ROSTER.push({name:nm,num:0});
   renderRosterScreen();
 }
@@ -6009,8 +6011,8 @@ function saveRoster(){
   if(hasBlank){showToast('Fill in all player names');return;}
   // Names are the primary key for stats — two identical names would silently merge into one
   // player (roster says 11, game shows 10, stats combined).
-  var seen={},dupe=null;
-  LIVE_ROSTER.forEach(function(p){var k=(p.name||'').trim().toLowerCase();if(seen[k]&&!dupe)dupe=p.name;seen[k]=1;});
+  var seen=new Set(),dupe=null;
+  LIVE_ROSTER.forEach(function(p){var k=(p.name||'').trim().toLowerCase();if(seen.has(k)&&!dupe)dupe=p.name;seen.add(k);});
   if(dupe){showToast('⚠️ Duplicate name: "'+dupe+'" — add a last initial to tell them apart');return;}
   LIVE_ROSTER.forEach(function(p){p.name=(p.name||'').trim();});
   LIVE_ROSTER=sortRoster(LIVE_ROSTER); // always alphabetized once saved

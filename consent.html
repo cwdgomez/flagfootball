@@ -22,7 +22,7 @@
 :root{
   --p:#AA0000;--p2:#770000;--s:#FFD700;--s2:#CC9900;
   --dark:#080808;--dark2:#111;--dark3:#1a1a1a;--dark4:#242424;--sur:#181818;
-  --txt:#f2f2f2;--dim:#888;--dimmer:#767676;
+  --txt:#f2f2f2;--dim:#888;--dimmer:#8f8f8f;
   --green:#22C55E;--teal:#14B8A6;
   --gold:#FFD700;
 }
@@ -36,7 +36,7 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;
 /* HEADER */
 .form-hdr{text-align:center;padding:24px 0 20px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:24px;}
 .form-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:6px;color:var(--s);}
-.form-logo span{color:var(--p);}
+.form-logo span{color:#ff3b3b;}
 .form-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;
   letter-spacing:3px;text-transform:uppercase;color:var(--txt);margin-top:10px;}
 .form-sub{font-size:13px;color:var(--dim);margin-top:6px;line-height:1.5;}
@@ -152,6 +152,8 @@ body{font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;
   outline-offset:3px;
   border-radius:12px;
 }
+/* ── a11y: WCAG 2.1 AA contrast (axe color-contrast / link-in-text-block) ── */
+p a,li a,.sec a,.form-footer a,label a{text-decoration:underline !important;text-underline-offset:2px;text-decoration-thickness:1px;}
 </style>
 </head>
 <body>
